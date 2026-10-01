@@ -629,11 +629,20 @@ function Diagnostico() {
                 >
                   <Button
                     size="lg"
-                    className="w-full rounded-sm bg-green-600 px-8 py-6 text-base font-bold text-white shadow-md hover:bg-green-700 sm:text-lg"
+                    className="w-full rounded-sm bg-green-600 px-8 py-6 text-base font-bold text-white shadow-md hover:bg-green-700 sm:text-lg cursor-pointer transition-colors"
                   >
-                    💬 Falar com o consultor no WhatsApp
+                    Concluir diagnóstico
                   </Button>
                 </a>
+                <div className="mt-4">
+                  <button
+                    type="button"
+                    onClick={reiniciar}
+                    className="text-xs text-gray-500 underline hover:text-gray-800 transition-colors cursor-pointer"
+                  >
+                    Refazer diagnóstico
+                  </button>
+                </div>
                 <p className="mt-3 text-xs text-gray-500">
                   Atendimento direto e personalizado no WhatsApp (81 9754-3716). Sem custo e sem
                   compromisso.
