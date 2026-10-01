@@ -5,7 +5,6 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
-import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 const AZUL = '#0A1F38'
@@ -457,15 +456,17 @@ const PERGUNTAS = [
 function Diagnostico() {
   const [etapa, setEtapa] = useState(0)
   const [respostas, setRespostas] = useState<Record<string, string>>({})
-  const [dadosOk, setDadosOk] = useState(false)
-  const [nome, setNome] = useState('')
-  const [whats, setWhats] = useState('')
 
   const concluido = etapa >= PERGUNTAS.length
 
   const responder = (q: string, r: string) => {
     setRespostas((prev) => ({ ...prev, [q]: r }))
     setEtapa((e) => e + 1)
+  }
+
+  const reiniciar = () => {
+    setRespostas({})
+    setEtapa(0)
   }
 
   const faixaParaCredito: Record<string, number> = {
@@ -491,7 +492,7 @@ function Diagnostico() {
     }))
     .sort((a, b) => a.total - b.total)
 
-  const msgDiagnostico = `Olá! Acabei de completar o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\n\nQuero falar com o especialista e realizar meu sonho.`
+  const msgDiagnostico = `Olá! Acabei de finalizar o diagnóstico no site da Consórcio C Consulting Group e gostaria de falar com um consultor.\n\nMeu perfil:\n• Objetivo: ${respostas.objetivo ?? '-'}\n• Bem: ${respostas.bem ?? '-'}\n• Faixa de valor: ${respostas.valor ?? '-'}\n• Contemplação: ${respostas.prazo ?? '-'}\n• Parcela no orçamento: ${respostas.parcela ?? '-'}\n• Decisão: ${respostas.urgencia ?? '-'}\n\nGostaria de receber a cotação oficial para o meu perfil!`
 
   return (
     <section id="diagnostico" className="w-full px-4 py-16" style={{ background: AZUL }}>
@@ -501,7 +502,7 @@ function Diagnostico() {
         </p>
         <h2 className="mt-2 text-3xl font-bold text-white">Diagnóstico + cotação completa</h2>
         <p className="mt-2 text-sm text-white/70">
-          6 perguntas rápidas. No final, montamos seu perfil e nosso especialista cota entre as
+          6 perguntas rápidas. No final, montamos seu perfil e nosso consultor cota entre as
           principais administradoras para entregar o melhor preço, prazo e condição para o seu
           sonho.
         </p>
@@ -541,13 +542,23 @@ function Diagnostico() {
             </>
           )}
 
-          {concluido && !dadosOk && (
+          {concluido && (
             <>
-              <span className="inline-block rounded-sm bg-green-700 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                Perfil gerado
-              </span>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="inline-block rounded-sm bg-green-700 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
+                  ✓ Perfil gerado
+                </span>
+                <button
+                  type="button"
+                  onClick={reiniciar}
+                  className="text-xs text-gray-500 underline hover:text-gray-800 transition-colors"
+                >
+                  Refazer diagnóstico
+                </button>
+              </div>
+
               <h3 className="mt-4 text-xl font-bold" style={{ color: AZUL }}>
-                Diagnóstico concluído. Este é o seu perfil:
+                Diagnóstico concluído! Este é o seu perfil:
               </h3>
               <div className="mt-4 grid gap-2 rounded-sm bg-gray-50 p-4 text-sm text-gray-700 sm:grid-cols-2">
                 <div>
@@ -569,6 +580,7 @@ function Diagnostico() {
                   <strong>Decisão:</strong> {respostas.urgencia}
                 </div>
               </div>
+
               <h4 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
                 Prévia do comparativo (crédito de {fmtBRL(credito)}, 48x)
               </h4>
@@ -579,14 +591,14 @@ function Diagnostico() {
                     className="flex items-center justify-between rounded-sm border p-3"
                     style={
                       i === 0
-                        ? { borderColor: AZUL_MEDIO, borderWidth: 2 }
+                        ? { borderColor: AZUL_MEDIO, borderWidth: 2, background: '#f0f6f0' }
                         : { borderColor: '#e5e7eb' }
                     }
                   >
                     <span className="text-sm font-semibold" style={{ color: AZUL }}>
                       {i === 0 && (
                         <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                          MELHOR
+                          MELHOR PREÇO
                         </span>
                       )}
                       {o.nome}
@@ -597,81 +609,37 @@ function Diagnostico() {
                   </div>
                 ))}
               </div>
-              <div className="mt-8 border-t pt-6">
-                <h4 className="font-bold" style={{ color: AZUL }}>
-                  Falta um passo para falar com o especialista
-                </h4>
-                <p className="mt-1 text-sm text-gray-600">
-                  Deixe seu nome e WhatsApp para levarmos o seu diagnóstico direto para a conversa.
-                </p>
-                <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                  <div>
-                    <Label htmlFor="nome">Nome</Label>
-                    <Input
-                      id="nome"
-                      value={nome}
-                      onChange={(e) => setNome(e.target.value)}
-                      placeholder="Seu nome"
-                      className="mt-1"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="whats">WhatsApp</Label>
-                    <Input
-                      id="whats"
-                      value={whats}
-                      onChange={(e) => setWhats(e.target.value)}
-                      placeholder="(81) 9 9999-9999"
-                      className="mt-1"
-                    />
-                  </div>
+
+              <div className="mt-8 rounded-sm border-2 border-green-600/30 bg-green-50/50 p-6 text-center">
+                <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-3xl text-green-700">
+                  ✓
                 </div>
-                <Button
-                  className="mt-4 w-full rounded-sm font-semibold text-white"
-                  style={{ background: AZUL_MEDIO }}
-                  disabled={!nome || whats.length < 8}
-                  onClick={() => setDadosOk(true)}
+                <h4 className="text-xl font-bold" style={{ color: AZUL }}>
+                  Fale agora direto com nosso consultor
+                </h4>
+                <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
+                  Seu perfil já está pronto. Toque no botão abaixo para iniciar a conversa no
+                  WhatsApp com todos os dados preenchidos, sem precisar preencher formulários.
+                </p>
+                <a
+                  href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-5 block"
                 >
-                  Concluir diagnóstico
-                </Button>
+                  <Button
+                    size="lg"
+                    className="w-full rounded-sm bg-green-600 px-8 py-6 text-base font-bold text-white shadow-md hover:bg-green-700 sm:text-lg"
+                  >
+                    💬 Falar com o consultor no WhatsApp
+                  </Button>
+                </a>
+                <p className="mt-3 text-xs text-gray-500">
+                  Atendimento direto e personalizado no WhatsApp (81 9754-3716). Sem custo e sem
+                  compromisso.
+                </p>
               </div>
             </>
-          )}
-
-          {concluido && dadosOk && (
-            <div className="py-6 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-                ✓
-              </div>
-              <h3 className="mt-5 text-2xl font-bold" style={{ color: AZUL }}>
-                Diagnóstico completo, {nome.split(' ')[0]}!
-              </h3>
-              <p className="mx-auto mt-3 max-w-md text-base font-medium text-gray-700">
-                Fale direto com o nosso especialista e{' '}
-                <strong style={{ color: AZUL }}>ainda hoje</strong> dê o primeiro passo para
-                realizar o seu sonho.
-              </p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-                O seu perfil já está pronto na nossa mão. É só tocar no botão abaixo — a conversa
-                abre com tudo o que você respondeu, sem repetir nada.
-              </p>
-              <a
-                href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 block"
-              >
-                <Button
-                  size="lg"
-                  className="w-full rounded-sm bg-green-600 px-8 py-6 text-lg font-bold text-white hover:bg-green-700"
-                >
-                  💬 Falar agora com o especialista no WhatsApp
-                </Button>
-              </a>
-              <p className="mt-3 text-xs text-gray-400">
-                Atendimento humano, sem custo e sem compromisso. O seu sonho não pode esperar.
-              </p>
-            </div>
           )}
         </div>
       </div>
