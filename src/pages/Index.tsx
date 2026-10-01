@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label'
 
 const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
+const WHATS_CONSULTOR = '558197543716'
 
 /* Taxa média de administração total (% do crédito) — BCB, maio/2026, ponderada por cotas ativas */
 const TAXAS: Record<
@@ -131,7 +132,7 @@ function Caminhos() {
     },
     {
       titulo: 'Diagnóstico + Cotação',
-      desc: 'Nosso carro-chefe: um diagnóstico guiado entende seu objetivo e nosso motor cota todas as administradoras para achar a melhor condição.',
+      desc: 'Um diagnóstico guiado entende seu objetivo e nosso time cota todas as administradoras para achar a melhor condição para você.',
       cta: 'Começar diagnóstico',
       href: '#diagnostico',
       destaque: true,
@@ -323,7 +324,13 @@ function Simulador() {
               prazo; não inclui fundo de reserva, seguro ou reajustes). A cotação oficial é feita
               com a administradora, com condições do dia.
             </p>
-            <a href="#lead">
+            <a
+              href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(
+                `Olá! Simulei um consórcio de ${bem.label.toLowerCase()} no site da C Consulting Group.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\n\nQuero a cotação oficial com essas condições.`,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <Button
                 className="mt-4 w-full rounded-sm font-semibold text-white"
                 style={{ background: AZUL_MEDIO }}
@@ -427,7 +434,7 @@ function Diagnostico() {
     <section id="diagnostico" className="w-full px-4 py-16" style={{ background: AZUL }}>
       <div className="mx-auto max-w-3xl">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          Nosso carro-chefe
+          Atendimento personalizado
         </p>
         <h2 className="mt-2 text-3xl font-bold text-white">Diagnóstico + cotação completa</h2>
         <p className="mt-2 text-sm text-white/70">
@@ -560,7 +567,14 @@ function Diagnostico() {
                   className="mt-4 w-full rounded-sm font-semibold text-white"
                   style={{ background: AZUL_MEDIO }}
                   disabled={!nome || whats.length < 8}
-                  onClick={() => setEnviado(true)}
+                  onClick={() => {
+                    const msg = `Olá! Acabei de fazer o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\n\nQuero receber minha cotação oficial.`
+                    window.open(
+                      `https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msg)}`,
+                      '_blank',
+                    )
+                    setEnviado(true)
+                  }}
                 >
                   Quero minha cotação oficial
                 </Button>
