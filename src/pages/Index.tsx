@@ -618,8 +618,8 @@ function Diagnostico() {
                   Fale agora direto com nosso consultor
                 </h4>
                 <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-                  Seu perfil já está pronto. Toque no botão abaixo para iniciar a conversa no
-                  WhatsApp com todos os dados preenchidos, sem precisar preencher formulários.
+                  Seu diagnóstico está pronto. Toque no botão abaixo para iniciar a conversa no
+                  WhatsApp com o consultor especialista já com todas as suas informações resumidas.
                 </p>
                 <a
                   href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
