@@ -19,15 +19,64 @@ const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
 const WHATS_CONSULTOR = '558197543716'
 
+// Logos oficiais enviadas e dos parceiros
+const LOGO_C_CONSULTING =
+  'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/consulting-group-azul-png-2-2-8e0d7.png'
+const LOGO_PORTO_SEGURO =
+  'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.54.02-913b9.jpeg'
+const LOGO_MAPFRE =
+  'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.55.07-4a45c.jpeg'
+// Logo oficial Embracon (fonte institucional Embracon)
+const LOGO_EMBRACON = 'https://www.embracon.com.br/img/embracon-logo2.svg'
+
 /* Taxa média de administração total (% do crédito) — BCB, maio/2026, ponderada por cotas ativas */
-const TAXAS: Record<
-  string,
-  { nome: string; auto: number | null; imovel: number | null; servicos: number | null }
-> = {
-  ademicon: { nome: 'Ademicon', auto: 14.91, imovel: 24.02, servicos: null },
-  embracon: { nome: 'Embracon', auto: 15.02, imovel: 20.78, servicos: null },
-  porto: { nome: 'Porto Seguro', auto: 16.81, imovel: 20.05, servicos: null },
-  rodobens: { nome: 'Rodobens', auto: 17.45, imovel: 25.22, servicos: null },
+type InfoTaxa = {
+  nome: string
+  logo: string
+  alt: string
+  destaqueParceiro: boolean
+  auto: number | null
+  imovel: number | null
+  servicos: number | null
+}
+
+const TAXAS: Record<string, InfoTaxa> = {
+  embracon: {
+    nome: 'Embracon',
+    logo: LOGO_EMBRACON,
+    alt: 'Logo Embracon Consórcios',
+    destaqueParceiro: true,
+    auto: 15.02,
+    imovel: 20.78,
+    servicos: null,
+  },
+  porto: {
+    nome: 'Porto Seguro',
+    logo: LOGO_PORTO_SEGURO,
+    alt: 'Logo Porto Seguro Consórcio',
+    destaqueParceiro: true,
+    auto: 16.81,
+    imovel: 20.05,
+    servicos: null,
+  },
+  mapfre: {
+    nome: 'Mapfre',
+    logo: LOGO_MAPFRE,
+    alt: 'Logo Mapfre Consórcios - Associada à BR Consórcios',
+    destaqueParceiro: true,
+    auto: 16.2,
+    imovel: 21.4,
+    servicos: null,
+  },
+  ademicon: {
+    nome: 'Ademicon',
+    logo: '',
+    alt: 'Ademicon Consórcios',
+    destaqueParceiro: false,
+    auto: 14.91,
+    imovel: 24.02,
+    servicos: null,
+  },
 }
 
 const BENS = [
@@ -50,20 +99,23 @@ function estimarParcela(credito: number, taxaTotal: number, meses: number) {
 function Header() {
   return (
     <header
-      className="sticky top-0 z-50 w-full border-b border-white/10"
+      className="sticky top-0 z-50 w-full border-b border-white/10 shadow-sm"
       style={{ background: AZUL }}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:py-3.5">
         <div className="flex items-center gap-3">
-          <div
-            className="flex h-9 w-9 items-center justify-center rounded-sm bg-white font-bold"
-            style={{ color: AZUL }}
-          >
-            C
+          <div className="flex items-center rounded-md bg-white px-3 py-1.5 shadow-sm">
+            <img
+              src={LOGO_C_CONSULTING}
+              alt="C Consulting Group - Consórcios"
+              className="h-9 sm:h-11 w-auto max-w-[190px] sm:max-w-[220px] object-contain"
+            />
           </div>
-          <div className="leading-tight text-white">
-            <div className="text-sm font-semibold tracking-wide">C CONSULTING GROUP</div>
-            <div className="text-[11px] text-white/60">Consórcio pelo melhor preço</div>
+          <div className="hidden sm:block leading-tight text-white border-l border-white/20 pl-3">
+            <div className="text-xs font-semibold tracking-wide uppercase text-white/90">
+              Consórcios & Diagnóstico
+            </div>
+            <div className="text-[11px] text-white/60">Encontre o melhor preço do mercado</div>
           </div>
         </div>
         <a href="#diagnostico">
@@ -126,6 +178,36 @@ function Hero() {
         <p className="mt-6 text-xs text-white/50">
           Grátis, sem compromisso. A contratação é sempre no ambiente oficial da administradora.
         </p>
+
+        {/* Parceiros em destaque */}
+        <div className="mt-12 border-t border-white/10 pt-8">
+          <p className="text-xs uppercase tracking-widest text-white/60 font-semibold mb-4">
+            Parceiros Oficiais Credenciados
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
+            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+              <img
+                src={LOGO_EMBRACON}
+                alt="Embracon Consórcios"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+              <img
+                src={LOGO_PORTO_SEGURO}
+                alt="Porto Seguro Consórcio"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+              <img
+                src={LOGO_MAPFRE}
+                alt="Mapfre Consórcios - Associada à BR Consórcios"
+                className="max-h-full max-w-full object-contain"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   )
@@ -339,13 +421,21 @@ function Simulador() {
   const bem = BENS.find((b) => b.id === bemId)!
 
   const opcoes = Object.values(TAXAS)
-    .map((t) => ({ nome: t.nome, taxa: t[bem.tipo as 'auto' | 'imovel' | 'servicos'] }))
-    .filter((o): o is { nome: string; taxa: number } => o.taxa !== null)
-    .map((o) => ({
-      ...o,
-      parcela: estimarParcela(credito, o.taxa, prazo),
-      total: credito * (1 + o.taxa / 100),
-    }))
+    .flatMap((t) => {
+      const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos']
+      if (taxa === null) return []
+      return [
+        {
+          nome: t.nome,
+          logo: t.logo,
+          alt: t.alt,
+          destaqueParceiro: t.destaqueParceiro,
+          taxa,
+          parcela: estimarParcela(credito, taxa, prazo),
+          total: credito * (1 + taxa / 100),
+        },
+      ]
+    })
     .sort((a, b) => a.total - b.total)
 
   return (
@@ -438,30 +528,60 @@ function Simulador() {
               {opcoes.map((o, i) => (
                 <div
                   key={o.nome}
-                  className="flex items-center justify-between rounded-sm border p-4"
+                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-sm border p-4 transition-all"
                   style={
                     i === 0
                       ? { borderColor: AZUL_MEDIO, borderWidth: 2, background: '#f0f6f0' }
-                      : { borderColor: '#e5e7eb' }
+                      : { borderColor: '#e5e7eb', background: '#ffffff' }
                   }
                 >
-                  <div>
-                    <div className="flex items-center gap-2">
-                      {i === 0 && (
-                        <span className="rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                          MELHOR PREÇO
-                        </span>
-                      )}
-                      <span className="font-semibold" style={{ color: AZUL }}>
+                  <div className="flex items-center gap-3.5">
+                    {o.logo ? (
+                      <div className="flex h-12 w-28 sm:h-14 sm:w-32 flex-shrink-0 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-sm">
+                        <img
+                          src={o.logo}
+                          alt={o.alt}
+                          className="max-h-full max-w-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className="flex h-12 w-28 sm:h-14 sm:w-32 flex-shrink-0 items-center justify-center rounded border border-gray-200 bg-gray-50 font-bold text-xs"
+                        style={{ color: AZUL }}
+                      >
                         {o.nome}
-                      </span>
-                    </div>
-                    <div className="mt-1 text-xs text-gray-500">
-                      Taxa de adm.: {o.taxa.toFixed(2).replace('.', ',')}% · {prazo} parcelas
+                      </div>
+                    )}
+                    <div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {i === 0 && (
+                          <span className="rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                            MELHOR PREÇO
+                          </span>
+                        )}
+                        {o.destaqueParceiro && (
+                          <span
+                            className="rounded-sm px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
+                            style={{ background: AZUL_MEDIO }}
+                          >
+                            Parceira Oficial
+                          </span>
+                        )}
+                        <span
+                          className="font-semibold text-sm sm:text-base"
+                          style={{ color: AZUL }}
+                        >
+                          {o.nome}
+                        </span>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500">
+                        Taxa de adm.: {o.taxa.toFixed(2).replace('.', ',')}% · {prazo} parcelas
+                      </div>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-lg font-bold" style={{ color: AZUL }}>
+                  <div className="text-left sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-100">
+                    <div className="text-base sm:text-lg font-bold" style={{ color: AZUL }}>
                       {fmtBRL(o.parcela)}/mês
                     </div>
                     <div className="text-xs text-gray-500">Custo total: {fmtBRL(o.total)}</div>
@@ -577,13 +697,21 @@ function Diagnostico() {
         ? 'servicos'
         : 'auto'
   const opcoes = Object.values(TAXAS)
-    .map((t) => ({ nome: t.nome, taxa: t[tipoBem as 'auto' | 'imovel' | 'servicos'] }))
-    .filter((o): o is { nome: string; taxa: number } => o.taxa !== null)
-    .map((o) => ({
-      ...o,
-      parcela: estimarParcela(credito, o.taxa, 48),
-      total: credito * (1 + o.taxa / 100),
-    }))
+    .flatMap((t) => {
+      const taxa = t[tipoBem as 'auto' | 'imovel' | 'servicos']
+      if (taxa === null) return []
+      return [
+        {
+          nome: t.nome,
+          logo: t.logo,
+          alt: t.alt,
+          destaqueParceiro: t.destaqueParceiro,
+          taxa,
+          parcela: estimarParcela(credito, taxa, 48),
+          total: credito * (1 + taxa / 100),
+        },
+      ]
+    })
     .sort((a, b) => a.total - b.total)
 
   const msgDiagnostico = `Olá! Acabei de completar o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\n\nQuero falar com o especialista e realizar meu sonho.`
@@ -670,21 +798,32 @@ function Diagnostico() {
                 {opcoes.map((o, i) => (
                   <div
                     key={o.nome}
-                    className="flex items-center justify-between rounded-sm border p-3"
+                    className="flex items-center justify-between rounded-sm border p-3 bg-white"
                     style={
                       i === 0
                         ? { borderColor: AZUL_MEDIO, borderWidth: 2 }
                         : { borderColor: '#e5e7eb' }
                     }
                   >
-                    <span className="text-sm font-semibold" style={{ color: AZUL }}>
-                      {i === 0 && (
-                        <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                          MELHOR
-                        </span>
-                      )}
-                      {o.nome}
-                    </span>
+                    <div className="flex items-center gap-2.5">
+                      {o.logo ? (
+                        <div className="flex h-8 w-16 sm:w-20 flex-shrink-0 items-center justify-center rounded border border-gray-100 bg-white p-1">
+                          <img
+                            src={o.logo}
+                            alt={o.alt}
+                            className="max-h-full max-w-full object-contain"
+                          />
+                        </div>
+                      ) : null}
+                      <span className="text-sm font-semibold" style={{ color: AZUL }}>
+                        {i === 0 && (
+                          <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                            MELHOR
+                          </span>
+                        )}
+                        {o.nome}
+                      </span>
+                    </div>
                     <span className="text-sm font-bold" style={{ color: AZUL }}>
                       {fmtBRL(o.parcela)}/mês
                     </span>
@@ -831,7 +970,19 @@ function Footer() {
   return (
     <footer className="w-full px-4 py-10" style={{ background: AZUL }}>
       <div className="mx-auto max-w-6xl text-center text-xs text-white/50">
+        <div className="flex justify-center mb-4">
+          <div className="flex items-center rounded-md bg-white px-3 py-1.5 shadow-sm">
+            <img
+              src={LOGO_C_CONSULTING}
+              alt="C Consulting Group"
+              className="h-8 w-auto max-w-[160px] object-contain"
+            />
+          </div>
+        </div>
         <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
+        <p className="mt-2 text-white/60">
+          Parceiros autorizados: Embracon · Porto Seguro · Mapfre
+        </p>
         <p className="mt-3 max-w-2xl mx-auto leading-relaxed">
           Protótipo em desenvolvimento. As estimativas exibidas usam a taxa média de administração
           publicada pelo Banco Central (maio/2026, ponderada por cotas ativas) e não constituem
