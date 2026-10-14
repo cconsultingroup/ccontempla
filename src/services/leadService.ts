@@ -11,6 +11,7 @@ export interface LeadConsorcio {
   prazoContemplacao: string
   parcelaOrcamento: string
   urgencia: string
+  melhorHorarioContato?: string
   creditoEstimado?: number
   origem?: 'diagnostico' | 'simulador' | 'site'
   status?: 'novo' | 'em_atendimento' | 'ganho' | 'perdido'
@@ -38,6 +39,7 @@ function recordToLead(record: Record<string, any>): LeadConsorcio {
     prazoContemplacao: record.prazoContemplacao || '',
     parcelaOrcamento: record.parcelaOrcamento || '',
     urgencia: record.urgencia || '',
+    melhorHorarioContato: record.melhorHorarioContato || '',
     creditoEstimado: record.creditoEstimado ?? undefined,
     origem: (record.origem as LeadConsorcio['origem']) || 'diagnostico',
     status: (record.status as LeadConsorcio['status']) || 'novo',
@@ -74,6 +76,7 @@ export const LeadService = {
                     prazoContemplacao: localLead.prazoContemplacao,
                     parcelaOrcamento: localLead.parcelaOrcamento,
                     urgencia: localLead.urgencia,
+                    melhorHorarioContato: localLead.melhorHorarioContato || '',
                     creditoEstimado: localLead.creditoEstimado,
                     origem: localLead.origem || 'diagnostico',
                     status: localLead.status || 'novo',
@@ -121,7 +124,8 @@ export const LeadService = {
         prazoContemplacao: lead.prazoContemplacao || '',
         parcelaOrcamento: lead.parcelaOrcamento || '',
         urgencia: lead.urgencia || '',
-        creditoEstimado: lead.creditoEstimado || null,
+        melhorHorarioContato: lead.melhorHorarioContato || '',
+        creditoEstimado: lead.creditoEstimado ?? null,
         origem: lead.origem || 'diagnostico',
         status: lead.status || 'novo',
       })
@@ -178,6 +182,7 @@ export const LeadService = {
       'Data/Hora',
       'Nome',
       'WhatsApp/Telefone',
+      'Melhor Horário para Contato',
       'Objetivo',
       'Tipo de Bem',
       'Faixa de Valor',
@@ -191,6 +196,7 @@ export const LeadService = {
       new Date(l.criadoEm).toLocaleString('pt-BR'),
       `"${(l.nome || '').replace(/"/g, '""')}"`,
       `"${(l.telefone || '').replace(/"/g, '""')}"`,
+      `"${(l.melhorHorarioContato || 'Não informado').replace(/"/g, '""')}"`,
       `"${(l.objetivo || '').replace(/"/g, '""')}"`,
       `"${(l.tipoBem || '').replace(/"/g, '""')}"`,
       `"${(l.faixaValor || '').replace(/"/g, '""')}"`,

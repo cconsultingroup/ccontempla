@@ -647,6 +647,7 @@ export default function ParceiroPage() {
                     <th className="py-3 px-4">Data/Hora</th>
                     <th className="py-3 px-4">Cliente</th>
                     <th className="py-3 px-4">WhatsApp</th>
+                    <th className="py-3 px-4">Melhor Horário</th>
                     <th className="py-3 px-4">Bem & Valor</th>
                     <th className="py-3 px-4">Contemplação / Prazo</th>
                     <th className="py-3 px-4">Parcela Desejada</th>
@@ -687,6 +688,11 @@ export default function ParceiroPage() {
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}
+                        </td>
+                        <td className="py-3 px-4 whitespace-nowrap">
+                          <span className="inline-block rounded bg-blue-50 border border-blue-100 px-2 py-0.5 text-[11px] font-medium text-blue-800">
+                            🕐 {lead.melhorHorarioContato || 'Não informado'}
+                          </span>
                         </td>
                         <td className="py-3 px-4">
                           <span className="font-medium text-gray-900">{lead.tipoBem}</span>
@@ -833,6 +839,14 @@ export default function ParceiroPage() {
                     </span>
                     <span className="font-medium">{leadSelecionado.urgencia}</span>
                   </div>
+                  <div className="col-span-2 p-2.5 rounded border border-blue-200 bg-blue-50/60">
+                    <span className="text-[10px] uppercase font-bold text-blue-700 block">
+                      🕐 Melhor Horário para Contato
+                    </span>
+                    <span className="font-semibold text-blue-950 text-xs">
+                      {leadSelecionado.melhorHorarioContato || 'Não informado pelo cliente'}
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -843,7 +857,7 @@ export default function ParceiroPage() {
                 {leadSelecionado.telefone && (
                   <a
                     href={`https://wa.me/55${leadSelecionado.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi seu diagnóstico de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e separei as melhores cartas da Embracon, Mapfre e Porto Seguro para você. Podemos conversar?`,
+                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi seu diagnóstico de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e que você prefere contato no horário: ${leadSelecionado.melhorHorarioContato || 'horário comercial'}. Separei as melhores cartas da Embracon, Mapfre e Porto Seguro para você. Podemos conversar?`,
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

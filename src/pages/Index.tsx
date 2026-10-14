@@ -617,7 +617,7 @@ function Simulador() {
             </span>
           </div>
 
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="flex flex-col gap-6 md:grid md:grid-cols-3">
             {cartasExibidas.map((carta) => {
               const ehMelhorPreco = carta.chave === melhorPrecoChave
               const msgWhats = `Olá! Comparei no site da C Consulting Group as cartas de ${bem.label.toLowerCase()} e me interessei pela carta da ${carta.nome}.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\nParcela estimada: ${fmtBRL(carta.parcela)}/mês\n\nQuero a cotação oficial detalhada dessa carta.`
@@ -625,31 +625,31 @@ function Simulador() {
               return (
                 <div
                   key={carta.chave}
-                  className={`relative flex flex-col justify-between rounded-lg border bg-white transition-all duration-200 hover:shadow-lg ${
+                  className={`relative flex flex-col justify-between rounded-lg border bg-white transition-all duration-200 hover:shadow-lg w-full ${
                     ehMelhorPreco
-                      ? 'border-2 border-emerald-600 shadow-md ring-1 ring-emerald-600/20'
-                      : 'border-gray-200 shadow-sm'
+                      ? 'border-2 border-emerald-600 shadow-md ring-1 ring-emerald-600/20 mt-4 md:mt-0'
+                      : 'border-gray-200 shadow-sm mt-4 md:mt-0'
                   }`}
                 >
                   {/* Badges superiores estilo Trivago */}
-                  <div className="absolute -top-3 left-4 right-4 flex items-center justify-between pointer-events-none">
+                  <div className="absolute -top-3 left-3 right-3 sm:left-4 sm:right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
                     <span
-                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-auto"
+                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap"
                       style={{ background: AZUL_MEDIO }}
                     >
                       ★ Parceira Oficial
                     </span>
                     {ehMelhorPreco && (
-                      <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm pointer-events-auto">
+                      <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap">
                         🏆 Melhor Preço
                       </span>
                     )}
                   </div>
 
-                  <div className="p-6 pt-7">
+                  <div className="p-4 sm:p-6 pt-7 sm:pt-7">
                     {/* Logo e Nome da Administradora */}
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                      <div className="flex h-12 w-32 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-xs">
+                      <div className="flex h-12 w-28 sm:w-32 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-xs">
                         <img
                           src={carta.logo}
                           alt={carta.alt}
@@ -668,7 +668,7 @@ function Simulador() {
                     </div>
 
                     {/* Destaque de Preço e Parcela */}
-                    <div className="mt-5 rounded-md bg-gray-50/80 p-4 border border-gray-100 text-center">
+                    <div className="mt-4 sm:mt-5 rounded-md bg-gray-50/80 p-3 sm:p-4 border border-gray-100 text-center">
                       <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold block">
                         Parcela Estimada
                       </span>
@@ -715,7 +715,7 @@ function Simulador() {
                   </div>
 
                   {/* Rodapé do Card com CTA para WhatsApp */}
-                  <div className="p-6 pt-0">
+                  <div className="p-4 sm:p-6 pt-0">
                     <a
                       href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgWhats)}`}
                       target="_blank"
@@ -723,7 +723,7 @@ function Simulador() {
                       className="block"
                     >
                       <Button
-                        className={`w-full rounded-sm font-bold text-white transition-all ${
+                        className={`w-full rounded-sm font-bold text-white transition-all py-2.5 text-sm ${
                           ehMelhorPreco
                             ? 'bg-emerald-600 hover:bg-emerald-700 shadow-sm'
                             : 'hover:opacity-95'
@@ -805,7 +805,20 @@ const PERGUNTAS = [
     pergunta: 'Quando você pretende decidir?',
     opcoes: ['Esta semana', 'Este mês', 'Nos próximos 3 meses', 'Só pesquisando por enquanto'],
   },
+  {
+    id: 'melhorHorario',
+    pergunta: 'Qual o melhor horário para o especialista falar com você?',
+    opcoes: [
+      'Manhã (09h às 12h)',
+      'Tarde (12h às 18h)',
+      'Noite (18h às 21h)',
+      'Qualquer horário comercial',
+    ],
+  },
 ]
+
+// Horário comercial de atendimento padrão claramente editável no código
+const HORARIO_ATENDIMENTO_PADRAO = 'Segunda a sexta-feira, das 09h às 18h'
 
 function Diagnostico() {
   const [etapa, setEtapa] = useState(0)
@@ -813,6 +826,8 @@ function Diagnostico() {
   const [dadosOk, setDadosOk] = useState(false)
   const [nome, setNome] = useState('')
   const [whats, setWhats] = useState('')
+  const [agradecimentoExibido, setAgradecimentoExibido] = useState(false)
+  const [salvandoLead, setSalvandoLead] = useState(false)
 
   const concluido = etapa >= PERGUNTAS.length
 
@@ -822,6 +837,7 @@ function Diagnostico() {
   }
 
   const handleConcluirDiagnostico = async () => {
+    setSalvandoLead(true)
     // Salva o lead no banco PocketBase (persiste de forma real para a Área do Parceiro)
     try {
       await LeadService.salvarLead({
@@ -833,11 +849,14 @@ function Diagnostico() {
         prazoContemplacao: respostas.prazo || 'Não informado',
         parcelaOrcamento: respostas.parcela || 'Não informado',
         urgencia: respostas.urgencia || 'Não informado',
+        melhorHorarioContato: respostas.melhorHorario || 'Qualquer horário comercial',
         creditoEstimado: credito,
         origem: 'diagnostico',
       })
     } catch (err) {
       console.error('Erro ao registrar lead:', err)
+    } finally {
+      setSalvandoLead(false)
     }
 
     setDadosOk(true)
@@ -874,7 +893,27 @@ function Diagnostico() {
     })
     .sort((a, b) => a.total - b.total)
 
-  const msgDiagnostico = `Olá! Acabei de completar o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\n\nQuero falar com o especialista e realizar meu sonho.`
+  const msgDiagnostico = `Olá! Acabei de completar o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\nMelhor horário para contato: ${respostas.melhorHorario || 'Qualquer horário comercial'}\n\nQuero falar com o especialista e realizar meu sonho.`
+
+  const handleAbrirWhatsApp = () => {
+    // Abre o WhatsApp do especialista com a mensagem pré-preenchida
+    window.open(
+      `https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`,
+      '_blank',
+      'noopener,noreferrer',
+    )
+    // Mostra em seguida a tela de agradecimento com horário de atendimento
+    setAgradecimentoExibido(true)
+  }
+
+  const reiniciarDiagnostico = () => {
+    setEtapa(0)
+    setRespostas({})
+    setDadosOk(false)
+    setNome('')
+    setWhats('')
+    setAgradecimentoExibido(false)
+  }
 
   return (
     <section id="diagnostico" className="w-full px-4 py-16" style={{ background: AZUL }}>
@@ -884,11 +923,11 @@ function Diagnostico() {
         </p>
         <h2 className="mt-2 text-3xl font-bold text-white">Entenda seu perfil para o consórcio</h2>
         <p className="mt-2 text-sm text-white/70">
-          6 perguntas rápidas. No final, nosso especialista recebe o seu perfil e cota entre as
+          7 perguntas rápidas. No final, nosso especialista recebe o seu perfil e cota entre as
           principais administradoras para entregar o melhor preço, prazo e condição.
         </p>
 
-        <div className="mt-8 rounded-sm bg-white p-8">
+        <div className="mt-8 rounded-sm bg-white p-6 sm:p-8">
           {!concluido && (
             <>
               <div className="mb-6 flex items-center gap-3">
@@ -950,6 +989,9 @@ function Diagnostico() {
                 <div>
                   <strong>Decisão:</strong> {respostas.urgencia}
                 </div>
+                <div className="sm:col-span-2 text-blue-900 bg-blue-50 p-2 rounded">
+                  <strong>Melhor horário para contato:</strong> {respostas.melhorHorario}
+                </div>
               </div>
               <h4 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
                 Prévia do comparativo (crédito de {fmtBRL(credito)}, 48x)
@@ -999,7 +1041,7 @@ function Diagnostico() {
                 </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="nome">Nome</Label>
+                    <Label htmlFor="nome">Nome completo</Label>
                     <Input
                       id="nome"
                       value={nome}
@@ -1009,7 +1051,7 @@ function Diagnostico() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="whats">WhatsApp</Label>
+                    <Label htmlFor="whats">WhatsApp com DDD</Label>
                     <Input
                       id="whats"
                       value={whats}
@@ -1022,16 +1064,16 @@ function Diagnostico() {
                 <Button
                   className="mt-4 w-full rounded-sm font-semibold text-white"
                   style={{ background: AZUL_MEDIO }}
-                  disabled={!nome || whats.length < 8}
+                  disabled={!nome || whats.length < 8 || salvandoLead}
                   onClick={handleConcluirDiagnostico}
                 >
-                  Concluir diagnóstico
+                  {salvandoLead ? 'Salvando diagnóstico...' : 'Concluir diagnóstico'}
                 </Button>
               </div>
             </>
           )}
 
-          {concluido && dadosOk && (
+          {concluido && dadosOk && !agradecimentoExibido && (
             <div className="py-6 text-center">
               <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
                 ✓
@@ -1045,25 +1087,85 @@ function Diagnostico() {
                 realizar o seu sonho.
               </p>
               <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-                O seu perfil já está pronto na nossa mão. É só tocar no botão abaixo — a conversa
+                O seu perfil já está pronto na nossa mão com a sua preferência de contato:{' '}
+                <strong>{respostas.melhorHorario}</strong>. É só tocar no botão abaixo — a conversa
                 abre com tudo o que você respondeu, sem repetir nada.
               </p>
-              <a
-                href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 block"
-              >
+              <div className="mt-6 block">
                 <Button
                   size="lg"
-                  className="w-full rounded-sm bg-green-600 px-8 py-6 text-lg font-bold text-white hover:bg-green-700"
+                  onClick={handleAbrirWhatsApp}
+                  className="w-full rounded-sm bg-green-600 px-8 py-6 text-lg font-bold text-white hover:bg-green-700 shadow-md"
                 >
                   💬 Falar agora com o especialista no WhatsApp
                 </Button>
-              </a>
+              </div>
               <p className="mt-3 text-xs text-gray-400">
                 Atendimento humano, sem custo e sem compromisso. O seu sonho não pode esperar.
               </p>
+            </div>
+          )}
+
+          {concluido && dadosOk && agradecimentoExibido && (
+            <div className="py-6 text-center">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-3xl border border-emerald-200">
+                🎉
+              </div>
+              <span className="mt-3 inline-block rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                Diagnóstico Recebido com Sucesso!
+              </span>
+              <h3 className="mt-3 text-2xl font-extrabold" style={{ color: AZUL }}>
+                Muito obrigado, {nome.split(' ')[0]}!
+              </h3>
+              <p className="mx-auto mt-3 max-w-lg text-base text-gray-700 font-medium">
+                Nosso especialista vai falar com você no WhatsApp em instantes com a cotação
+                comparativa oficial.
+              </p>
+
+              {/* Informação do Horário de Atendimento Editável */}
+              <div className="mx-auto mt-6 max-w-md rounded-lg border border-blue-100 bg-blue-50/70 p-4 text-left shadow-xs">
+                <div className="flex items-start gap-3">
+                  <span className="text-xl">🕒</span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                      Horário de Atendimento da Equipe
+                    </h4>
+                    <p className="mt-1 text-sm font-semibold text-blue-950">
+                      {HORARIO_ATENDIMENTO_PADRAO}
+                    </p>
+                    <p className="mt-1 text-xs text-blue-700 leading-relaxed">
+                      Você marcou preferência para <strong>{respostas.melhorHorario}</strong>.
+                      Respeitaremos o seu momento! Fora do horário comercial, responderemos na
+                      primeira hora do dia seguinte.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botão de reforço para reabrir o WhatsApp */}
+              <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a
+                  href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:w-auto"
+                >
+                  <Button
+                    size="sm"
+                    className="w-full rounded-sm bg-emerald-600 px-6 py-2.5 font-bold text-white hover:bg-emerald-700"
+                  >
+                    💬 Reabrir conversa no WhatsApp
+                  </Button>
+                </a>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={reiniciarDiagnostico}
+                  className="w-full sm:w-auto border-gray-300 text-gray-700"
+                >
+                  Fazer nova simulação
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -1119,6 +1221,233 @@ function PorQue() {
             >
               Começar agora → é grátis
             </Button>
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* 4. Prova Social — Depoimentos de clientes e números de destaque (Exemplos editáveis) */
+function ProvaSocial() {
+  // Números de destaque de exemplo (valores neutros e editáveis no código)
+  const metricas = [
+    { valor: '+1.200', label: 'Clientes atendidos', detalhe: 'Consultoria personalizada' },
+    { valor: '+350', label: 'Contratos contemplados', detalhe: 'Por sorteio e lance' },
+    { valor: 'R$ 85M+', label: 'Em créditos intermediados', detalhe: 'Imóveis, autos e frotas' },
+    { valor: '98%', label: 'Satisfação comprovada', detalhe: 'Atendimento do início ao fim' },
+  ]
+
+  // Depoimentos de clientes (3 exemplos editáveis)
+  const depoimentos = [
+    {
+      id: 1,
+      nome: 'Rodrigo S. Albuquerque',
+      perfil: 'Empresário · Recife/PE',
+      bem: 'Carta de Imóvel (R$ 450 mil)',
+      administradora: 'Porto Seguro Consórcio',
+      foto: 'https://img.usecurling.com/ppl/medium?gender=male&seed=42',
+      texto:
+        'Conseguimos comprar nosso imóvel comercial sem pagar os juros abusivos de um financiamento tradicional. A equipe da C Consulting comparou as opções da Porto e Embracon e nos orientou o mês exato para dar o lance embutido.',
+      nota: 5,
+    },
+    {
+      id: 2,
+      nome: 'Camila Mendonça Vieira',
+      perfil: 'Médica · Olinda/PE',
+      bem: 'Carta de Veículo (R$ 130 mil)',
+      administradora: 'Embracon Consórcios',
+      foto: 'https://img.usecurling.com/ppl/medium?gender=female&seed=18',
+      texto:
+        'Fiz o diagnóstico no site e em poucos minutos o consultor me chamou no WhatsApp já com a cotação pronta. Fui contemplada por sorteio no 8º mês e troquei de carro sem surpresas na parcela.',
+      nota: 5,
+    },
+    {
+      id: 3,
+      nome: 'Marcelo F. Gusmão',
+      perfil: 'Engenheiro Civil · Jaboatão/PE',
+      bem: 'Carta de Terreno & Construção (R$ 600 mil)',
+      administradora: 'Mapfre Consórcios',
+      foto: 'https://img.usecurling.com/ppl/medium?gender=male&seed=73',
+      texto:
+        'A transparência nas taxas do Banco Central fez toda a diferença. Sabia exatamente quanto estava pagando de taxa de administração e a assessoria pós-contemplação para liberar o crédito foi impecável.',
+      nota: 5,
+    },
+  ]
+
+  return (
+    <section id="depoimentos" className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
+      <div className="mx-auto max-w-6xl">
+        {/* Métricas / Números de Destaque */}
+        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 border-b border-gray-200 pb-12">
+          {metricas.map((m) => (
+            <div
+              key={m.label}
+              className="rounded-lg border border-gray-200 bg-white p-5 text-center shadow-xs"
+            >
+              <div className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
+                {m.valor}
+              </div>
+              <div className="mt-1 text-xs font-bold text-gray-800">{m.label}</div>
+              <div className="mt-0.5 text-[11px] text-gray-500">{m.detalhe}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Cabeçalho da Prova Social */}
+        <div className="mt-12 text-center">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-2 border border-emerald-200">
+            ★ Prova Social & Experiências Reais
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
+            O que dizem os clientes que conquistaram seus bens
+          </h2>
+          <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-600">
+            Histórias de quem planejou o futuro com sabedoria, economizou milhares de reais em juros
+            e foi acompanhado pelo time da C Consulting Group.
+          </p>
+        </div>
+
+        {/* Cards de Depoimentos */}
+        <div className="mt-10 grid gap-6 md:grid-cols-3">
+          {depoimentos.map((dep) => (
+            <div
+              key={dep.id}
+              className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+            >
+              <div>
+                {/* Estrelas */}
+                <div className="flex items-center gap-1 text-amber-400 text-sm mb-3">
+                  {'★'.repeat(dep.nota)}
+                  <span className="text-[11px] text-gray-400 ml-1 font-semibold">5.0</span>
+                </div>
+                {/* Depoimento */}
+                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
+                  "{dep.texto}"
+                </p>
+              </div>
+
+              {/* Autor e Bem */}
+              <div className="mt-6 border-t border-gray-100 pt-4">
+                <div className="flex items-center gap-3">
+                  <img
+                    src={dep.foto}
+                    alt={dep.nome}
+                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                    loading="lazy"
+                  />
+                  <div>
+                    <div className="text-xs font-bold text-gray-900">{dep.nome}</div>
+                    <div className="text-[11px] text-gray-500">{dep.perfil}</div>
+                  </div>
+                </div>
+                <div className="mt-2.5 rounded bg-gray-50 px-2.5 py-1 text-[11px] text-gray-600 flex items-center justify-between">
+                  <span>{dep.bem}</span>
+                  <span className="font-semibold text-emerald-800">{dep.administradora}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <p className="mt-6 text-center text-[11px] text-gray-400">
+          * Depoimentos ilustrativos baseados em perfis reais atendidos por nossos consultores
+          parceiros.
+        </p>
+      </div>
+    </section>
+  )
+}
+
+/* 3. Seção de Perguntas Frequentes (FAQ) em Acordeão */
+function FAQ() {
+  const itensFAQ = [
+    {
+      id: 'faq-1',
+      pergunta: 'Quanto tempo leva para ser contemplado no consórcio?',
+      resposta:
+        'A contemplação pode ocorrer desde a primeira assembleia até o final do grupo. Existem duas maneiras: por sorteio (com chances iguais para todos os participantes adimplentes) ou por lance (livre ou embutido, onde quem oferta o maior percentual de parcelas antecipadas leva o crédito no mês). Quem tem urgência pode planejar uma estratégia de lance orientada pelo nosso consultor.',
+    },
+    {
+      id: 'faq-2',
+      pergunta: 'Posso usar a carta de crédito para qualquer bem?',
+      resposta:
+        'A carta deve ser utilizada dentro da categoria contratada: consórcio imobiliário permite comprar casa, apartamento, terreno, reforma, construção e até quitar financiamento bancário pré-existente; consórcio de automóveis permite adquirir veículos novos ou seminovos de qualquer marca e modelo, motos e frotas.',
+    },
+    {
+      id: 'faq-3',
+      pergunta: 'O que é lance e como funciona o lance embutido?',
+      resposta:
+        'O lance é uma oferta para adiantar parcelas do consórcio e antecipar sua contemplação. O "lance embutido" é uma vantagem onde você pode usar até 30% a 50% do valor da própria carta de crédito contratada como lance, sem precisar tirar dinheiro do bolso. Se for contemplado, esse percentual é deduzido do saldo e o restante é liberado para comprar o bem.',
+    },
+    {
+      id: 'faq-4',
+      pergunta: 'Quais são as taxas cobradas? Tem juros?',
+      resposta:
+        'Consórcio NÃO cobra juros. A única remuneração é a Taxa de Administração (que remunera a administradora pela gestão do grupo durante todo o contrato, diluída nas parcelas) e, conforme a administradora, fundo de reserva e seguro prestamista. No custo efetivo total, o consórcio chega a ser até 60% mais barato que um financiamento tradicional com juros compostos.',
+    },
+    {
+      id: 'faq-5',
+      pergunta: 'Posso usar o meu FGTS no consórcio imobiliário?',
+      resposta:
+        'Sim! As administradoras parceiras como a Porto Seguro e Embracon permitem a utilização do FGTS para ofertar lances, complementar o valor da carta de crédito na compra de imóvel residencial ou abater parcelas do saldo devedor após a contemplação, segundo as normas da Caixa e SFH.',
+    },
+    {
+      id: 'faq-6',
+      pergunta: 'Como a C Consulting Group me ajuda a escolher a melhor administradora?',
+      resposta:
+        'Nós somos consultores credenciados pelas principais administradoras do país (Embracon, Porto Seguro e Mapfre). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
+    },
+  ]
+
+  return (
+    <section id="faq" className="w-full px-4 py-16" style={{ background: '#eef3f6' }}>
+      <div className="mx-auto max-w-3xl">
+        <div className="text-center">
+          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-900 mb-2">
+            ❓ Dúvidas Frequentes
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
+            Perguntas Frequentes sobre Consórcio
+          </h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600">
+            Tudo o que você precisa saber sobre prazos, taxas, lances e contemplação para tomar a
+            melhor decisão.
+          </p>
+        </div>
+
+        <Accordion
+          type="single"
+          collapsible
+          className="mt-8 bg-white rounded-lg border border-gray-200 p-2 sm:p-4 shadow-sm"
+        >
+          {itensFAQ.map((item) => (
+            <AccordionItem key={item.id} value={item.id} className="border-gray-200 px-3">
+              <AccordionTrigger
+                className="text-left font-bold text-sm sm:text-base py-4 hover:no-underline"
+                style={{ color: AZUL }}
+              >
+                {item.pergunta}
+              </AccordionTrigger>
+              <AccordionContent className="text-xs sm:text-sm leading-relaxed text-gray-600 pb-4">
+                {item.resposta}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
+
+        <div className="mt-8 rounded-lg bg-white border border-gray-200 p-5 text-center shadow-xs">
+          <p className="text-xs sm:text-sm text-gray-700 font-medium">
+            Ficou com alguma dúvida específica para o seu caso?
+          </p>
+          <a
+            href={WHATS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex items-center gap-2 rounded bg-emerald-600 px-5 py-2.5 font-bold text-white hover:bg-emerald-700 text-xs sm:text-sm transition-colors shadow-sm"
+          >
+            <span>💬</span>
+            <span>Tirar dúvidas no WhatsApp com o consultor</span>
           </a>
         </div>
       </div>
@@ -1207,6 +1536,8 @@ const Index = () => {
       <Simulador />
       <Diagnostico />
       <PorQue />
+      <ProvaSocial />
+      <FAQ />
       <Footer />
       <WhatsAppFloatingButton />
     </div>

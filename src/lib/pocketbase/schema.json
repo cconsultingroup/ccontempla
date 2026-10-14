@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-14T18:46:44.332Z",
+  "generatedAt": "2026-10-14T19:39:53.005Z",
   "collections": [
     {
       "name": "users",
@@ -136,6 +136,12 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "melhorHorarioContato",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
