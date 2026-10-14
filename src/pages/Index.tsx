@@ -14,6 +14,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion'
+import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
 
 const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
@@ -26,8 +27,6 @@ const LOGO_PORTO_SEGURO =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.54.02-913b9.jpeg'
 const LOGO_MAPFRE =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.55.07-4a45c.jpeg'
-// Logo oficial Embracon (fonte institucional Embracon)
-const LOGO_EMBRACON = 'https://www.embracon.com.br/img/embracon-logo2.svg'
 
 /* Taxa média de administração total (% do crédito) — BCB, maio/2026, ponderada por cotas ativas */
 type InfoTaxa = {
