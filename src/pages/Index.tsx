@@ -821,10 +821,10 @@ function Diagnostico() {
     setEtapa((e) => e + 1)
   }
 
-  const handleConcluirDiagnostico = () => {
-    // Salva o lead no serviço de leads (persiste para a Área do Parceiro)
+  const handleConcluirDiagnostico = async () => {
+    // Salva o lead no banco PocketBase (persiste de forma real para a Área do Parceiro)
     try {
-      LeadService.salvarLead({
+      await LeadService.salvarLead({
         nome,
         telefone: whats,
         objetivo: respostas.objetivo || 'Não informado',

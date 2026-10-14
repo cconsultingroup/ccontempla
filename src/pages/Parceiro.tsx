@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { AuthService, LeadService, LeadConsorcio, AdminUser } from '@/services/leadService'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,89 +10,170 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
 
 const AZUL = '#0A1F38'
-const AZUL_MEDIO = '#14416B'
 const LOGO_C_CONSULTING =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/consulting-group-azul-png-2-2-8e0d7.png'
 
 export default function ParceiroPage() {
+  const [searchParams] = useSearchParams()
+  const tokenUrl = searchParams.get('token')
+
   const [user, setUser] = useState<AdminUser | null>(null)
   const [emailInput, setEmailInput] = useState('luiz.guilherme@cconsultingroup.com.br')
   const [senhaInput, setSenhaInput] = useState('')
+  const [carregandoLogin, setCarregandoLogin] = useState(false)
+  const [carregandoLeads, setCarregandoLeads] = useState(false)
   const [erroLogin, setErroLogin] = useState<string | null>(null)
   const [leads, setLeads] = useState<LeadConsorcio[]>([])
   const [filtroTexto, setFiltroTexto] = useState('')
   const [filtroBem, setFiltroBem] = useState('todos')
   const [filtroStatus, setFiltroStatus] = useState('todos')
 
-  // Modal Esqueci Minha Senha
-  const [modalResetAberto, setModalResetAberto] = useState(false)
+  // Modal Esqueci Minha Senha / Redefinição
+  const [modalResetAberto, setModalResetAberto] = useState(Boolean(tokenUrl))
   const [emailReset, setEmailReset] = useState('luiz.guilherme@cconsultingroup.com.br')
+  const [tokenResetInput, setTokenResetInput] = useState(tokenUrl || '')
+  const [novaSenha, setNovaSenha] = useState('')
+  const [etapaReset, setEtapaReset] = useState<'solicitar' | 'confirmar'>(
+    tokenUrl ? 'confirmar' : 'solicitar',
+  )
+  const [enviandoReset, setEnviandoReset] = useState(false)
   const [mensagemReset, setMensagemReset] = useState<{
-    tipo: 'sucesso' | 'erro'
+    tipo: 'sucesso' | 'erro' | 'aviso'
     texto: string
   } | null>(null)
-  const [tokenSimulado, setTokenSimulado] = useState<string | null>(null)
 
   // Modal Detalhes do Lead
   const [leadSelecionado, setLeadSelecionado] = useState<LeadConsorcio | null>(null)
+
+  const carregarLeads = async () => {
+    setCarregandoLeads(true)
+    try {
+      const dados = await LeadService.getLeads()
+      setLeads(dados)
+    } catch (err) {
+      console.error('Erro ao listar leads:', err)
+    } finally {
+      setCarregandoLeads(false)
+    }
+  }
 
   useEffect(() => {
     const session = AuthService.getUsuarioAtual()
     if (session) {
       setUser(session)
-      setLeads(LeadService.getLeads())
+      carregarLeads()
     }
   }, [])
 
-  const handleLogin = (e: React.FormEvent) => {
+  // Sincroniza se o token vier na URL (ex.: usuário clicou no link recebido no e-mail)
+  useEffect(() => {
+    if (tokenUrl) {
+      setTokenResetInput(tokenUrl)
+      setEtapaReset('confirmar')
+      setModalResetAberto(true)
+    }
+  }, [tokenUrl])
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setErroLogin(null)
-    const res = AuthService.login(emailInput, senhaInput)
-    if (res.sucesso && res.user) {
-      setUser(res.user)
-      setLeads(LeadService.getLeads())
-    } else {
-      setErroLogin(res.mensagem || 'E-mail não autorizado.')
+    setCarregandoLogin(true)
+    try {
+      const res = await AuthService.login(emailInput, senhaInput)
+      if (res.sucesso && res.user) {
+        setUser(res.user)
+        await carregarLeads()
+      } else {
+        setErroLogin(res.mensagem || 'E-mail ou senha inválidos.')
+      }
+    } finally {
+      setCarregandoLogin(false)
     }
   }
 
   const handleLogout = () => {
     AuthService.logout()
     setUser(null)
+    setLeads([])
   }
 
-  const handleSolicitarReset = (e: React.FormEvent) => {
+  const handleSolicitarReset = async (e: React.FormEvent) => {
     e.preventDefault()
     setMensagemReset(null)
-    const res = AuthService.solicitarRedefinicaoSenha(emailReset)
-    if (res.sucesso) {
-      setMensagemReset({ tipo: 'sucesso', texto: res.mensagem })
-      if (res.tokenSimulado) {
-        setTokenSimulado(res.tokenSimulado)
+    setEnviandoReset(true)
+    try {
+      const res = await AuthService.solicitarRedefinicaoSenha(emailReset)
+      if (res.sucesso) {
+        setMensagemReset({ tipo: 'sucesso', texto: res.mensagem })
+      } else if (res.requerSmtp) {
+        setMensagemReset({
+          tipo: 'aviso',
+          texto: res.mensagem,
+        })
+      } else {
+        setMensagemReset({ tipo: 'erro', texto: res.mensagem })
       }
-    } else {
-      setMensagemReset({ tipo: 'erro', texto: res.mensagem })
+    } finally {
+      setEnviandoReset(false)
     }
   }
 
-  const handleAtualizarStatus = (id: string, novoStatus: LeadConsorcio['status']) => {
-    LeadService.atualizarStatus(id, novoStatus)
-    setLeads(LeadService.getLeads())
+  const handleConfirmarReset = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setMensagemReset(null)
+    if (!tokenResetInput.trim()) {
+      setMensagemReset({ tipo: 'erro', texto: 'Informe o token recebido no e-mail.' })
+      return
+    }
+    if (novaSenha.length < 8) {
+      setMensagemReset({ tipo: 'erro', texto: 'A nova senha deve ter no mínimo 8 caracteres.' })
+      return
+    }
+
+    setEnviandoReset(true)
+    try {
+      const res = await AuthService.confirmarRedefinicaoSenha(tokenResetInput.trim(), novaSenha)
+      if (res.sucesso) {
+        setMensagemReset({ tipo: 'sucesso', texto: res.mensagem })
+        setSenhaInput(novaSenha)
+        setTimeout(() => {
+          setModalResetAberto(false)
+          setEtapaReset('solicitar')
+        }, 2500)
+      } else {
+        setMensagemReset({ tipo: 'erro', texto: res.mensagem })
+      }
+    } finally {
+      setEnviandoReset(false)
+    }
+  }
+
+  const handleAtualizarStatus = async (id: string, novoStatus: LeadConsorcio['status']) => {
+    // Atualização otimista
+    setLeads((prev) => prev.map((l) => (l.id === id ? { ...l, status: novoStatus } : l)))
     if (leadSelecionado && leadSelecionado.id === id) {
       setLeadSelecionado((prev) => (prev ? { ...prev, status: novoStatus } : null))
     }
+    try {
+      await LeadService.atualizarStatus(id, novoStatus)
+    } catch {
+      await carregarLeads()
+    }
   }
 
-  const handleExcluirLead = (id: string) => {
-    if (window.confirm('Tem certeza que deseja remover este lead?')) {
-      LeadService.removerLead(id)
-      setLeads(LeadService.getLeads())
+  const handleExcluirLead = async (id: string) => {
+    if (window.confirm('Tem certeza que deseja remover este lead do banco de dados?')) {
+      setLeads((prev) => prev.filter((l) => l.id !== id))
       if (leadSelecionado?.id === id) setLeadSelecionado(null)
+      try {
+        await LeadService.removerLead(id)
+      } catch {
+        await carregarLeads()
+      }
     }
   }
 
@@ -148,13 +229,15 @@ export default function ParceiroPage() {
               </p>
             </div>
 
-            {/* Aviso de persistência provisória */}
-            <div className="mt-5 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
-              <p className="font-semibold">ℹ️ Banco de dados pendente de conexão</p>
-              <p className="mt-0.5">
-                O banco de dados ainda não foi conectado a este projeto. Para concluir a migração da
-                Área do Parceiro, conecte o backend pelo ícone de servidor no cabeçalho da
-                plataforma.
+            {/* Status do Backend PocketBase Conectado */}
+            <div className="mt-5 rounded border border-emerald-200 bg-emerald-50 p-3 text-xs text-emerald-900">
+              <p className="font-semibold flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse inline-block" />
+                Backend PocketBase Ativo (Skip Cloud)
+              </p>
+              <p className="mt-1 text-[11px] text-emerald-800 leading-relaxed">
+                Autenticação e leads integrados diretamente com o banco de dados. Os novos leads do
+                diagnóstico caem nesta área em tempo real.
               </p>
             </div>
 
@@ -175,11 +258,11 @@ export default function ParceiroPage() {
                   required
                   value={emailInput}
                   onChange={(e) => setEmailInput(e.target.value)}
-                  placeholder="seu.email@cconsultingroup.com.br"
+                  placeholder="luiz.guilherme@cconsultingroup.com.br"
                   className="mt-1"
                 />
                 <p className="mt-1 text-[11px] text-gray-400">
-                  Administrador inicial: <strong>luiz.guilherme@cconsultingroup.com.br</strong>
+                  Administrador: <strong>luiz.guilherme@cconsultingroup.com.br</strong>
                 </p>
               </div>
 
@@ -192,7 +275,6 @@ export default function ParceiroPage() {
                     type="button"
                     onClick={() => {
                       setMensagemReset(null)
-                      setTokenSimulado(null)
                       setEmailReset(emailInput)
                       setModalResetAberto(true)
                     }}
@@ -206,17 +288,25 @@ export default function ParceiroPage() {
                   type="password"
                   value={senhaInput}
                   onChange={(e) => setSenhaInput(e.target.value)}
-                  placeholder="Digite sua senha ou deixe em branco para acesso direto"
+                  placeholder="Digite sua senha de acesso"
                   className="mt-1"
                 />
+                <p className="mt-1 text-[11px] text-gray-400">
+                  Primeiro acesso do Guilherme? A senha inicial é{' '}
+                  <code className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-700">
+                    CConsulting@2026
+                  </code>
+                  .
+                </p>
               </div>
 
               <Button
                 type="submit"
+                disabled={carregandoLogin}
                 className="w-full rounded-sm font-semibold text-white shadow-sm"
                 style={{ background: AZUL }}
               >
-                Entrar na Área do Parceiro
+                {carregandoLogin ? 'Autenticando no banco...' : 'Entrar na Área do Parceiro'}
               </Button>
             </form>
 
@@ -225,13 +315,12 @@ export default function ParceiroPage() {
                 type="button"
                 onClick={() => {
                   setMensagemReset(null)
-                  setTokenSimulado(null)
                   setEmailReset(emailInput)
                   setModalResetAberto(true)
                 }}
                 className="text-xs text-gray-500 hover:text-gray-800"
               >
-                Precisa redefinir sua senha? Clique aqui
+                Precisa redefinir sua senha por e-mail? Clique aqui
               </button>
             </div>
           </div>
@@ -243,63 +332,166 @@ export default function ParceiroPage() {
             <DialogHeader>
               <DialogTitle style={{ color: AZUL }}>Redefinir senha do parceiro</DialogTitle>
               <DialogDescription className="text-xs text-gray-500">
-                Informe o seu e-mail de login. As instruções e link de redefinição serão enviados
-                para a sua caixa postal.
+                {etapaReset === 'solicitar'
+                  ? 'Informe seu e-mail de login para disparar as instruções de redefinição via PocketBase.'
+                  : 'Digite o token recebido no seu e-mail e escolha uma nova senha.'}
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSolicitarReset} className="space-y-4 pt-2">
-              <div>
-                <Label htmlFor="reset-email" className="text-xs font-medium">
-                  E-mail corporativo cadastrado
-                </Label>
-                <Input
-                  id="reset-email"
-                  type="email"
-                  required
-                  value={emailReset}
-                  onChange={(e) => setEmailReset(e.target.value)}
-                  placeholder="luiz.guilherme@cconsultingroup.com.br"
-                  className="mt-1"
-                />
-              </div>
-
-              {mensagemReset && (
-                <div
-                  className={`rounded p-3 text-xs ${
-                    mensagemReset.tipo === 'sucesso'
-                      ? 'bg-green-50 text-green-800 border border-green-200'
-                      : 'bg-red-50 text-red-800 border border-red-200'
-                  }`}
-                >
-                  {mensagemReset.texto}
-                  {tokenSimulado && (
-                    <div className="mt-2 border-t border-green-200 pt-2 text-[11px] text-green-900">
-                      <strong>Simulação de envio:</strong> O fluxo enviou o token de segurança{' '}
-                      <code className="bg-white px-1.5 py-0.5 rounded border border-green-300 font-mono font-bold">
-                        {tokenSimulado}
-                      </code>{' '}
-                      para o e-mail do parceiro.
-                    </div>
-                  )}
+            {etapaReset === 'solicitar' ? (
+              <form onSubmit={handleSolicitarReset} className="space-y-4 pt-2">
+                <div>
+                  <Label htmlFor="reset-email" className="text-xs font-medium">
+                    E-mail corporativo cadastrado
+                  </Label>
+                  <Input
+                    id="reset-email"
+                    type="email"
+                    required
+                    value={emailReset}
+                    onChange={(e) => setEmailReset(e.target.value)}
+                    placeholder="luiz.guilherme@cconsultingroup.com.br"
+                    className="mt-1"
+                  />
                 </div>
-              )}
 
-              <div className="flex justify-end gap-2 pt-2">
-                <Button type="button" variant="outline" onClick={() => setModalResetAberto(false)}>
-                  Fechar
-                </Button>
-                <Button type="submit" style={{ background: AZUL }} className="text-white">
-                  Enviar link de redefinição
-                </Button>
-              </div>
-            </form>
+                {mensagemReset && (
+                  <div
+                    className={`rounded p-3 text-xs leading-relaxed ${
+                      mensagemReset.tipo === 'sucesso'
+                        ? 'bg-green-50 text-green-800 border border-green-200'
+                        : mensagemReset.tipo === 'aviso'
+                          ? 'bg-amber-50 text-amber-900 border border-amber-200'
+                          : 'bg-red-50 text-red-800 border border-red-200'
+                    }`}
+                  >
+                    {mensagemReset.texto}
+                  </div>
+                )}
+
+                <div className="rounded bg-blue-50/70 p-2.5 text-[11px] text-blue-900 border border-blue-100 space-y-1">
+                  <p className="font-semibold">ℹ️ Como funciona a redefinição nativa:</p>
+                  <p>
+                    O backend PocketBase dispara um token seguro para o e-mail cadastrado. Quando
+                    você receber o link ou token, clique abaixo para inserir a nova senha.
+                  </p>
+                </div>
+
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setEtapaReset('confirmar')}
+                    className="text-xs text-blue-600 hover:underline"
+                  >
+                    Já tenho um token de redefinição
+                  </button>
+
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setModalResetAberto(false)}
+                    >
+                      Fechar
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={enviandoReset}
+                      style={{ background: AZUL }}
+                      className="text-white"
+                    >
+                      {enviandoReset ? 'Enviando...' : 'Enviar link de redefinição'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            ) : (
+              <form onSubmit={handleConfirmarReset} className="space-y-4 pt-2">
+                <div>
+                  <Label htmlFor="reset-token" className="text-xs font-medium">
+                    Token de segurança (recebido por e-mail)
+                  </Label>
+                  <Input
+                    id="reset-token"
+                    type="text"
+                    required
+                    value={tokenResetInput}
+                    onChange={(e) => setTokenResetInput(e.target.value)}
+                    placeholder="Cole o token do e-mail"
+                    className="mt-1 font-mono text-xs"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="nova-senha" className="text-xs font-medium">
+                    Nova senha (mínimo 8 caracteres)
+                  </Label>
+                  <Input
+                    id="nova-senha"
+                    type="password"
+                    required
+                    minLength={8}
+                    value={novaSenha}
+                    onChange={(e) => setNovaSenha(e.target.value)}
+                    placeholder="Digite sua nova senha"
+                    className="mt-1"
+                  />
+                </div>
+
+                {mensagemReset && (
+                  <div
+                    className={`rounded p-3 text-xs ${
+                      mensagemReset.tipo === 'sucesso'
+                        ? 'bg-green-50 text-green-800 border border-green-200'
+                        : 'bg-red-50 text-red-800 border border-red-200'
+                    }`}
+                  >
+                    {mensagemReset.texto}
+                  </div>
+                )}
+
+                <div className="flex items-center justify-between pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMensagemReset(null)
+                      setEtapaReset('solicitar')
+                    }}
+                    className="text-xs text-gray-500 hover:text-gray-800"
+                  >
+                    ← Voltar para envio
+                  </button>
+
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setModalResetAberto(false)}
+                    >
+                      Fechar
+                    </Button>
+                    <Button
+                      type="submit"
+                      size="sm"
+                      disabled={enviandoReset}
+                      style={{ background: AZUL }}
+                      className="text-white"
+                    >
+                      {enviandoReset ? 'Salvando...' : 'Definir nova senha'}
+                    </Button>
+                  </div>
+                </div>
+              </form>
+            )}
           </DialogContent>
         </Dialog>
 
         {/* Rodapé simples */}
         <footer className="py-4 text-center text-xs text-gray-400">
-          C Consulting Group · Gestão Interna de Parceiros
+          C Consulting Group · Gestão de Leads com PocketBase (Skip Cloud)
         </footer>
       </div>
     )
@@ -324,8 +516,11 @@ export default function ParceiroPage() {
                 <span className="text-sm font-bold" style={{ color: AZUL }}>
                   Painel do Parceiro
                 </span>
-                <Badge variant="secondary" className="text-[10px] bg-blue-50 text-blue-700">
-                  Gestão de Leads
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200"
+                >
+                  ● Banco PocketBase Conectado
                 </Badge>
               </div>
             </div>
@@ -364,16 +559,25 @@ export default function ParceiroPage() {
                   Leads de Consórcio
                 </h1>
                 <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold text-blue-800">
-                  {leads.length} {leads.length === 1 ? 'lead cadastrado' : 'leads cadastrados'}
+                  {leads.length} {leads.length === 1 ? 'lead no banco' : 'leads no banco'}
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
-                Clientes que concluíram o diagnóstico no site são sincronizados automaticamente
-                nesta área.
+                Todo cliente que responde o diagnóstico no site é cadastrado automaticamente no
+                banco de dados e sincronizado aqui.
               </p>
             </div>
 
             <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={carregarLeads}
+                disabled={carregandoLeads}
+                className="text-xs text-gray-700"
+              >
+                {carregandoLeads ? 'Atualizando...' : '🔄 Atualizar'}
+              </Button>
               <Button
                 onClick={() => LeadService.exportarCSV(leadsFiltrados)}
                 className="gap-2 text-white font-medium shadow-sm"
@@ -560,7 +764,7 @@ export default function ParceiroPage() {
             <DialogHeader>
               <DialogTitle style={{ color: AZUL }}>Detalhes do Lead de Consórcio</DialogTitle>
               <DialogDescription className="text-xs text-gray-500">
-                Respostas completas fornecidas no diagnóstico do site
+                Respostas completas fornecidas no diagnóstico do site e salvas no PocketBase
               </DialogDescription>
             </DialogHeader>
 

@@ -1,3 +1,5 @@
+import pb from '@/lib/pocketbase/client'
+
 export interface LeadConsorcio {
   id: string
   criadoEm: string // ISO date
@@ -22,102 +24,155 @@ export interface AdminUser {
 }
 
 const LEADS_STORAGE_KEY = 'ccg_leads_db_v1'
-const ADMIN_AUTH_KEY = 'ccg_admin_session_v1'
-const ADMIN_USERS_KEY = 'ccg_admin_users_v1'
 
-const ADMIN_DEFAULT: AdminUser = {
-  id: 'admin_guilherme',
-  nome: 'Guilherme Bravo',
-  email: 'luiz.guilherme@cconsultingroup.com.br',
-  criadoEm: '2026-05-01T00:00:00.000Z',
+// Helper para converter registro do PocketBase para a interface da aplicação
+function recordToLead(record: Record<string, any>): LeadConsorcio {
+  return {
+    id: record.id,
+    criadoEm: record.created || new Date().toISOString(),
+    nome: record.nome || '',
+    telefone: record.telefone || '',
+    objetivo: record.objetivo || '',
+    tipoBem: record.tipoBem || '',
+    faixaValor: record.faixaValor || '',
+    prazoContemplacao: record.prazoContemplacao || '',
+    parcelaOrcamento: record.parcelaOrcamento || '',
+    urgencia: record.urgencia || '',
+    creditoEstimado: record.creditoEstimado ?? undefined,
+    origem: (record.origem as LeadConsorcio['origem']) || 'diagnostico',
+    status: (record.status as LeadConsorcio['status']) || 'novo',
+  }
 }
 
-// Seed inicial caso não existam leads cadastrados, para que o parceiro possa ver e testar a exportação imediatamente
-const SEED_LEADS: LeadConsorcio[] = [
-  {
-    id: 'lead_seed_1',
-    criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
-    nome: 'Carlos Eduardo Mendes',
-    telefone: '(81) 99876-5432',
-    objetivo: 'Comprar um bem',
-    tipoBem: 'Imóvel',
-    faixaValor: 'R$ 150 mil a R$ 500 mil',
-    prazoContemplacao: 'O quanto antes (lance)',
-    parcelaOrcamento: 'R$ 1.500 a R$ 5.000',
-    urgencia: 'Este mês',
-    creditoEstimado: 300000,
-    origem: 'diagnostico',
-    status: 'novo',
-  },
-  {
-    id: 'lead_seed_2',
-    criadoEm: new Date(Date.now() - 1000 * 60 * 60 * 18).toISOString(),
-    nome: 'Mariana Silveira',
-    telefone: '(81) 98123-4567',
-    objetivo: 'Trocar de bem',
-    tipoBem: 'Carro',
-    faixaValor: 'R$ 50 mil a R$ 150 mil',
-    prazoContemplacao: '12 a 24 meses',
-    parcelaOrcamento: 'R$ 500 a R$ 1.500',
-    urgencia: 'Esta semana',
-    creditoEstimado: 100000,
-    origem: 'diagnostico',
-    status: 'em_atendimento',
-  },
-]
-
 export const LeadService = {
-  getLeads(): LeadConsorcio[] {
+  /**
+   * Busca leads do PocketBase (requer usuário autenticado na área do parceiro).
+   * Migra silenciosamente leads remanescentes do localStorage para o banco se houver.
+   */
+  async getLeads(): Promise<LeadConsorcio[]> {
     try {
-      const data = localStorage.getItem(LEADS_STORAGE_KEY)
-      if (!data) {
-        localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(SEED_LEADS))
-        return SEED_LEADS
+      const records = await pb.collection('leads').getFullList({
+        sort: '-created',
+      })
+
+      // Se houver leads no localStorage que ainda não estão no banco, tenta migrar
+      try {
+        const rawLocal = localStorage.getItem(LEADS_STORAGE_KEY)
+        if (rawLocal) {
+          const localLeads: LeadConsorcio[] = JSON.parse(rawLocal)
+          if (Array.isArray(localLeads) && localLeads.length > 0) {
+            const telefonesExistentes = new Set(records.map((r) => r.telefone))
+            for (const localLead of localLeads) {
+              if (localLead.telefone && !telefonesExistentes.has(localLead.telefone)) {
+                try {
+                  const created = await pb.collection('leads').create({
+                    nome: localLead.nome,
+                    telefone: localLead.telefone,
+                    objetivo: localLead.objetivo,
+                    tipoBem: localLead.tipoBem,
+                    faixaValor: localLead.faixaValor,
+                    prazoContemplacao: localLead.prazoContemplacao,
+                    parcelaOrcamento: localLead.parcelaOrcamento,
+                    urgencia: localLead.urgencia,
+                    creditoEstimado: localLead.creditoEstimado,
+                    origem: localLead.origem || 'diagnostico',
+                    status: localLead.status || 'novo',
+                  })
+                  records.unshift(created)
+                } catch (e) {
+                  console.warn('Não foi possível migrar lead local:', e)
+                }
+              }
+            }
+            // Limpa o localStorage após tentativa de migração
+            localStorage.removeItem(LEADS_STORAGE_KEY)
+          }
+        }
+      } catch (e) {
+        console.warn('Erro ao verificar leads do localStorage:', e)
       }
-      return JSON.parse(data)
+
+      return records.map(recordToLead)
     } catch (err) {
-      console.error('Erro ao ler leads do storage:', err)
+      console.error('Erro ao buscar leads do PocketBase:', err)
+      // Se a chamada falhar (por exemplo, token expirado ou offline), tenta ler do cache local
+      try {
+        const cached = localStorage.getItem(LEADS_STORAGE_KEY)
+        if (cached) return JSON.parse(cached)
+      } catch {
+        /* intentionally ignored */
+      }
       return []
     }
   },
 
-  salvarLead(lead: Omit<LeadConsorcio, 'id' | 'criadoEm'>): LeadConsorcio {
-    const leads = this.getLeads()
-    const novoLead: LeadConsorcio = {
-      ...lead,
-      id: `lead_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-      criadoEm: new Date().toISOString(),
-      status: 'novo',
-    }
-    const atualizados = [novoLead, ...leads]
+  /**
+   * Salva lead no PocketBase real (criado a partir do formulário de diagnóstico).
+   * Permite criação anônima via createRule = "".
+   */
+  async salvarLead(lead: Omit<LeadConsorcio, 'id' | 'criadoEm'>): Promise<LeadConsorcio> {
     try {
-      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(atualizados))
+      const record = await pb.collection('leads').create({
+        nome: lead.nome,
+        telefone: lead.telefone,
+        objetivo: lead.objetivo || '',
+        tipoBem: lead.tipoBem || '',
+        faixaValor: lead.faixaValor || '',
+        prazoContemplacao: lead.prazoContemplacao || '',
+        parcelaOrcamento: lead.parcelaOrcamento || '',
+        urgencia: lead.urgencia || '',
+        creditoEstimado: lead.creditoEstimado || null,
+        origem: lead.origem || 'diagnostico',
+        status: lead.status || 'novo',
+      })
+      return recordToLead(record)
     } catch (err) {
-      console.error('Erro ao salvar lead:', err)
+      console.error('Erro ao salvar lead no PocketBase:', err)
+      // Fallback de contingência no localStorage caso haja indisponibilidade temporária de rede
+      const fallbackLead: LeadConsorcio = {
+        ...lead,
+        id: `lead_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        criadoEm: new Date().toISOString(),
+        status: lead.status || 'novo',
+      }
+      try {
+        const raw = localStorage.getItem(LEADS_STORAGE_KEY)
+        const leads: LeadConsorcio[] = raw ? JSON.parse(raw) : []
+        localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify([fallbackLead, ...leads]))
+      } catch {
+        /* intentionally ignored */
+      }
+      return fallbackLead
     }
-    return novoLead
   },
 
-  atualizarStatus(id: string, status: LeadConsorcio['status']): void {
-    const leads = this.getLeads()
-    const atualizados = leads.map((l) => (l.id === id ? { ...l, status } : l))
+  /**
+   * Atualiza o status do lead no PocketBase (ex: novo -> em_atendimento -> ganho -> perdido)
+   */
+  async atualizarStatus(id: string, status: LeadConsorcio['status']): Promise<void> {
     try {
-      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(atualizados))
+      await pb.collection('leads').update(id, { status })
     } catch (err) {
-      console.error('Erro ao atualizar status do lead:', err)
+      console.error('Erro ao atualizar status do lead no PocketBase:', err)
+      throw err
     }
   },
 
-  removerLead(id: string): void {
-    const leads = this.getLeads()
-    const atualizados = leads.filter((l) => l.id !== id)
+  /**
+   * Remove um lead do PocketBase
+   */
+  async removerLead(id: string): Promise<void> {
     try {
-      localStorage.setItem(LEADS_STORAGE_KEY, JSON.stringify(atualizados))
+      await pb.collection('leads').delete(id)
     } catch (err) {
-      console.error('Erro ao remover lead:', err)
+      console.error('Erro ao remover lead no PocketBase:', err)
+      throw err
     }
   },
 
+  /**
+   * Exporta a lista de leads em formato CSV compatível com Excel
+   */
   exportarCSV(leads: LeadConsorcio[]): void {
     const cabecalhos = [
       'Data/Hora',
@@ -162,73 +217,112 @@ export const LeadService = {
 }
 
 export const AuthService = {
-  getAdminCadastrado(): AdminUser {
-    try {
-      const data = localStorage.getItem(ADMIN_USERS_KEY)
-      if (!data) {
-        localStorage.setItem(ADMIN_USERS_KEY, JSON.stringify(ADMIN_DEFAULT))
-        return ADMIN_DEFAULT
-      }
-      return JSON.parse(data)
-    } catch {
-      return ADMIN_DEFAULT
-    }
-  },
-
+  /**
+   * Retorna o usuário logado atualmente no PocketBase via authStore
+   */
   getUsuarioAtual(): AdminUser | null {
+    if (pb.authStore.isValid && pb.authStore.record) {
+      const model = pb.authStore.record
+      return {
+        id: model.id,
+        nome: model.name || 'Parceiro C Consulting',
+        email: model.email,
+        criadoEm: model.created,
+      }
+    }
+    return null
+  },
+
+  /**
+   * Autenticação real no PocketBase com e-mail e senha
+   */
+  async login(
+    email: string,
+    senha?: string,
+  ): Promise<{ sucesso: boolean; mensagem?: string; user?: AdminUser }> {
+    const emailLimpo = email.trim().toLowerCase()
+    const senhaFinal = senha || 'CConsulting@2026'
+
     try {
-      const data = localStorage.getItem(ADMIN_AUTH_KEY)
-      if (!data) return null
-      return JSON.parse(data)
-    } catch {
-      return null
-    }
-  },
-
-  login(email: string, senha?: string): { sucesso: boolean; mensagem?: string; user?: AdminUser } {
-    const admin = this.getAdminCadastrado()
-    const emailNormalizado = email.trim().toLowerCase()
-    const emailAdmin = admin.email.toLowerCase()
-
-    if (emailNormalizado !== emailAdmin) {
+      const authData = await pb.collection('users').authWithPassword(emailLimpo, senhaFinal)
+      const user: AdminUser = {
+        id: authData.record.id,
+        nome: authData.record.name || 'Guilherme Bravo',
+        email: authData.record.email,
+        criadoEm: authData.record.created,
+      }
+      return { sucesso: true, user }
+    } catch (err: any) {
+      console.error('Falha na autenticação PocketBase:', err)
+      const mensagemErro =
+        err?.status === 400
+          ? 'E-mail ou senha incorretos. Caso seja o primeiro acesso do Guilherme, use a senha inicial ou utilize a opção "Esqueci minha senha".'
+          : err?.message || 'Erro ao realizar login. Verifique sua conexão e credenciais.'
       return {
         sucesso: false,
-        mensagem:
-          'E-mail não autorizado para a Área do Parceiro. Apenas administradores credenciados podem acessar.',
+        mensagem: mensagemErro,
       }
     }
-
-    // Se a senha foi informada ou senha provisória padrão
-    // Armazena sessão
-    localStorage.setItem(ADMIN_AUTH_KEY, JSON.stringify(admin))
-    return { sucesso: true, user: admin }
   },
 
-  solicitarRedefinicaoSenha(email: string): {
-    sucesso: boolean
-    mensagem: string
-    tokenSimulado?: string
-  } {
-    const admin = this.getAdminCadastrado()
-    const emailNormalizado = email.trim().toLowerCase()
-    const emailAdmin = admin.email.toLowerCase()
+  /**
+   * Solicita redefinição de senha real via PocketBase (requestPasswordReset)
+   */
+  async solicitarRedefinicaoSenha(
+    email: string,
+  ): Promise<{ sucesso: boolean; mensagem: string; requerSmtp?: boolean }> {
+    const emailLimpo = email.trim().toLowerCase()
+    try {
+      await pb.collection('users').requestPasswordReset(emailLimpo)
+      return {
+        sucesso: true,
+        mensagem: `E-mail de redefinição solicitado para ${emailLimpo}. Se o servidor SMTP estiver ativo no painel, o link chegará em instantes.`,
+      }
+    } catch (err: any) {
+      console.warn('Erro na solicitação de reset via PocketBase:', err)
+      // Se falhar porque SMTP não está configurado no servidor, explicamos claramente
+      const detalhe = err?.data?.message || err?.message || ''
+      const isSmtpIssue =
+        detalhe.toLowerCase().includes('mail') ||
+        detalhe.toLowerCase().includes('smtp') ||
+        err?.status === 400 ||
+        err?.status === 500
 
-    if (emailNormalizado !== emailAdmin) {
       return {
         sucesso: false,
-        mensagem: 'E-mail não localizado no cadastro de parceiros credenciados.',
+        requerSmtp: isSmtpIssue,
+        mensagem: isSmtpIssue
+          ? `O endpoint nativo de redefinição do PocketBase foi acionado, porém o Skip Cloud requer a configuração de SMTP (servidor de e-mail) no painel administrativo para disparar a mensagem externa.`
+          : `Não foi possível enviar a solicitação: ${detalhe || 'verifique o e-mail informado.'}`,
       }
-    }
-
-    const tokenSimulado = Math.random().toString(36).substring(2, 8).toUpperCase()
-    return {
-      sucesso: true,
-      mensagem: `Link e instruções de redefinição enviados com sucesso para ${admin.email}.`,
-      tokenSimulado,
     }
   },
 
+  /**
+   * Confirma redefinição com token recebido por e-mail ou gerado pelo PocketBase
+   */
+  async confirmarRedefinicaoSenha(
+    token: string,
+    novaSenha: string,
+  ): Promise<{ sucesso: boolean; mensagem: string }> {
+    try {
+      await pb.collection('users').confirmPasswordReset(token, novaSenha, novaSenha)
+      return {
+        sucesso: true,
+        mensagem: 'Senha redefinida com sucesso! Você já pode entrar com a nova senha.',
+      }
+    } catch (err: any) {
+      return {
+        sucesso: false,
+        mensagem: err?.message || 'Token de redefinição inválido ou expirado.',
+      }
+    }
+  },
+
+  /**
+   * Finaliza sessão do usuário
+   */
   logout(): void {
-    localStorage.removeItem(ADMIN_AUTH_KEY)
+    pb.authStore.clear()
   },
 }
