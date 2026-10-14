@@ -21,7 +21,18 @@ export interface AdminUser {
   id: string
   nome: string
   email: string
+  role: 'admin' | 'consultor'
   criadoEm: string
+}
+
+export interface ConsultorItem {
+  id: string
+  name: string
+  email: string
+  role: 'admin' | 'consultor'
+  verified: boolean
+  created: string
+  updated?: string
 }
 
 const LEADS_STORAGE_KEY = 'ccg_leads_db_v1'
@@ -229,10 +240,16 @@ export const AuthService = {
   getUsuarioAtual(): AdminUser | null {
     if (pb.authStore.isValid && pb.authStore.record) {
       const model = pb.authStore.record
+      const email = model.email || ''
+      const role =
+        model.role === 'admin' || email === 'luiz.guilherme@cconsultingroup.com.br'
+          ? 'admin'
+          : 'consultor'
       return {
         id: model.id,
         nome: model.name || 'Parceiro C Consulting',
-        email: model.email,
+        email: email,
+        role: role,
         criadoEm: model.created,
       }
     }
@@ -247,14 +264,20 @@ export const AuthService = {
     senha?: string,
   ): Promise<{ sucesso: boolean; mensagem?: string; user?: AdminUser }> {
     const emailLimpo = email.trim().toLowerCase()
-    const senhaFinal = senha || 'CConsulting@2026'
+    const senhaFinal = senha || ''
 
     try {
       const authData = await pb.collection('users').authWithPassword(emailLimpo, senhaFinal)
+      const role =
+        authData.record.role === 'admin' ||
+        authData.record.email === 'luiz.guilherme@cconsultingroup.com.br'
+          ? 'admin'
+          : 'consultor'
       const user: AdminUser = {
         id: authData.record.id,
         nome: authData.record.name || 'Guilherme Bravo',
         email: authData.record.email,
+        role: role,
         criadoEm: authData.record.created,
       }
       return { sucesso: true, user }
@@ -262,7 +285,7 @@ export const AuthService = {
       console.error('Falha na autenticação PocketBase:', err)
       const mensagemErro =
         err?.status === 400
-          ? 'E-mail ou senha incorretos. Caso seja o primeiro acesso do Guilherme, use a senha inicial ou utilize a opção "Esqueci minha senha".'
+          ? 'E-mail ou senha incorretos. Verifique suas credenciais de acesso ou solicite redefinição ao administrador.'
           : err?.message || 'Erro ao realizar login. Verifique sua conexão e credenciais.'
       return {
         sucesso: false,
@@ -330,5 +353,91 @@ export const AuthService = {
    */
   logout(): void {
     pb.authStore.clear()
+  },
+
+  /**
+   * Gestão de consultores pelo Administrador Guilherme (sem requerer envio de e-mail)
+   */
+  async listarConsultores(): Promise<ConsultorItem[]> {
+    try {
+      const res = await pb.send<{ items: ConsultorItem[] }>('/backend/v1/ccg/consultores', {
+        method: 'GET',
+      })
+      return res.items || []
+    } catch (err) {
+      console.error('Erro ao listar consultores:', err)
+      throw err
+    }
+  },
+
+  async criarConsultor(dados: {
+    nome: string
+    email: string
+    senhaInicial: string
+  }): Promise<{ sucesso: boolean; mensagem: string; id?: string }> {
+    try {
+      const res = await pb.send<{ mensagem: string; id: string }>('/backend/v1/ccg/consultores', {
+        method: 'POST',
+        body: {
+          name: dados.nome.trim(),
+          email: dados.email.trim().toLowerCase(),
+          password: dados.senhaInicial.trim(),
+        },
+      })
+      return {
+        sucesso: true,
+        mensagem: res.mensagem || 'Consultor cadastrado com sucesso!',
+        id: res.id,
+      }
+    } catch (err: any) {
+      console.error('Erro ao criar consultor:', err)
+      const msg = err?.data?.message || err?.message || 'Não foi possível cadastrar o consultor.'
+      return { sucesso: false, mensagem: msg }
+    }
+  },
+
+  async redefinirSenhaConsultor(
+    userId: string,
+    novaSenha: string,
+  ): Promise<{ sucesso: boolean; mensagem: string }> {
+    try {
+      const res = await pb.send<{ mensagem: string; sucesso: boolean }>(
+        '/backend/v1/ccg/consultores/reset-password',
+        {
+          method: 'POST',
+          body: {
+            userId,
+            newPassword: novaSenha.trim(),
+          },
+        },
+      )
+      return {
+        sucesso: true,
+        mensagem: res.mensagem || 'Senha redefinida com sucesso!',
+      }
+    } catch (err: any) {
+      console.error('Erro ao redefinir senha do consultor:', err)
+      const msg = err?.data?.message || err?.message || 'Não foi possível redefinir a senha.'
+      return { sucesso: false, mensagem: msg }
+    }
+  },
+
+  async excluirConsultor(userId: string): Promise<{ sucesso: boolean; mensagem: string }> {
+    try {
+      const res = await pb.send<{ mensagem: string; sucesso: boolean }>(
+        `/backend/v1/ccg/consultores/${encodeURIComponent(userId)}`,
+        {
+          method: 'DELETE',
+        },
+      )
+      return {
+        sucesso: true,
+        mensagem: res.mensagem || 'Consultor removido com sucesso.',
+      }
+    } catch (err: any) {
+      console.error('Erro ao excluir consultor:', err)
+      const msg = err?.data?.message || err?.message || 'Não foi possível excluir o consultor.'
+      return { sucesso: false, mensagem: msg }
+    }
   },
 }

@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { AuthService, LeadService, LeadConsorcio, AdminUser } from '@/services/leadService'
+import {
+  AuthService,
+  LeadService,
+  LeadConsorcio,
+  AdminUser,
+  ConsultorItem,
+} from '@/services/leadService'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -49,6 +55,31 @@ export default function ParceiroPage() {
   // Modal Detalhes do Lead
   const [leadSelecionado, setLeadSelecionado] = useState<LeadConsorcio | null>(null)
 
+  // Gestão de Consultores (Exclusivo Administrador)
+  const [consultores, setConsultores] = useState<ConsultorItem[]>([])
+  const [carregandoConsultores, setCarregandoConsultores] = useState(false)
+  const [modalNovoConsultor, setModalNovoConsultor] = useState(false)
+  const [novoNome, setNovoNome] = useState('')
+  const [novoEmail, setNovoEmail] = useState('')
+  const [novaSenhaConsultor, setNovaSenhaConsultor] = useState('')
+  const [salvandoNovoConsultor, setSalvandoNovoConsultor] = useState(false)
+  const [erroNovoConsultor, setErroNovoConsultor] = useState<string | null>(null)
+
+  // Modal Redefinir Senha de Consultor (Direto pelo painel, sem SMTP)
+  const [consultorParaReset, setConsultorParaReset] = useState<ConsultorItem | null>(null)
+  const [senhaRedefinidaManual, setSenhaRedefinidaManual] = useState('')
+  const [salvandoResetManual, setSalvandoResetManual] = useState(false)
+  const [mensagemResetManual, setMensagemResetManual] = useState<{
+    tipo: 'sucesso' | 'erro'
+    texto: string
+  } | null>(null)
+
+  // Feedback geral de operações de consultores
+  const [alertaConsultores, setAlertaConsultores] = useState<{
+    tipo: 'sucesso' | 'erro'
+    texto: string
+  } | null>(null)
+
   const carregarLeads = async () => {
     setCarregandoLeads(true)
     try {
@@ -61,11 +92,26 @@ export default function ParceiroPage() {
     }
   }
 
+  const carregarConsultores = async () => {
+    setCarregandoConsultores(true)
+    try {
+      const lista = await AuthService.listarConsultores()
+      setConsultores(lista)
+    } catch (err) {
+      console.error('Erro ao carregar consultores:', err)
+    } finally {
+      setCarregandoConsultores(false)
+    }
+  }
+
   useEffect(() => {
     const session = AuthService.getUsuarioAtual()
     if (session) {
       setUser(session)
       carregarLeads()
+      if (session.role === 'admin') {
+        carregarConsultores()
+      }
     }
   }, [])
 
@@ -87,6 +133,9 @@ export default function ParceiroPage() {
       if (res.sucesso && res.user) {
         setUser(res.user)
         await carregarLeads()
+        if (res.user.role === 'admin') {
+          await carregarConsultores()
+        }
       } else {
         setErroLogin(res.mensagem || 'E-mail ou senha inválidos.')
       }
@@ -99,6 +148,124 @@ export default function ParceiroPage() {
     AuthService.logout()
     setUser(null)
     setLeads([])
+    setConsultores([])
+  }
+
+  const handleCriarConsultor = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setErroNovoConsultor(null)
+
+    if (!novoNome.trim()) {
+      setErroNovoConsultor('Informe o nome completo do consultor.')
+      return
+    }
+    if (!novoEmail.trim() || !novoEmail.includes('@')) {
+      setErroNovoConsultor('Informe um e-mail válido.')
+      return
+    }
+    if (novaSenhaConsultor.length < 8) {
+      setErroNovoConsultor('A senha inicial deve conter pelo menos 8 caracteres.')
+      return
+    }
+
+    setSalvandoNovoConsultor(true)
+    try {
+      const res = await AuthService.criarConsultor({
+        nome: novoNome,
+        email: novoEmail,
+        senhaInicial: novaSenhaConsultor,
+      })
+      if (res.sucesso) {
+        setAlertaConsultores({
+          tipo: 'sucesso',
+          texto: `Consultor ${novoNome} (${novoEmail}) cadastrado com sucesso! Senha inicial pronta para uso.`,
+        })
+        setNovoNome('')
+        setNovoEmail('')
+        setNovaSenhaConsultor('')
+        setModalNovoConsultor(false)
+        await carregarConsultores()
+      } else {
+        setErroNovoConsultor(res.mensagem)
+      }
+    } finally {
+      setSalvandoNovoConsultor(false)
+    }
+  }
+
+  const handleExecutarResetManual = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!consultorParaReset) return
+    setMensagemResetManual(null)
+
+    if (senhaRedefinidaManual.length < 8) {
+      setMensagemResetManual({
+        tipo: 'erro',
+        texto: 'A nova senha deve ter no mínimo 8 caracteres.',
+      })
+      return
+    }
+
+    setSalvandoResetManual(true)
+    try {
+      const res = await AuthService.redefinirSenhaConsultor(
+        consultorParaReset.id,
+        senhaRedefinidaManual,
+      )
+      if (res.sucesso) {
+        setMensagemResetManual({
+          tipo: 'sucesso',
+          texto: res.mensagem,
+        })
+        setAlertaConsultores({
+          tipo: 'sucesso',
+          texto: `Senha de ${consultorParaReset.name} redefinida com sucesso! O consultor já pode logar com a nova senha.`,
+        })
+        setTimeout(() => {
+          setConsultorParaReset(null)
+          setSenhaRedefinidaManual('')
+          setMensagemResetManual(null)
+        }, 1800)
+      } else {
+        setMensagemResetManual({ tipo: 'erro', texto: res.mensagem })
+      }
+    } finally {
+      setSalvandoResetManual(false)
+    }
+  }
+
+  const handleExcluirConsultor = async (consultor: ConsultorItem) => {
+    if (consultor.email === 'luiz.guilherme@cconsultingroup.com.br') {
+      alert('Não é permitido excluir a conta do administrador principal.')
+      return
+    }
+    if (user && consultor.id === user.id) {
+      alert('Você não pode excluir sua própria conta.')
+      return
+    }
+
+    const confirmou = window.confirm(
+      `Tem certeza que deseja excluir o acesso de "${consultor.name}" (${consultor.email})? Esta ação não pode ser desfeita.`,
+    )
+    if (!confirmou) return
+
+    try {
+      const res = await AuthService.excluirConsultor(consultor.id)
+      if (res.sucesso) {
+        setAlertaConsultores({
+          tipo: 'sucesso',
+          texto: `Consultor ${consultor.name} removido com sucesso.`,
+        })
+        await carregarConsultores()
+      } else {
+        setAlertaConsultores({ tipo: 'erro', texto: res.mensagem })
+      }
+    } catch (err: any) {
+      setAlertaConsultores({
+        tipo: 'erro',
+        texto: err?.message || 'Erro ao remover consultor.',
+      })
+    }
   }
 
   const handleSolicitarReset = async (e: React.FormEvent) => {
@@ -292,11 +459,10 @@ export default function ParceiroPage() {
                   className="mt-1"
                 />
                 <p className="mt-1 text-[11px] text-gray-400">
-                  Primeiro acesso do Guilherme? A senha inicial é{' '}
+                  Senha do administrador Guilherme:{' '}
                   <code className="font-mono bg-gray-100 px-1 py-0.5 rounded text-gray-700">
-                    CConsulting@2026
+                    Pna20020
                   </code>
-                  .
                 </p>
               </div>
 
@@ -369,11 +535,15 @@ export default function ParceiroPage() {
                   </div>
                 )}
 
-                <div className="rounded bg-blue-50/70 p-2.5 text-[11px] text-blue-900 border border-blue-100 space-y-1">
-                  <p className="font-semibold">ℹ️ Como funciona a redefinição nativa:</p>
-                  <p>
-                    O backend PocketBase dispara um token seguro para o e-mail cadastrado. Quando
-                    você receber o link ou token, clique abaixo para inserir a nova senha.
+                <div className="rounded bg-amber-50 p-3 text-[11px] text-amber-950 border border-amber-200 space-y-1.5">
+                  <p className="font-semibold flex items-center gap-1.5">
+                    <span>⚠️</span> Aviso sobre redefinição por e-mail:
+                  </p>
+                  <p className="leading-relaxed">
+                    O envio de e-mails automáticos requer a configuração do servidor SMTP no Skip
+                    Cloud. Caso não receba o e-mail,{' '}
+                    <strong>solicite ao administrador (Guilherme Bravo)</strong> a redefinição
+                    direta da sua senha pelo painel, sem depender de e-mail.
                   </p>
                 </div>
 
@@ -528,7 +698,16 @@ export default function ParceiroPage() {
 
           <div className="flex items-center gap-3">
             <div className="text-right hidden sm:block">
-              <div className="text-xs font-semibold text-gray-800">{user.nome}</div>
+              <div className="flex items-center gap-1.5 justify-end">
+                <span className="text-xs font-semibold text-gray-800">{user.nome}</span>
+                {user.role === 'admin' ? (
+                  <Badge className="bg-[#0A1F38] text-[10px] text-white">Administrador</Badge>
+                ) : (
+                  <Badge variant="outline" className="text-[10px] text-gray-600 border-gray-300">
+                    Consultor
+                  </Badge>
+                )}
+              </div>
               <div className="text-[11px] text-gray-500">{user.email}</div>
             </div>
             <Link to="/">
@@ -549,7 +728,173 @@ export default function ParceiroPage() {
       </header>
 
       {/* Conteúdo Principal */}
-      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
+        {/* SEÇÃO EXCLUSIVA DO ADMINISTRADOR: GERENCIAR CONSULTORES */}
+        {user.role === 'admin' && (
+          <section className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-gray-100 pb-4">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-xl">👥</span>
+                  <h2 className="text-lg font-bold" style={{ color: AZUL }}>
+                    Gerenciar Consultores da Área do Parceiro
+                  </h2>
+                  <Badge className="bg-blue-100 text-blue-800 text-[10px] hover:bg-blue-100">
+                    Acesso Admin
+                  </Badge>
+                </div>
+                <p className="mt-1 text-xs text-gray-600">
+                  Crie novos logins de consultores, redefina senhas diretamente pelo painel (sem
+                  depender de e-mail/SMTP) e gerencie quem pode acessar esta área.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={carregarConsultores}
+                  disabled={carregandoConsultores}
+                  className="text-xs text-gray-700"
+                >
+                  {carregandoConsultores ? 'Carregando...' : '🔄 Atualizar'}
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setErroNovoConsultor(null)
+                    setModalNovoConsultor(true)
+                  }}
+                  className="text-xs font-semibold text-white shadow-sm gap-1.5"
+                  style={{ background: AZUL }}
+                >
+                  <span>＋</span> Novo Consultor
+                </Button>
+              </div>
+            </div>
+
+            {/* Mensagem de alerta de sucesso/erro para operações de consultores */}
+            {alertaConsultores && (
+              <div
+                className={`mt-4 rounded p-3 text-xs flex items-center justify-between ${
+                  alertaConsultores.tipo === 'sucesso'
+                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                    : 'bg-red-50 text-red-800 border border-red-200'
+                }`}
+              >
+                <span>{alertaConsultores.texto}</span>
+                <button
+                  type="button"
+                  onClick={() => setAlertaConsultores(null)}
+                  className="font-bold ml-2 hover:opacity-75"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+
+            {/* Tabela de Consultores */}
+            <div className="mt-4 overflow-x-auto rounded border border-gray-100">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-gray-50 text-gray-600 font-semibold uppercase tracking-wider border-b border-gray-200">
+                  <tr>
+                    <th className="py-2.5 px-4">Nome do Consultor</th>
+                    <th className="py-2.5 px-4">E-mail de Login</th>
+                    <th className="py-2.5 px-4">Função / Perfil</th>
+                    <th className="py-2.5 px-4">Status</th>
+                    <th className="py-2.5 px-4">Cadastrado em</th>
+                    <th className="py-2.5 px-4 text-right">Ações Rápidas</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-100 text-gray-700">
+                  {consultores.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-6 text-center text-gray-500">
+                        {carregandoConsultores
+                          ? 'Carregando lista de consultores...'
+                          : 'Nenhum usuário encontrado.'}
+                      </td>
+                    </tr>
+                  ) : (
+                    consultores.map((c) => {
+                      const isMainAdmin = c.email === 'luiz.guilherme@cconsultingroup.com.br'
+                      const isSelf = c.id === user.id
+                      const criadoFormatado = c.created
+                        ? new Date(c.created).toLocaleDateString('pt-BR')
+                        : '—'
+
+                      return (
+                        <tr key={c.id} className="hover:bg-gray-50/70 transition-colors">
+                          <td className="py-3 px-4 font-semibold text-gray-900 whitespace-nowrap">
+                            {c.name || 'Sem nome'}
+                            {isMainAdmin && (
+                              <span className="ml-2 text-[10px] font-normal text-gray-400">
+                                (Você / Dono)
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 text-gray-600 font-mono text-[11px] whitespace-nowrap">
+                            {c.email}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            {c.role === 'admin' || isMainAdmin ? (
+                              <Badge className="bg-[#0A1F38] text-[10px] text-white">
+                                Administrador
+                              </Badge>
+                            ) : (
+                              <Badge
+                                variant="secondary"
+                                className="bg-gray-100 text-[10px] text-gray-700"
+                              >
+                                Consultor
+                              </Badge>
+                            )}
+                          </td>
+                          <td className="py-3 px-4 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 text-[11px] text-emerald-700 font-medium">
+                              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500 inline-block" />
+                              Ativo
+                            </span>
+                          </td>
+                          <td className="py-3 px-4 text-gray-500 text-[11px] whitespace-nowrap">
+                            {criadoFormatado}
+                          </td>
+                          <td className="py-3 px-4 text-right whitespace-nowrap">
+                            <div className="inline-flex items-center gap-1.5">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  setConsultorParaReset(c)
+                                  setSenhaRedefinidaManual('')
+                                  setMensagemResetManual(null)
+                                }}
+                                className="h-7 text-[11px] border-blue-200 text-blue-700 hover:bg-blue-50"
+                              >
+                                🔑 Redefinir Senha
+                              </Button>
+
+                              {!isMainAdmin && !isSelf && (
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleExcluirConsultor(c)}
+                                  className="h-7 text-[11px] text-red-600 hover:text-red-800 hover:bg-red-50"
+                                >
+                                  Excluir
+                                </Button>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
         {/* Banner de Boas-vindas e Ações */}
         <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -759,6 +1104,166 @@ export default function ParceiroPage() {
           )}
         </div>
       </main>
+
+      {/* Modal: Novo Consultor */}
+      <Dialog open={modalNovoConsultor} onOpenChange={setModalNovoConsultor}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle style={{ color: AZUL }}>Cadastrar Novo Consultor</DialogTitle>
+            <DialogDescription className="text-xs text-gray-500">
+              O consultor receberá acesso imediato à Área do Parceiro com a senha inicial definida
+              aqui, sem precisar depender de e-mail de ativação.
+            </DialogDescription>
+          </DialogHeader>
+
+          <form onSubmit={handleCriarConsultor} className="space-y-4 pt-2">
+            {erroNovoConsultor && (
+              <div className="rounded bg-red-50 p-2.5 text-xs text-red-700 border border-red-200">
+                {erroNovoConsultor}
+              </div>
+            )}
+
+            <div>
+              <Label htmlFor="novo-nome" className="text-xs font-semibold text-gray-700">
+                Nome completo
+              </Label>
+              <Input
+                id="novo-nome"
+                type="text"
+                required
+                value={novoNome}
+                onChange={(e) => setNovoNome(e.target.value)}
+                placeholder="Ex: João da Silva"
+                className="mt-1 text-xs"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="novo-email" className="text-xs font-semibold text-gray-700">
+                E-mail corporativo de login
+              </Label>
+              <Input
+                id="novo-email"
+                type="email"
+                required
+                value={novoEmail}
+                onChange={(e) => setNovoEmail(e.target.value)}
+                placeholder="Ex: joao@cconsultingroup.com.br"
+                className="mt-1 text-xs"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="nova-senha-consultor" className="text-xs font-semibold text-gray-700">
+                Senha inicial de acesso (mínimo 8 caracteres)
+              </Label>
+              <Input
+                id="nova-senha-consultor"
+                type="text"
+                required
+                minLength={8}
+                value={novaSenhaConsultor}
+                onChange={(e) => setNovaSenhaConsultor(e.target.value)}
+                placeholder="Ex: Consultor@2026"
+                className="mt-1 text-xs font-mono"
+              />
+              <p className="mt-1 text-[11px] text-gray-400">
+                Você pode passar esta senha diretamente para o consultor.
+              </p>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setModalNovoConsultor(false)}
+                disabled={salvandoNovoConsultor}
+              >
+                Cancelar
+              </Button>
+              <Button
+                type="submit"
+                size="sm"
+                disabled={salvandoNovoConsultor}
+                style={{ background: AZUL }}
+                className="text-white font-semibold"
+              >
+                {salvandoNovoConsultor ? 'Salvando...' : 'Cadastrar Consultor'}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Modal: Redefinir Senha do Consultor pelo Painel Admin */}
+      <Dialog
+        open={Boolean(consultorParaReset)}
+        onOpenChange={(aberto) => !aberto && setConsultorParaReset(null)}
+      >
+        {consultorParaReset && (
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle style={{ color: AZUL }}>Redefinir Senha do Consultor</DialogTitle>
+              <DialogDescription className="text-xs text-gray-500">
+                Defina uma nova senha para <strong>{consultorParaReset.name}</strong> (
+                {consultorParaReset.email}). A alteração tem efeito imediato e dispensa e-mail/SMTP.
+              </DialogDescription>
+            </DialogHeader>
+
+            <form onSubmit={handleExecutarResetManual} className="space-y-4 pt-2">
+              {mensagemResetManual && (
+                <div
+                  className={`rounded p-2.5 text-xs ${
+                    mensagemResetManual.tipo === 'sucesso'
+                      ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                      : 'bg-red-50 text-red-800 border border-red-200'
+                  }`}
+                >
+                  {mensagemResetManual.texto}
+                </div>
+              )}
+
+              <div>
+                <Label htmlFor="nova-senha-manual" className="text-xs font-semibold text-gray-700">
+                  Nova senha (mínimo 8 caracteres)
+                </Label>
+                <Input
+                  id="nova-senha-manual"
+                  type="text"
+                  required
+                  minLength={8}
+                  value={senhaRedefinidaManual}
+                  onChange={(e) => setSenhaRedefinidaManual(e.target.value)}
+                  placeholder="Digite a nova senha do consultor"
+                  className="mt-1 text-xs font-mono"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-gray-100">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setConsultorParaReset(null)}
+                  disabled={salvandoResetManual}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  size="sm"
+                  disabled={salvandoResetManual}
+                  style={{ background: AZUL }}
+                  className="text-white font-semibold"
+                >
+                  {salvandoResetManual ? 'Salvando...' : 'Salvar Nova Senha'}
+                </Button>
+              </div>
+            </form>
+          </DialogContent>
+        )}
+      </Dialog>
 
       {/* Modal de Detalhes do Lead */}
       <Dialog
