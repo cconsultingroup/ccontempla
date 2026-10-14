@@ -4,6 +4,7 @@
    CTAs: "Entender meu perfil para o consórcio" (diagnóstico) e "Já sei o bem que quero comprar → simular melhores condições" (simulador).
    Fonte das taxas: Banco Central — taxa média de administração ponderada por cotas ativas (maio/2026) */
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Input } from '@/components/ui/input'
@@ -15,10 +16,12 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
+import { LeadService } from '@/services/leadService'
 
 const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
 const WHATS_CONSULTOR = '558197543716'
+const WHATS_URL = `https://wa.me/${WHATS_CONSULTOR}`
 
 // Logos oficiais enviadas e dos parceiros
 const LOGO_C_CONSULTING =
@@ -117,15 +120,31 @@ function Header() {
             <div className="text-[11px] text-white/60">Encontre o melhor preço do mercado</div>
           </div>
         </div>
-        <a href="#diagnostico">
-          <Button
-            size="sm"
-            className="rounded-sm bg-white font-medium hover:bg-white/90"
-            style={{ color: AZUL }}
+        <div className="flex items-center gap-2 sm:gap-3">
+          <a
+            href={WHATS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label="Falar no WhatsApp com o parceiro"
           >
-            Fazer diagnóstico
-          </Button>
-        </a>
+            <Button
+              size="sm"
+              className="rounded-sm bg-emerald-600 font-semibold text-white hover:bg-emerald-500 shadow-sm flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm"
+            >
+              <span>💬</span>
+              <span>Falar no WhatsApp</span>
+            </Button>
+          </a>
+          <a href="#diagnostico" className="hidden sm:inline-block">
+            <Button
+              size="sm"
+              className="rounded-sm bg-white font-medium hover:bg-white/90"
+              style={{ color: AZUL }}
+            >
+              Fazer diagnóstico
+            </Button>
+          </a>
+        </div>
       </div>
     </header>
   )
@@ -414,204 +433,324 @@ function Caminhos() {
 }
 
 function Simulador() {
-  const [bemId, setBemId] = useState('moto')
-  const [credito, setCredito] = useState(20000)
-  const [prazo, setPrazo] = useState(48)
-  const bem = BENS.find((b) => b.id === bemId)!
+  const [bemId, setBemId] = useState('imovel')
+  const [credito, setCredito] = useState(300000)
+  const [prazo, setPrazo] = useState(72)
+  const [cartasSelecionada, setCartasSelecionada] = useState<
+    'todas' | 'embracon' | 'mapfre' | 'porto'
+  >('todas')
+  const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
-  const opcoes = Object.values(TAXAS)
-    .flatMap((t) => {
-      const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos']
-      if (taxa === null) return []
-      return [
-        {
-          nome: t.nome,
-          logo: t.logo,
-          alt: t.alt,
-          destaqueParceiro: t.destaqueParceiro,
-          taxa,
-          parcela: estimarParcela(credito, taxa, prazo),
-          total: credito * (1 + taxa / 100),
-        },
-      ]
-    })
-    .sort((a, b) => a.total - b.total)
+  // As 3 administradoras parceiras solicitadas (Embracon, Mapfre e Porto Seguro)
+  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'mapfre'] as const
+
+  const cartas = PARCEIRAS_CHAVE.map((chave) => {
+    const t = TAXAS[chave]
+    const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos'] ?? 20.0
+    const parcela = estimarParcela(credito, taxa, prazo)
+    const total = credito * (1 + taxa / 100)
+
+    // Diferenciais específicos por administradora para o comparador Trivago
+    const diferenciais: Record<string, { selo: string; destaque: boolean; vantagens: string[] }> = {
+      embracon: {
+        selo: 'Maior flexibilidade de lances',
+        destaque: chave === 'embracon',
+        vantagens: [
+          'Opção de lance embutido de até 50%',
+          'Contemplações mensais por sorteio e lance livre',
+          'Atendimento ágil para liberação do crédito',
+        ],
+      },
+      porto: {
+        selo: 'Menor taxa média BCB',
+        destaque: chave === 'porto',
+        vantagens: [
+          'Solidez e tradição do Grupo Porto Seguro',
+          'Possibilidade de usar FGTS no imóvel',
+          'Assessoria pós-contemplação dedicada',
+        ],
+      },
+      mapfre: {
+        selo: 'Ampla rede credenciada',
+        destaque: chave === 'mapfre',
+        vantagens: [
+          'Associada à BR Consórcios',
+          'Prazos estendidos sob medida',
+          'Seguro prestamista opcional integrado',
+        ],
+      },
+    }
+
+    const infoDif = diferenciais[chave]
+
+    return {
+      chave,
+      nome: t.nome,
+      logo: t.logo,
+      alt: t.alt,
+      destaqueParceiro: true,
+      taxa,
+      parcela,
+      total,
+      selo: infoDif.selo,
+      vantagens: infoDif.vantagens,
+    }
+  }).sort((a, b) => a.total - b.total)
+
+  // A primeira é a de menor custo total
+  const melhorPrecoChave = cartas[0]?.chave
+
+  const cartasExibidas =
+    cartasSelecionada === 'todas' ? cartas : cartas.filter((c) => c.chave === cartasSelecionada)
 
   return (
     <section id="simulador" className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
-      <div className="mx-auto max-w-5xl">
-        <p
-          className="text-xs font-semibold uppercase tracking-[0.2em]"
-          style={{ color: AZUL_MEDIO }}
-        >
-          Simulador
-        </p>
-        <h2 className="mt-2 text-3xl font-bold" style={{ color: AZUL }}>
-          Compare as melhores condições
-        </h2>
-        <p className="mt-2 max-w-2xl text-sm text-gray-600">
-          Escolha o bem, o crédito e o prazo. Comparamos as principais administradoras usando a taxa
-          média de administração publicada pelo Banco Central (maio/2026, ponderada por cotas
-          ativas).
-        </p>
+      <div className="mx-auto max-w-6xl">
+        {/* Cabeçalho estilo Comparador Trivago */}
+        <div className="text-center md:text-left md:flex md:items-end md:justify-between border-b border-gray-200 pb-6">
+          <div>
+            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-900 mb-2">
+              <span>🔍</span> Comparador de Cartas · Estilo Trivago
+            </div>
+            <h2 className="text-3xl font-extrabold" style={{ color: AZUL }}>
+              Compare as Cartas de Consórcio Lado a Lado
+            </h2>
+            <p className="mt-2 max-w-2xl text-sm text-gray-600">
+              Acesso direto e transparente às condições oficiais da <strong>Embracon</strong>,{' '}
+              <strong>Mapfre</strong> e <strong>Porto Seguro</strong>. Veja quem oferece a menor
+              parcela e o melhor custo total para o seu objetivo.
+            </p>
+          </div>
+          <div className="mt-4 md:mt-0">
+            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1">
+              ✓ Dados oficiais regulados pelo Banco Central
+            </span>
+          </div>
+        </div>
 
-        <div className="mt-8 grid gap-6 lg:grid-cols-5">
-          <div className="rounded-sm border border-gray-200 bg-white p-6 lg:col-span-2">
-            <Label className="text-xs font-semibold uppercase tracking-wide text-gray-500">
-              1. O bem
-            </Label>
-            <div className="mt-3 grid grid-cols-2 gap-2">
-              {BENS.map((b) => (
-                <button
-                  key={b.id}
-                  onClick={() => {
-                    setBemId(b.id)
-                    setCredito(b.creditoPadrao)
-                  }}
-                  className="rounded-sm border px-4 py-3 text-sm font-medium transition-colors"
-                  style={
-                    bemId === b.id
-                      ? { background: AZUL, color: '#fff', borderColor: AZUL }
-                      : { background: '#fff', color: AZUL, borderColor: '#e5e7eb' }
-                  }
-                >
-                  {b.label}
-                </button>
-              ))}
+        {/* Barra de Filtros / Busca Trivago */}
+        <div className="mt-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+          <div className="grid gap-6 md:grid-cols-12">
+            {/* 1. Escolha do Bem */}
+            <div className="md:col-span-4">
+              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                1. Escolha o Bem
+              </Label>
+              <div className="mt-2 grid grid-cols-2 gap-1.5">
+                {BENS.map((b) => (
+                  <button
+                    key={b.id}
+                    onClick={() => {
+                      setBemId(b.id)
+                      setCredito(b.creditoPadrao)
+                    }}
+                    className={`rounded border px-3 py-2 text-xs font-semibold transition-all text-left flex items-center justify-between ${
+                      bemId === b.id
+                        ? 'border-[#0A1F38] bg-[#0A1F38] text-white shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    <span>{b.label}</span>
+                    {bemId === b.id && <span className="text-xs">✓</span>}
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <Label className="mt-8 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-              2. Crédito:{' '}
-              <span className="font-bold" style={{ color: AZUL }}>
-                {fmtBRL(credito)}
-              </span>
-            </Label>
-            <Slider
-              className="mt-4"
-              min={bem.tipo === 'imovel' ? 100000 : 5000}
-              max={bem.tipo === 'imovel' ? 1000000 : 200000}
-              step={bem.tipo === 'imovel' ? 10000 : 5000}
-              value={[credito]}
-              onValueChange={(v) => setCredito(v[0])}
-            />
+            {/* 2. Valor do Crédito com Slider */}
+            <div className="md:col-span-5">
+              <div className="flex items-center justify-between">
+                <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                  2. Valor da Carta (Crédito)
+                </Label>
+                <span className="text-base font-extrabold" style={{ color: AZUL }}>
+                  {fmtBRL(credito)}
+                </span>
+              </div>
+              <div className="mt-4">
+                <Slider
+                  min={bem.tipo === 'imovel' ? 100000 : 10000}
+                  max={bem.tipo === 'imovel' ? 1200000 : 250000}
+                  step={bem.tipo === 'imovel' ? 10000 : 5000}
+                  value={[credito]}
+                  onValueChange={(v) => setCredito(v[0])}
+                />
+                <div className="mt-2 flex justify-between text-[11px] text-gray-400 font-mono">
+                  <span>{fmtBRL(bem.tipo === 'imovel' ? 100000 : 10000)}</span>
+                  <span>{fmtBRL(bem.tipo === 'imovel' ? 1200000 : 250000)}</span>
+                </div>
+              </div>
+            </div>
 
-            <Label className="mt-8 block text-xs font-semibold uppercase tracking-wide text-gray-500">
-              3. Prazo
-            </Label>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {PRAZOS.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPrazo(p)}
-                  className="rounded-sm border px-3 py-2 text-sm font-medium"
-                  style={
-                    prazo === p
-                      ? { background: AZUL, color: '#fff', borderColor: AZUL }
-                      : { background: '#fff', color: AZUL, borderColor: '#e5e7eb' }
-                  }
-                >
-                  {p}x
-                </button>
-              ))}
+            {/* 3. Prazo em Meses */}
+            <div className="md:col-span-3">
+              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                3. Prazo Desejado
+              </Label>
+              <div className="mt-2 flex flex-wrap gap-1.5">
+                {PRAZOS.map((p) => (
+                  <button
+                    key={p}
+                    onClick={() => setPrazo(p)}
+                    className={`flex-1 min-w-[42px] rounded border py-2 text-xs font-semibold text-center transition-all ${
+                      prazo === p
+                        ? 'border-[#0A1F38] bg-[#0A1F38] text-white shadow-sm'
+                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                    }`}
+                  >
+                    {p}x
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
+        </div>
 
-          <div className="rounded-sm border border-gray-200 bg-white p-6 lg:col-span-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold uppercase tracking-wide text-gray-500">
-                Comparativo de administradoras
-              </h3>
-              <span className="text-[11px] text-gray-400">ordenado por custo total</span>
-            </div>
-            <div className="mt-4 space-y-3">
-              {opcoes.map((o, i) => (
+        {/* Comparador Visual em Colunas / Cards (Estilo Trivago) */}
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              Cartas Disponíveis para {bem.label} · Crédito {fmtBRL(credito)} em {prazo} meses
+            </span>
+            <span className="text-xs text-gray-500 hidden sm:inline">
+              3 administradoras credenciadas comparadas em tempo real
+            </span>
+          </div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {cartasExibidas.map((carta) => {
+              const ehMelhorPreco = carta.chave === melhorPrecoChave
+              const msgWhats = `Olá! Comparei no site da C Consulting Group as cartas de ${bem.label.toLowerCase()} e me interessei pela carta da ${carta.nome}.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\nParcela estimada: ${fmtBRL(carta.parcela)}/mês\n\nQuero a cotação oficial detalhada dessa carta.`
+
+              return (
                 <div
-                  key={o.nome}
-                  className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 rounded-sm border p-4 transition-all"
-                  style={
-                    i === 0
-                      ? { borderColor: AZUL_MEDIO, borderWidth: 2, background: '#f0f6f0' }
-                      : { borderColor: '#e5e7eb', background: '#ffffff' }
-                  }
+                  key={carta.chave}
+                  className={`relative flex flex-col justify-between rounded-lg border bg-white transition-all duration-200 hover:shadow-lg ${
+                    ehMelhorPreco
+                      ? 'border-2 border-emerald-600 shadow-md ring-1 ring-emerald-600/20'
+                      : 'border-gray-200 shadow-sm'
+                  }`}
                 >
-                  <div className="flex items-center gap-3.5">
-                    {o.logo ? (
-                      <div className="flex h-12 w-28 sm:h-14 sm:w-32 flex-shrink-0 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-sm">
+                  {/* Badges superiores estilo Trivago */}
+                  <div className="absolute -top-3 left-4 right-4 flex items-center justify-between pointer-events-none">
+                    <span
+                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-auto"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    {ehMelhorPreco && (
+                      <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm pointer-events-auto">
+                        🏆 Melhor Preço
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="p-6 pt-7">
+                    {/* Logo e Nome da Administradora */}
+                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                      <div className="flex h-12 w-32 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-xs">
                         <img
-                          src={o.logo}
-                          alt={o.alt}
+                          src={carta.logo}
+                          alt={carta.alt}
                           className="max-h-full max-w-full object-contain"
                           loading="lazy"
                         />
                       </div>
-                    ) : (
-                      <div
-                        className="flex h-12 w-28 sm:h-14 sm:w-32 flex-shrink-0 items-center justify-center rounded border border-gray-200 bg-gray-50 font-bold text-xs"
-                        style={{ color: AZUL }}
-                      >
-                        {o.nome}
-                      </div>
-                    )}
-                    <div>
-                      <div className="flex flex-wrap items-center gap-2">
-                        {i === 0 && (
-                          <span className="rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                            MELHOR PREÇO
-                          </span>
-                        )}
-                        {o.destaqueParceiro && (
-                          <span
-                            className="rounded-sm px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white"
-                            style={{ background: AZUL_MEDIO }}
-                          >
-                            Parceira Oficial
-                          </span>
-                        )}
-                        <span
-                          className="font-semibold text-sm sm:text-base"
-                          style={{ color: AZUL }}
-                        >
-                          {o.nome}
+                      <div className="text-right">
+                        <span className="text-xs font-semibold text-gray-500 block">
+                          Taxa Adm. Total
+                        </span>
+                        <span className="text-sm font-bold text-gray-900">
+                          {carta.taxa.toFixed(2).replace('.', ',')}%
                         </span>
                       </div>
-                      <div className="mt-1 text-xs text-gray-500">
-                        Taxa de adm.: {o.taxa.toFixed(2).replace('.', ',')}% · {prazo} parcelas
+                    </div>
+
+                    {/* Destaque de Preço e Parcela */}
+                    <div className="mt-5 rounded-md bg-gray-50/80 p-4 border border-gray-100 text-center">
+                      <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold block">
+                        Parcela Estimada
+                      </span>
+                      <div
+                        className="mt-1 text-2xl sm:text-3xl font-extrabold"
+                        style={{ color: AZUL }}
+                      >
+                        {fmtBRL(carta.parcela)}
+                        <span className="text-xs font-medium text-gray-500">/mês</span>
+                      </div>
+                      <div className="mt-1 text-xs text-gray-500">{prazo} parcelas sem juros</div>
+                    </div>
+
+                    {/* Ficha Resumo da Carta */}
+                    <div className="mt-4 space-y-2 text-xs">
+                      <div className="flex justify-between py-1 border-b border-gray-100">
+                        <span className="text-gray-500">Carta de Crédito:</span>
+                        <span className="font-bold text-gray-900">{fmtBRL(credito)}</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-gray-100">
+                        <span className="text-gray-500">Custo Total Previsto:</span>
+                        <span className="font-bold text-gray-900">{fmtBRL(carta.total)}</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-gray-100">
+                        <span className="text-gray-500">Destaque:</span>
+                        <span className="font-medium text-emerald-800">{carta.selo}</span>
                       </div>
                     </div>
-                  </div>
-                  <div className="text-left sm:text-right border-t sm:border-t-0 pt-2 sm:pt-0 border-gray-100">
-                    <div className="text-base sm:text-lg font-bold" style={{ color: AZUL }}>
-                      {fmtBRL(o.parcela)}/mês
+
+                    {/* Lista de Vantagens da Administradora */}
+                    <div className="mt-4 pt-3 border-t border-gray-100">
+                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                        Condições da Carta
+                      </span>
+                      <ul className="space-y-1.5 text-xs text-gray-600">
+                        {carta.vantagens.map((v, idx) => (
+                          <li key={idx} className="flex items-start gap-1.5">
+                            <span className="text-emerald-600 font-bold">✓</span>
+                            <span>{v}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <div className="text-xs text-gray-500">Custo total: {fmtBRL(o.total)}</div>
+                  </div>
+
+                  {/* Rodapé do Card com CTA para WhatsApp */}
+                  <div className="p-6 pt-0">
+                    <a
+                      href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgWhats)}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block"
+                    >
+                      <Button
+                        className={`w-full rounded-sm font-bold text-white transition-all ${
+                          ehMelhorPreco
+                            ? 'bg-emerald-600 hover:bg-emerald-700 shadow-sm'
+                            : 'hover:opacity-95'
+                        }`}
+                        style={ehMelhorPreco ? {} : { background: AZUL_MEDIO }}
+                      >
+                        Cotar Carta {carta.nome}
+                      </Button>
+                    </a>
                   </div>
                 </div>
-              ))}
-              {bem.tipo === 'servicos' && (
-                <p className="text-xs text-gray-500">
-                  Para consórcio de serviços, as taxas variam por administradora e tipo de serviço —
-                  nosso especialista coleta as condições oficiais para o seu caso.
-                </p>
-              )}
-            </div>
-            <p className="mt-4 text-[11px] leading-relaxed text-gray-400">
-              Valores estimados para orientação inicial (parcela = crédito + taxa de administração ÷
-              prazo; não inclui fundo de reserva, seguro ou reajustes). A cotação oficial é feita
-              com a administradora, com condições do dia.
+              )
+            })}
+          </div>
+
+          <div className="mt-6 rounded-md bg-white border border-gray-200 p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-gray-500">
+            <p>
+              * Estimativa comparativa sem juros calculada conforme taxa de administração ponderada
+              do BCB. Contratação formalizada no ambiente oficial da administradora.
             </p>
             <a
-              href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(
-                `Olá! Simulei um consórcio de ${bem.label.toLowerCase()} no site da C Consulting Group.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\n\nQuero a cotação oficial com essas condições.`,
-              )}`}
+              href={WHATS_URL}
               target="_blank"
               rel="noopener noreferrer"
+              className="mt-2 sm:mt-0 inline-flex items-center gap-1 font-semibold text-emerald-700 hover:underline"
             >
-              <Button
-                className="mt-4 w-full rounded-sm font-semibold text-white"
-                style={{ background: AZUL_MEDIO }}
-              >
-                Falar com o especialista no WhatsApp
-              </Button>
+              <span>💬</span> Falar com o parceiro no WhatsApp
             </a>
           </div>
         </div>
@@ -680,6 +819,28 @@ function Diagnostico() {
   const responder = (q: string, r: string) => {
     setRespostas((prev) => ({ ...prev, [q]: r }))
     setEtapa((e) => e + 1)
+  }
+
+  const handleConcluirDiagnostico = () => {
+    // Salva o lead no serviço de leads (persiste para a Área do Parceiro)
+    try {
+      LeadService.salvarLead({
+        nome,
+        telefone: whats,
+        objetivo: respostas.objetivo || 'Não informado',
+        tipoBem: respostas.bem || 'Não informado',
+        faixaValor: respostas.valor || 'Não informado',
+        prazoContemplacao: respostas.prazo || 'Não informado',
+        parcelaOrcamento: respostas.parcela || 'Não informado',
+        urgencia: respostas.urgencia || 'Não informado',
+        creditoEstimado: credito,
+        origem: 'diagnostico',
+      })
+    } catch (err) {
+      console.error('Erro ao registrar lead:', err)
+    }
+
+    setDadosOk(true)
   }
 
   const faixaParaCredito: Record<string, number> = {
@@ -862,7 +1023,7 @@ function Diagnostico() {
                   className="mt-4 w-full rounded-sm font-semibold text-white"
                   style={{ background: AZUL_MEDIO }}
                   disabled={!nome || whats.length < 8}
-                  onClick={() => setDadosOk(true)}
+                  onClick={handleConcluirDiagnostico}
                 >
                   Concluir diagnóstico
                 </Button>
@@ -982,20 +1143,62 @@ function Footer() {
         <p className="mt-2 text-white/60">
           Parceiros autorizados: Embracon · Porto Seguro · Mapfre
         </p>
-        <p className="mt-3 max-w-2xl mx-auto leading-relaxed">
+
+        {/* Botão de WhatsApp no rodapé */}
+        <div className="mt-4 flex justify-center">
+          <a
+            href={WHATS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 shadow-sm text-xs transition-colors"
+          >
+            <span>💬</span>
+            <span>Falar diretamente com o parceiro no WhatsApp (81 9754-3716)</span>
+          </a>
+        </div>
+
+        <p className="mt-4 max-w-2xl mx-auto leading-relaxed">
           Protótipo em desenvolvimento. As estimativas exibidas usam a taxa média de administração
           publicada pelo Banco Central (maio/2026, ponderada por cotas ativas) e não constituem
           oferta ou cotação oficial. A contratação ocorre no ambiente oficial da administradora
           escolhida. Sistema de consórcios regulado pelo Banco Central.
         </p>
+
+        {/* Link discreto para Área do Parceiro */}
+        <div className="mt-6 border-t border-white/10 pt-4 flex items-center justify-between text-[11px] text-white/40">
+          <span>
+            © {new Date().getFullYear()} C Consulting Group. Todos os direitos reservados.
+          </span>
+          <Link
+            to="/parceiro"
+            className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline"
+          >
+            🔒 Área do Parceiro
+          </Link>
+        </div>
       </div>
     </footer>
   )
 }
 
+function WhatsAppFloatingButton() {
+  return (
+    <a
+      href={WHATS_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label="Falar no WhatsApp com o parceiro"
+      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-emerald-500"
+    >
+      <span className="text-lg">💬</span>
+      <span className="hidden sm:inline">Falar com o Parceiro</span>
+    </a>
+  )
+}
+
 const Index = () => {
   return (
-    <div className="min-h-screen" style={{ background: '#faf9f5' }}>
+    <div className="min-h-screen relative" style={{ background: '#faf9f5' }}>
       <Header />
       <Hero />
       <OQueE />
@@ -1005,6 +1208,7 @@ const Index = () => {
       <Diagnostico />
       <PorQue />
       <Footer />
+      <WhatsAppFloatingButton />
     </div>
   )
 }
