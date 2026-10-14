@@ -150,10 +150,11 @@ export default function ParceiroPage() {
 
             {/* Aviso de persistência provisória */}
             <div className="mt-5 rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-900">
-              <p className="font-semibold">ℹ️ Modo Provisório (Persistência Local)</p>
+              <p className="font-semibold">ℹ️ Banco de dados pendente de conexão</p>
               <p className="mt-0.5">
-                O backend do projeto ainda não possui banco conectado. As operações funcionam de
-                modo local estruturado para futura migração ao Supabase.
+                O banco de dados ainda não foi conectado a este projeto. Para concluir a migração da
+                Área do Parceiro, conecte o backend pelo ícone de servidor no cabeçalho da
+                plataforma.
               </p>
             </div>
 
