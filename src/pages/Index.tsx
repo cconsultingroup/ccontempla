@@ -165,6 +165,16 @@ function Header() {
               Fazer diagnóstico
             </Button>
           </a>
+          <Link to="/parceiro" title="Área do Parceiro" aria-label="Acessar Área do Parceiro">
+            <Button
+              size="sm"
+              variant="outline"
+              className="rounded-sm border-white/30 bg-transparent font-medium text-white hover:bg-white/10 hover:text-white px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm flex items-center gap-1.5"
+            >
+              <span className="text-xs">🔒</span>
+              <span className="hidden sm:inline">Área do Parceiro</span>
+            </Button>
+          </Link>
         </div>
       </div>
     </header>
