@@ -18,7 +18,6 @@ import {
 import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
 import LOGO_ITAU from '@/assets/image-8977c.png'
 import LOGO_BB from '@/assets/image-2876a.png'
-import LOGO_HONDA from '@/assets/image-1025b.png'
 import { LeadService } from '@/services/leadService'
 
 const AZUL = '#0A1F38'
@@ -91,15 +90,6 @@ const TAXAS: Record<string, InfoTaxa> = {
     imovel: 20.15,
     servicos: 18.0,
   },
-  honda: {
-    nome: 'Honda Consórcio',
-    logo: LOGO_HONDA,
-    alt: 'Logo Honda Consórcio',
-    destaqueParceiro: true,
-    auto: 14.8,
-    imovel: 21.1,
-    servicos: 17.9,
-  },
 }
 
 const BENS = [
@@ -127,18 +117,20 @@ function Header() {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:py-3.5">
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-md bg-white px-3 py-1.5 shadow-sm">
+          <div className="flex items-center rounded-md bg-white px-3 sm:px-4 py-2 sm:py-2.5 shadow-md">
             <img
               src={LOGO_C_CONSULTING}
-              alt="C Consulting Group - Consórcios"
-              className="h-9 sm:h-11 w-auto max-w-[190px] sm:max-w-[220px] object-contain"
+              alt="C Consulting Group - Consórcios, Seguro e Previdência"
+              className="h-11 sm:h-14 md:h-16 w-auto max-w-[220px] sm:max-w-[280px] md:max-w-[320px] object-contain"
             />
           </div>
           <div className="hidden sm:block leading-tight text-white border-l border-white/20 pl-3">
-            <div className="text-xs font-semibold tracking-wide uppercase text-white/90">
-              Consórcios & Diagnóstico
+            <div className="text-xs sm:text-sm font-bold tracking-wide uppercase text-white/95">
+              Consórcios, Seguro e Previdência
             </div>
-            <div className="text-[11px] text-white/60">Encontre o melhor preço do mercado</div>
+            <div className="text-[11px] sm:text-xs text-white/70">
+              Encontre o melhor preço do mercado
+            </div>
           </div>
         </div>
         <div className="flex items-center gap-2 sm:gap-3">
@@ -156,16 +148,20 @@ function Header() {
               <span>Falar no WhatsApp</span>
             </Button>
           </a>
-          <a href="#diagnostico" className="hidden sm:inline-block">
+          <a href="#cotacao" className="hidden sm:inline-block">
             <Button
               size="sm"
               className="rounded-sm bg-white font-medium hover:bg-white/90"
               style={{ color: AZUL }}
             >
-              Fazer diagnóstico
+              Fazer cotação
             </Button>
           </a>
-          <Link to="/parceiro" title="Área do Parceiro" aria-label="Acessar Área do Parceiro">
+          <Link
+            to="/parceiro"
+            title="Área do Parceiro (CRM Jarvis)"
+            aria-label="Acessar Área do Parceiro (CRM Jarvis)"
+          >
             <Button
               size="sm"
               variant="outline"
@@ -173,6 +169,9 @@ function Header() {
             >
               <span className="text-xs">🔒</span>
               <span className="hidden sm:inline">Área do Parceiro</span>
+              <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.5 rounded text-white/90 font-mono">
+                Jarvis
+              </span>
             </Button>
           </Link>
         </div>
@@ -189,29 +188,31 @@ function Hero() {
     >
       <div className="mx-auto max-w-3xl">
         <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          C Consulting Group · Consórcios
+          C Consulting Group
         </p>
         <h1 className="text-4xl font-bold leading-tight text-white md:text-5xl">
-          O consórcio certo,
+          Consórcios, Seguro e Previdência
           <br />
-          pelo{' '}
-          <span className="underline decoration-white/40 underline-offset-8">
-            melhor preço
-          </span> do
-          mercado.
+          <span className="text-2xl md:text-3xl font-medium text-white/90">
+            pelo{' '}
+            <span className="underline decoration-white/40 underline-offset-8">
+              melhor preço
+            </span>{' '}
+            do mercado.
+          </span>
         </h1>
         <p className="mx-auto mt-6 max-w-xl text-base text-white/70">
           Cotamos entre as principais administradoras do Brasil e encontramos para você o melhor
-          preço, o melhor prazo e a melhor condição. Sem juros. Sem custo para simular.
+          preço, o melhor prazo e a melhor condição. Sem juros. Sem custo para fazer sua cotação.
         </p>
         <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
-          <a href="#diagnostico" className="w-full sm:w-auto">
+          <a href="#cotacao" className="w-full sm:w-auto">
             <Button
               size="lg"
               className="w-full rounded-sm bg-white px-8 font-semibold hover:bg-white/90"
               style={{ color: AZUL }}
             >
-              Entender meu perfil para o consórcio
+              Fazer cotação do meu perfil
             </Button>
           </a>
           <a href="#simulador" className="w-full sm:w-auto">
@@ -228,106 +229,106 @@ function Hero() {
           Grátis, sem compromisso. A contratação é sempre no ambiente oficial da administradora.
         </p>
 
-        {/* Parceiros em destaque */}
+        {/* Faixa de Parceiros em Carrossel Deslizante Contínuo (Marquee Infinito) */}
         <div className="mt-12 border-t border-white/10 pt-8">
-          <p className="text-xs uppercase tracking-widest text-white/70 font-semibold mb-5">
-            Parceiros Oficiais Credenciados
-          </p>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto">
-            {/* Embracon */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <img
-                src={LOGO_EMBRACON}
-                alt="Embracon Consórcios"
-                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
-              />
-            </div>
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
+              Parceiros Oficiais Credenciados
+            </p>
+            <span className="text-[10px] text-white/50 hidden sm:inline">
+              (passe o mouse para pausar)
+            </span>
+          </div>
 
-            {/* Porto Seguro */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <img
-                src={LOGO_PORTO_SEGURO}
-                alt="Porto Seguro Consórcio"
-                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
-              />
-            </div>
+          {/* Carrossel infinito com as 5 marcas aumentadas */}
+          <div className="relative w-full overflow-hidden py-3">
+            {/* Gradientes laterais para transição suave */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-20 bg-gradient-to-r from-[#0A1F38] to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-20 bg-gradient-to-l from-[#14416B] to-transparent" />
 
-            {/* Mapfre */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <img
-                src={LOGO_MAPFRE}
-                alt="Mapfre Consórcios - Associada à BR Consórcios"
-                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
-              />
-            </div>
+            <div className="animate-marquee flex gap-4 sm:gap-6 items-center">
+              {[0, 1].map((copyIndex) => (
+                <div key={copyIndex} className="flex gap-4 sm:gap-6 items-center flex-shrink-0">
+                  {/* Embracon */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <img
+                      src={LOGO_EMBRACON}
+                      alt="Embracon Consórcios"
+                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
+                    />
+                  </div>
 
-            {/* Itaú Consórcio */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#EC7000] p-1 shadow-xs">
-                <img
-                  src={LOGO_ITAU}
-                  alt="Itaú Consórcio"
-                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                />
-              </div>
-            </div>
+                  {/* Porto Seguro */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <img
+                      src={LOGO_PORTO_SEGURO}
+                      alt="Porto Seguro Consórcio"
+                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
+                    />
+                  </div>
 
-            {/* BB Consórcios */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#FFED00] p-1 shadow-xs">
-                <img
-                  src={LOGO_BB}
-                  alt="BB Consórcios"
-                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                />
-              </div>
-            </div>
+                  {/* Mapfre */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <img
+                      src={LOGO_MAPFRE}
+                      alt="Mapfre Consórcios - Associada à BR Consórcios"
+                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
+                    />
+                  </div>
 
-            {/* Honda Consórcio */}
-            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
-              <span
-                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
-                style={{ background: AZUL_MEDIO }}
-              >
-                ★ Parceira Oficial
-              </span>
-              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#CC0000] p-1 shadow-xs">
-                <img
-                  src={LOGO_HONDA}
-                  alt="Honda Consórcio"
-                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                />
-              </div>
+                  {/* Itaú Consórcio */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-4 sm:px-5 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <div className="w-full h-18 sm:h-26 flex items-center justify-center overflow-hidden rounded-lg bg-[#EC7000] p-2 shadow-xs">
+                      <img
+                        src={LOGO_ITAU}
+                        alt="Itaú Consórcio"
+                        className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+
+                  {/* BB Consórcios */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-4 sm:px-5 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <div className="w-full h-18 sm:h-26 flex items-center justify-center overflow-hidden rounded-lg bg-[#FFED00] p-2 shadow-xs">
+                      <img
+                        src={LOGO_BB}
+                        alt="BB Consórcios"
+                        className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
@@ -415,12 +416,12 @@ function OQueE() {
           </AccordionItem>
         </Accordion>
         <div className="mt-8 text-center">
-          <a href="#diagnostico">
+          <a href="#cotacao">
             <Button
               className="rounded-sm font-semibold text-white"
               style={{ background: AZUL_MEDIO }}
             >
-              Entendi — quero meu diagnóstico
+              Entendi — quero minha cotação
             </Button>
           </a>
         </div>
@@ -485,10 +486,10 @@ function Emocional() {
 function Caminhos() {
   const cards = [
     {
-      titulo: 'Diagnóstico',
-      desc: 'Responda 6 perguntas rápidas. Nosso especialista recebe o seu perfil e cota as melhores condições para o seu caso.',
-      cta: 'Fazer meu diagnóstico',
-      href: '#diagnostico',
+      titulo: 'Cotação',
+      desc: 'Responda 7 perguntas rápidas. Nosso especialista recebe o seu perfil e cota as melhores condições para o seu caso.',
+      cta: 'Fazer minha cotação',
+      href: '#cotacao',
       destaque: true,
     },
     {
@@ -542,12 +543,12 @@ function Simulador() {
   const [credito, setCredito] = useState(300000)
   const [prazo, setPrazo] = useState(72)
   const [cartasSelecionada, setCartasSelecionada] = useState<
-    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb' | 'honda'
+    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb'
   >('todas')
   const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
-  // As 6 administradoras parceiras oficiais
-  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre', 'honda'] as const
+  // As 5 administradoras parceiras oficiais
+  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre'] as const
 
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
@@ -612,16 +613,6 @@ function Simulador() {
           'Uso facilitado do FGTS para lances residenciais',
         ],
       },
-      honda: {
-        selo: 'Referência nacional em frotas',
-        destaque: chave === 'honda',
-        bgLogo: '#CC0000',
-        vantagens: [
-          'Líder absoluta em consórcio de motos e veículos',
-          'Planos exclusivos com parcelas reduzidas',
-          'Alta taxa histórica de contemplação mensal',
-        ],
-      },
     }
 
     const infoDif = diferenciais[chave]
@@ -661,9 +652,9 @@ function Simulador() {
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
               Acesso direto e transparente às condições oficiais de <strong>Porto Seguro</strong>,{' '}
-              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong>,{' '}
-              <strong>Mapfre</strong> e <strong>Honda</strong>. Veja quem oferece a menor parcela e
-              o melhor custo total para o seu objetivo.
+              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong> e{' '}
+              <strong>Mapfre</strong>. Veja quem oferece a menor parcela e o melhor custo total para
+              o seu objetivo.
             </p>
           </div>
           <div className="mt-4 md:mt-0">
@@ -758,7 +749,7 @@ function Simulador() {
               Cartas Disponíveis para {bem.label} · Crédito {fmtBRL(credito)} em {prazo} meses
             </span>
             <span className="text-xs text-gray-500 hidden sm:inline">
-              6 administradoras credenciadas comparadas em tempo real
+              5 administradoras credenciadas comparadas em tempo real
             </span>
           </div>
 
@@ -1041,7 +1032,7 @@ function Diagnostico() {
     })
     .sort((a, b) => a.total - b.total)
 
-  const msgDiagnostico = `Olá! Acabei de completar o diagnóstico de consórcio no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\nMelhor horário para contato: ${respostas.melhorHorario || 'Qualquer horário comercial'}\n\nQuero falar com o especialista e realizar meu sonho.`
+  const msgDiagnostico = `Olá! Acabei de completar a cotação no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\nMelhor horário para contato: ${respostas.melhorHorario || 'Qualquer horário comercial'}\n\nQuero falar com o especialista e realizar meu sonho.`
 
   const handleAbrirWhatsApp = () => {
     // Abre o WhatsApp do especialista com a mensagem pré-preenchida
@@ -1064,12 +1055,11 @@ function Diagnostico() {
   }
 
   return (
-    <section id="diagnostico" className="w-full px-4 py-16" style={{ background: AZUL }}>
+    <section id="cotacao" className="w-full px-4 py-16 scroll-mt-16" style={{ background: AZUL }}>
+      <div id="diagnostico" className="sr-only" aria-hidden="true" />
       <div className="mx-auto max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          Diagnóstico
-        </p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Entenda seu perfil para o consórcio</h2>
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Cotação</p>
+        <h2 className="mt-2 text-3xl font-bold text-white">Faça sua cotação personalizada</h2>
         <p className="mt-2 text-sm text-white/70">
           7 perguntas rápidas. No final, nosso especialista recebe o seu perfil e cota entre as
           principais administradoras para entregar o melhor preço, prazo e condição.
@@ -1116,7 +1106,7 @@ function Diagnostico() {
                 Perfil gerado
               </span>
               <h3 className="mt-4 text-xl font-bold" style={{ color: AZUL }}>
-                Diagnóstico concluído. Este é o seu perfil:
+                Cotação concluída. Este é o seu perfil:
               </h3>
               <div className="mt-4 grid gap-2 rounded-sm bg-gray-50 p-4 text-sm text-gray-700 sm:grid-cols-2">
                 <div>
@@ -1164,9 +1154,7 @@ function Diagnostico() {
                               ? '#EC7000'
                               : o.nome.includes('BB')
                                 ? '#FFED00'
-                                : o.nome.includes('Honda')
-                                  ? '#CC0000'
-                                  : '#ffffff',
+                                : '#ffffff',
                           }}
                         >
                           <img
@@ -1201,7 +1189,7 @@ function Diagnostico() {
                   Falta um passo para falar com o especialista
                 </h4>
                 <p className="mt-1 text-sm text-gray-600">
-                  Deixe seu nome e WhatsApp para levarmos o seu diagnóstico direto para a conversa.
+                  Deixe seu nome e WhatsApp para levarmos a sua cotação direto para a conversa.
                 </p>
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div>
@@ -1231,7 +1219,7 @@ function Diagnostico() {
                   disabled={!nome || whats.length < 8 || salvandoLead}
                   onClick={handleConcluirDiagnostico}
                 >
-                  {salvandoLead ? 'Salvando diagnóstico...' : 'Concluir diagnóstico'}
+                  {salvandoLead ? 'Salvando cotação...' : 'Concluir cotação'}
                 </Button>
               </div>
             </>
@@ -1243,7 +1231,7 @@ function Diagnostico() {
                 ✓
               </div>
               <h3 className="mt-5 text-2xl font-bold" style={{ color: AZUL }}>
-                Diagnóstico completo, {nome.split(' ')[0]}!
+                Cotação completa, {nome.split(' ')[0]}!
               </h3>
               <p className="mx-auto mt-3 max-w-md text-base font-medium text-gray-700">
                 Fale direto com o nosso especialista e{' '}
@@ -1276,7 +1264,7 @@ function Diagnostico() {
                 🎉
               </div>
               <span className="mt-3 inline-block rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                Diagnóstico Recebido com Sucesso!
+                Cotação Recebida com Sucesso!
               </span>
               <h3 className="mt-3 text-2xl font-extrabold" style={{ color: AZUL }}>
                 Muito obrigado, {nome.split(' ')[0]}!
@@ -1377,7 +1365,7 @@ function PorQue() {
             A conquista de um bem muda uma família. O seu momento é agora — e a gente cuida do preço
             para você cuidar do sonho.
           </p>
-          <a href="#diagnostico" className="mt-6 inline-block">
+          <a href="#cotacao" className="mt-6 inline-block">
             <Button
               size="lg"
               className="rounded-sm bg-white px-8 font-bold hover:bg-white/90"
@@ -1423,7 +1411,7 @@ function ProvaSocial() {
       administradora: 'Embracon Consórcios',
       foto: 'https://img.usecurling.com/ppl/medium?gender=female&seed=18',
       texto:
-        'Fiz o diagnóstico no site e em poucos minutos o consultor me chamou no WhatsApp já com a cotação pronta. Fui contemplada por sorteio no 8º mês e troquei de carro sem surpresas na parcela.',
+        'Fiz a cotação no site e em poucos minutos o consultor me chamou no WhatsApp já com a proposta pronta. Fui contemplada por sorteio no 8º mês e troquei de carro sem surpresas na parcela.',
       nota: 5,
     },
     {
@@ -1560,7 +1548,7 @@ function FAQ() {
       id: 'faq-6',
       pergunta: 'Como a C Consulting Group me ajuda a escolher a melhor administradora?',
       resposta:
-        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios, Mapfre e Honda). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
+        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios e Mapfre). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
     },
   ]
 
@@ -1634,7 +1622,7 @@ function Footer() {
         </div>
         <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
         <p className="mt-2 text-white/60">
-          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre · Honda
+          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre
         </p>
 
         {/* Botão de WhatsApp no rodapé */}
@@ -1665,8 +1653,9 @@ function Footer() {
           <Link
             to="/parceiro"
             className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline"
+            title="CRM Jarvis — Consórcio, Seguro e Previdência"
           >
-            🔒 Área do Parceiro
+            🔒 Área do Parceiro (CRM Jarvis)
           </Link>
         </div>
       </div>
@@ -1690,6 +1679,10 @@ function WhatsAppFloatingButton() {
 }
 
 const Index = () => {
+  useState(() => {
+    document.title = 'C Consulting Group · Consórcios, Seguro e Previdência'
+  })
+
   return (
     <div className="min-h-screen relative" style={{ background: '#faf9f5' }}>
       <Header />

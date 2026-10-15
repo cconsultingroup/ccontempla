@@ -105,6 +105,7 @@ export default function ParceiroPage() {
   }
 
   useEffect(() => {
+    document.title = 'Jarvis — Consórcio, Seguro e Previdência | CRM C Consulting Group'
     const session = AuthService.getUsuarioAtual()
     if (session) {
       setUser(session)
@@ -382,17 +383,20 @@ export default function ParceiroPage() {
           <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
             <div className="text-center">
               <div
-                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-white text-xl font-bold"
+                className="mx-auto flex h-12 w-12 items-center justify-center rounded-full text-white text-xl font-bold shadow-sm"
                 style={{ background: AZUL }}
               >
-                🔐
+                🤖
               </div>
-              <h1 className="mt-4 text-2xl font-bold" style={{ color: AZUL }}>
-                Área do Parceiro
+              <div className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-blue-50 border border-blue-200 px-2.5 py-0.5 text-[11px] font-mono font-bold text-blue-900">
+                CRM Jarvis
+              </div>
+              <h1 className="mt-2 text-2xl font-extrabold" style={{ color: AZUL }}>
+                Jarvis — Consórcio, Seguro e Previdência
               </h1>
-              <p className="mt-1 text-sm text-gray-500">
-                Acesso exclusivo para administradores e consultores credenciados da C Consulting
-                Group.
+              <p className="mt-1 text-xs text-gray-500">
+                Área do Parceiro · Acesso exclusivo para administradores e consultores credenciados
+                da C Consulting Group.
               </p>
             </div>
 
@@ -403,8 +407,8 @@ export default function ParceiroPage() {
                 Backend PocketBase Ativo (Skip Cloud)
               </p>
               <p className="mt-1 text-[11px] text-emerald-800 leading-relaxed">
-                Autenticação e leads integrados diretamente com o banco de dados. Os novos leads do
-                diagnóstico caem nesta área em tempo real.
+                Autenticação e leads integrados diretamente com o banco de dados. Os novos leads da
+                cotação caem nesta área em tempo real.
               </p>
             </div>
 
@@ -472,7 +476,7 @@ export default function ParceiroPage() {
                 className="w-full rounded-sm font-semibold text-white shadow-sm"
                 style={{ background: AZUL }}
               >
-                {carregandoLogin ? 'Autenticando no banco...' : 'Entrar na Área do Parceiro'}
+                {carregandoLogin ? 'Autenticando no banco...' : 'Entrar no CRM Jarvis'}
               </Button>
             </form>
 
@@ -661,7 +665,7 @@ export default function ParceiroPage() {
 
         {/* Rodapé simples */}
         <footer className="py-4 text-center text-xs text-gray-400">
-          C Consulting Group · Gestão de Leads com PocketBase (Skip Cloud)
+          C Consulting Group · CRM Jarvis · Consórcio, Seguro e Previdência (Skip Cloud)
         </footer>
       </div>
     )
@@ -684,13 +688,19 @@ export default function ParceiroPage() {
             <div className="hidden sm:block border-l border-gray-200 pl-4">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold" style={{ color: AZUL }}>
-                  Painel do Parceiro
+                  Jarvis — Consórcio, Seguro e Previdência
                 </span>
+                <Badge
+                  variant="secondary"
+                  className="text-[10px] bg-blue-50 text-blue-800 border border-blue-200 font-mono"
+                >
+                  CRM Jarvis
+                </Badge>
                 <Badge
                   variant="secondary"
                   className="text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200"
                 >
-                  ● Banco PocketBase Conectado
+                  ● PocketBase Conectado
                 </Badge>
               </div>
             </div>
@@ -737,7 +747,7 @@ export default function ParceiroPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-xl">👥</span>
                   <h2 className="text-lg font-bold" style={{ color: AZUL }}>
-                    Gerenciar Consultores da Área do Parceiro
+                    Gerenciar Consultores do CRM Jarvis
                   </h2>
                   <Badge className="bg-blue-100 text-blue-800 text-[10px] hover:bg-blue-100">
                     Acesso Admin
@@ -908,8 +918,8 @@ export default function ParceiroPage() {
                 </span>
               </div>
               <p className="mt-1 text-sm text-gray-600">
-                Todo cliente que responde o diagnóstico no site é cadastrado automaticamente no
-                banco de dados e sincronizado aqui.
+                Todo cliente que realiza a cotação no site é cadastrado automaticamente no banco de
+                dados e sincronizado aqui.
               </p>
             </div>
 
@@ -980,7 +990,7 @@ export default function ParceiroPage() {
               <h3 className="mt-3 text-base font-bold text-gray-700">Nenhum lead encontrado</h3>
               <p className="mt-1 text-sm text-gray-500">
                 {leads.length === 0
-                  ? 'Ainda não há respostas no diagnóstico. Os novos leads aparecerão aqui em tempo real.'
+                  ? 'Ainda não há respostas na cotação. Os novos leads aparecerão aqui em tempo real.'
                   : 'Nenhum lead corresponde aos filtros selecionados.'}
               </p>
             </div>
@@ -1111,8 +1121,8 @@ export default function ParceiroPage() {
           <DialogHeader>
             <DialogTitle style={{ color: AZUL }}>Cadastrar Novo Consultor</DialogTitle>
             <DialogDescription className="text-xs text-gray-500">
-              O consultor receberá acesso imediato à Área do Parceiro com a senha inicial definida
-              aqui, sem precisar depender de e-mail de ativação.
+              O consultor receberá acesso imediato ao CRM Jarvis com a senha inicial definida aqui,
+              sem precisar depender de e-mail de ativação.
             </DialogDescription>
           </DialogHeader>
 
@@ -1275,7 +1285,7 @@ export default function ParceiroPage() {
             <DialogHeader>
               <DialogTitle style={{ color: AZUL }}>Detalhes do Lead de Consórcio</DialogTitle>
               <DialogDescription className="text-xs text-gray-500">
-                Respostas completas fornecidas no diagnóstico do site e salvas no PocketBase
+                Respostas completas fornecidas na cotação do site e salvas no PocketBase
               </DialogDescription>
             </DialogHeader>
 
@@ -1306,7 +1316,7 @@ export default function ParceiroPage() {
               </div>
 
               <div className="space-y-2 border-t border-gray-200 pt-3">
-                <h4 className="font-bold text-gray-800 text-sm">Respostas do Diagnóstico:</h4>
+                <h4 className="font-bold text-gray-800 text-sm">Respostas da Cotação:</h4>
                 <div className="grid grid-cols-2 gap-2 text-gray-700">
                   <div className="p-2 rounded border bg-white">
                     <span className="text-[10px] uppercase font-bold text-gray-400 block">
@@ -1362,7 +1372,7 @@ export default function ParceiroPage() {
                 {leadSelecionado.telefone && (
                   <a
                     href={`https://wa.me/55${leadSelecionado.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi seu diagnóstico de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e que você prefere contato no horário: ${leadSelecionado.melhorHorarioContato || 'horário comercial'}. Separei as melhores cartas das administradoras parceiras (Porto Seguro, Embracon, Itaú, BB, Mapfre e Honda) para você. Podemos conversar?`,
+                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi sua cotação de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e que você prefere contato no horário: ${leadSelecionado.melhorHorarioContato || 'horário comercial'}. Separei as melhores cartas das administradoras parceiras (Porto Seguro, Embracon, Itaú, BB e Mapfre) para você. Podemos conversar?`,
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
