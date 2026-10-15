@@ -1362,7 +1362,7 @@ export default function ParceiroPage() {
                 {leadSelecionado.telefone && (
                   <a
                     href={`https://wa.me/55${leadSelecionado.telefone.replace(/\D/g, '')}?text=${encodeURIComponent(
-                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi seu diagnóstico de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e que você prefere contato no horário: ${leadSelecionado.melhorHorarioContato || 'horário comercial'}. Separei as melhores cartas da Embracon, Mapfre e Porto Seguro para você. Podemos conversar?`,
+                      `Olá ${leadSelecionado.nome}! Sou o Guilherme da C Consulting Group. Vi seu diagnóstico de consórcio para ${leadSelecionado.tipoBem} (${leadSelecionado.faixaValor}) e que você prefere contato no horário: ${leadSelecionado.melhorHorarioContato || 'horário comercial'}. Separei as melhores cartas das administradoras parceiras (Porto Seguro, Embracon, Itaú, BB, Mapfre e Honda) para você. Podemos conversar?`,
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"

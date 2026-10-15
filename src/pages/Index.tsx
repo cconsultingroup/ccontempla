@@ -16,6 +16,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion'
 import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
+import LOGO_ITAU from '@/assets/image-8977c.png'
+import LOGO_BB from '@/assets/image-2876a.png'
+import LOGO_HONDA from '@/assets/image-1025b.png'
 import { LeadService } from '@/services/leadService'
 
 const AZUL = '#0A1F38'
@@ -31,7 +34,7 @@ const LOGO_PORTO_SEGURO =
 const LOGO_MAPFRE =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.55.07-4a45c.jpeg'
 
-/* Taxa média de administração total (% do crédito) — BCB, maio/2026, ponderada por cotas ativas */
+/* Taxa média de administração total (% do crédito) — BCB, ponderada por cotas ativas */
 type InfoTaxa = {
   nome: string
   logo: string
@@ -50,7 +53,7 @@ const TAXAS: Record<string, InfoTaxa> = {
     destaqueParceiro: true,
     auto: 15.02,
     imovel: 20.78,
-    servicos: null,
+    servicos: 18.5,
   },
   porto: {
     nome: 'Porto Seguro',
@@ -59,7 +62,7 @@ const TAXAS: Record<string, InfoTaxa> = {
     destaqueParceiro: true,
     auto: 16.81,
     imovel: 20.05,
-    servicos: null,
+    servicos: 19.0,
   },
   mapfre: {
     nome: 'Mapfre',
@@ -68,16 +71,34 @@ const TAXAS: Record<string, InfoTaxa> = {
     destaqueParceiro: true,
     auto: 16.2,
     imovel: 21.4,
-    servicos: null,
+    servicos: 19.5,
   },
-  ademicon: {
-    nome: 'Ademicon',
-    logo: '',
-    alt: 'Ademicon Consórcios',
-    destaqueParceiro: false,
-    auto: 14.91,
-    imovel: 24.02,
-    servicos: null,
+  itau: {
+    nome: 'Itaú Consórcio',
+    logo: LOGO_ITAU,
+    alt: 'Logo Consórcio Itaú',
+    destaqueParceiro: true,
+    auto: 15.6,
+    imovel: 19.8,
+    servicos: 18.2,
+  },
+  bb: {
+    nome: 'BB Consórcios',
+    logo: LOGO_BB,
+    alt: 'Logo BB Consórcios - Banco do Brasil',
+    destaqueParceiro: true,
+    auto: 15.4,
+    imovel: 20.15,
+    servicos: 18.0,
+  },
+  honda: {
+    nome: 'Honda Consórcio',
+    logo: LOGO_HONDA,
+    alt: 'Logo Honda Consórcio',
+    destaqueParceiro: true,
+    auto: 14.8,
+    imovel: 21.1,
+    servicos: 17.9,
   },
 }
 
@@ -199,30 +220,104 @@ function Hero() {
 
         {/* Parceiros em destaque */}
         <div className="mt-12 border-t border-white/10 pt-8">
-          <p className="text-xs uppercase tracking-widest text-white/60 font-semibold mb-4">
+          <p className="text-xs uppercase tracking-widest text-white/70 font-semibold mb-5">
             Parceiros Oficiais Credenciados
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6">
-            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 max-w-5xl mx-auto">
+            {/* Embracon */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
               <img
                 src={LOGO_EMBRACON}
                 alt="Embracon Consórcios"
-                className="max-h-full max-w-full object-contain"
+                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
               />
             </div>
-            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+
+            {/* Porto Seguro */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
               <img
                 src={LOGO_PORTO_SEGURO}
                 alt="Porto Seguro Consórcio"
-                className="max-h-full max-w-full object-contain"
+                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
               />
             </div>
-            <div className="flex h-12 w-32 sm:h-14 sm:w-36 items-center justify-center rounded-md bg-white p-2 shadow-sm">
+
+            {/* Mapfre */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-3 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
               <img
                 src={LOGO_MAPFRE}
                 alt="Mapfre Consórcios - Associada à BR Consórcios"
-                className="max-h-full max-w-full object-contain"
+                className="h-14 sm:h-16 w-auto max-w-[130px] object-contain transition-transform group-hover:scale-105"
               />
+            </div>
+
+            {/* Itaú Consórcio */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
+              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#EC7000] p-1 shadow-xs">
+                <img
+                  src={LOGO_ITAU}
+                  alt="Itaú Consórcio"
+                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                />
+              </div>
+            </div>
+
+            {/* BB Consórcios */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
+              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#FFED00] p-1 shadow-xs">
+                <img
+                  src={LOGO_BB}
+                  alt="BB Consórcios"
+                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                />
+              </div>
+            </div>
+
+            {/* Honda Consórcio */}
+            <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white p-2.5 shadow-md hover:shadow-lg transition-all border border-white/20 h-24 sm:h-28">
+              <span
+                className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold text-white uppercase tracking-wider shadow-xs"
+                style={{ background: AZUL_MEDIO }}
+              >
+                ★ Parceira Oficial
+              </span>
+              <div className="w-full h-14 sm:h-16 flex items-center justify-center overflow-hidden rounded-md bg-[#CC0000] p-1 shadow-xs">
+                <img
+                  src={LOGO_HONDA}
+                  alt="Honda Consórcio"
+                  className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -437,12 +532,12 @@ function Simulador() {
   const [credito, setCredito] = useState(300000)
   const [prazo, setPrazo] = useState(72)
   const [cartasSelecionada, setCartasSelecionada] = useState<
-    'todas' | 'embracon' | 'mapfre' | 'porto'
+    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb' | 'honda'
   >('todas')
   const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
-  // As 3 administradoras parceiras solicitadas (Embracon, Mapfre e Porto Seguro)
-  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'mapfre'] as const
+  // As 6 administradoras parceiras oficiais
+  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre', 'honda'] as const
 
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
@@ -450,8 +545,16 @@ function Simulador() {
     const parcela = estimarParcela(credito, taxa, prazo)
     const total = credito * (1 + taxa / 100)
 
-    // Diferenciais específicos por administradora para o comparador Trivago
-    const diferenciais: Record<string, { selo: string; destaque: boolean; vantagens: string[] }> = {
+    // Diferenciais e vantagens específicos por administradora
+    const diferenciais: Record<
+      string,
+      {
+        selo: string
+        destaque: boolean
+        bgLogo?: string
+        vantagens: string[]
+      }
+    > = {
       embracon: {
         selo: 'Maior flexibilidade de lances',
         destaque: chave === 'embracon',
@@ -462,7 +565,7 @@ function Simulador() {
         ],
       },
       porto: {
-        selo: 'Menor taxa média BCB',
+        selo: 'Tradição e solidez máxima',
         destaque: chave === 'porto',
         vantagens: [
           'Solidez e tradição do Grupo Porto Seguro',
@@ -479,6 +582,36 @@ function Simulador() {
           'Seguro prestamista opcional integrado',
         ],
       },
+      itau: {
+        selo: 'Crédito ágil & menor burocracia',
+        destaque: chave === 'itau',
+        bgLogo: '#EC7000',
+        vantagens: [
+          'Agilidade na liberação de cartas contempladas',
+          'Flexibilidade no abatimento de parcelas',
+          'Possibilidade de lance embutido de até 30%',
+        ],
+      },
+      bb: {
+        selo: 'Solidez e capilaridade federal',
+        destaque: chave === 'bb',
+        bgLogo: '#FFED00',
+        vantagens: [
+          'Solidez centenária do Banco do Brasil',
+          'Grupos estruturados com assembleias transparentes',
+          'Uso facilitado do FGTS para lances residenciais',
+        ],
+      },
+      honda: {
+        selo: 'Referência nacional em frotas',
+        destaque: chave === 'honda',
+        bgLogo: '#CC0000',
+        vantagens: [
+          'Líder absoluta em consórcio de motos e veículos',
+          'Planos exclusivos com parcelas reduzidas',
+          'Alta taxa histórica de contemplação mensal',
+        ],
+      },
     }
 
     const infoDif = diferenciais[chave]
@@ -489,6 +622,7 @@ function Simulador() {
       logo: t.logo,
       alt: t.alt,
       destaqueParceiro: true,
+      bgLogo: infoDif.bgLogo,
       taxa,
       parcela,
       total,
@@ -506,19 +640,20 @@ function Simulador() {
   return (
     <section id="simulador" className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
       <div className="mx-auto max-w-6xl">
-        {/* Cabeçalho estilo Comparador Trivago */}
+        {/* Cabeçalho do Comparador Oficial */}
         <div className="text-center md:text-left md:flex md:items-end md:justify-between border-b border-gray-200 pb-6">
           <div>
             <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-900 mb-2">
-              <span>🔍</span> Comparador de Cartas · Estilo Trivago
+              <span>🔍</span> Comparador Oficial de Cartas
             </div>
             <h2 className="text-3xl font-extrabold" style={{ color: AZUL }}>
               Compare as Cartas de Consórcio Lado a Lado
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Acesso direto e transparente às condições oficiais da <strong>Embracon</strong>,{' '}
-              <strong>Mapfre</strong> e <strong>Porto Seguro</strong>. Veja quem oferece a menor
-              parcela e o melhor custo total para o seu objetivo.
+              Acesso direto e transparente às condições oficiais de <strong>Porto Seguro</strong>,{' '}
+              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong>,{' '}
+              <strong>Mapfre</strong> e <strong>Honda</strong>. Veja quem oferece a menor parcela e
+              o melhor custo total para o seu objetivo.
             </p>
           </div>
           <div className="mt-4 md:mt-0">
@@ -528,7 +663,7 @@ function Simulador() {
           </div>
         </div>
 
-        {/* Barra de Filtros / Busca Trivago */}
+        {/* Barra de Filtros / Busca */}
         <div className="mt-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
           <div className="grid gap-6 md:grid-cols-12">
             {/* 1. Escolha do Bem */}
@@ -606,18 +741,18 @@ function Simulador() {
           </div>
         </div>
 
-        {/* Comparador Visual em Colunas / Cards (Estilo Trivago) */}
+        {/* Comparador Visual em Colunas / Cards */}
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
             <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
               Cartas Disponíveis para {bem.label} · Crédito {fmtBRL(credito)} em {prazo} meses
             </span>
             <span className="text-xs text-gray-500 hidden sm:inline">
-              3 administradoras credenciadas comparadas em tempo real
+              6 administradoras credenciadas comparadas em tempo real
             </span>
           </div>
 
-          <div className="flex flex-col gap-6 md:grid md:grid-cols-3">
+          <div className="flex flex-col gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
             {cartasExibidas.map((carta) => {
               const ehMelhorPreco = carta.chave === melhorPrecoChave
               const msgWhats = `Olá! Comparei no site da C Consulting Group as cartas de ${bem.label.toLowerCase()} e me interessei pela carta da ${carta.nome}.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\nParcela estimada: ${fmtBRL(carta.parcela)}/mês\n\nQuero a cotação oficial detalhada dessa carta.`
@@ -631,7 +766,7 @@ function Simulador() {
                       : 'border-gray-200 shadow-sm mt-4 md:mt-0'
                   }`}
                 >
-                  {/* Badges superiores estilo Trivago */}
+                  {/* Badges superiores */}
                   <div className="absolute -top-3 left-3 right-3 sm:left-4 sm:right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
                     <span
                       className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap"
@@ -641,7 +776,7 @@ function Simulador() {
                     </span>
                     {ehMelhorPreco && (
                       <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap">
-                        🏆 Melhor Preço
+                        🏆 Menor Parcela
                       </span>
                     )}
                   </div>
@@ -649,7 +784,10 @@ function Simulador() {
                   <div className="p-4 sm:p-6 pt-7 sm:pt-7">
                     {/* Logo e Nome da Administradora */}
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
-                      <div className="flex h-12 w-28 sm:w-32 items-center justify-center rounded border border-gray-100 bg-white p-1.5 shadow-xs">
+                      <div
+                        className="flex h-14 w-32 sm:w-36 items-center justify-center rounded-md border border-gray-100 p-1.5 shadow-xs overflow-hidden"
+                        style={{ backgroundColor: carta.bgLogo || '#ffffff' }}
+                      >
                         <img
                           src={carta.logo}
                           alt={carta.alt}
@@ -1000,16 +1138,27 @@ function Diagnostico() {
                 {opcoes.map((o, i) => (
                   <div
                     key={o.nome}
-                    className="flex items-center justify-between rounded-sm border p-3 bg-white"
+                    className="flex items-center justify-between rounded-lg border p-3 bg-white shadow-xs"
                     style={
                       i === 0
                         ? { borderColor: AZUL_MEDIO, borderWidth: 2 }
                         : { borderColor: '#e5e7eb' }
                     }
                   >
-                    <div className="flex items-center gap-2.5">
+                    <div className="flex items-center gap-3">
                       {o.logo ? (
-                        <div className="flex h-8 w-16 sm:w-20 flex-shrink-0 items-center justify-center rounded border border-gray-100 bg-white p-1">
+                        <div
+                          className="flex h-10 w-20 sm:w-24 flex-shrink-0 items-center justify-center rounded-md border border-gray-100 p-1 shadow-xs overflow-hidden"
+                          style={{
+                            backgroundColor: o.nome.includes('Itaú')
+                              ? '#EC7000'
+                              : o.nome.includes('BB')
+                                ? '#FFED00'
+                                : o.nome.includes('Honda')
+                                  ? '#CC0000'
+                                  : '#ffffff',
+                          }}
+                        >
                           <img
                             src={o.logo}
                             alt={o.alt}
@@ -1017,16 +1166,21 @@ function Diagnostico() {
                           />
                         </div>
                       ) : null}
-                      <span className="text-sm font-semibold" style={{ color: AZUL }}>
-                        {i === 0 && (
-                          <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                            MELHOR
-                          </span>
-                        )}
-                        {o.nome}
-                      </span>
+                      <div>
+                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 block">
+                          ★ Parceira Oficial
+                        </span>
+                        <span className="text-sm font-semibold" style={{ color: AZUL }}>
+                          {i === 0 && (
+                            <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                              MELHOR PARCELA
+                            </span>
+                          )}
+                          {o.nome}
+                        </span>
+                      </div>
                     </div>
-                    <span className="text-sm font-bold" style={{ color: AZUL }}>
+                    <span className="text-sm sm:text-base font-bold" style={{ color: AZUL }}>
                       {fmtBRL(o.parcela)}/mês
                     </span>
                   </div>
@@ -1396,7 +1550,7 @@ function FAQ() {
       id: 'faq-6',
       pergunta: 'Como a C Consulting Group me ajuda a escolher a melhor administradora?',
       resposta:
-        'Nós somos consultores credenciados pelas principais administradoras do país (Embracon, Porto Seguro e Mapfre). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
+        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios, Mapfre e Honda). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
     },
   ]
 
@@ -1470,7 +1624,7 @@ function Footer() {
         </div>
         <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
         <p className="mt-2 text-white/60">
-          Parceiros autorizados: Embracon · Porto Seguro · Mapfre
+          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre · Honda
         </p>
 
         {/* Botão de WhatsApp no rodapé */}
@@ -1530,10 +1684,11 @@ const Index = () => {
     <div className="min-h-screen relative" style={{ background: '#faf9f5' }}>
       <Header />
       <Hero />
+      {/* O comparador/simulador aparece logo em seguida dos parceiros (Hero) */}
+      <Simulador />
       <OQueE />
       <Emocional />
       <Caminhos />
-      <Simulador />
       <Diagnostico />
       <PorQue />
       <ProvaSocial />
