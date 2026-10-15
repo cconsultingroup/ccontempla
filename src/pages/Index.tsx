@@ -17,7 +17,8 @@ import {
 import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
 import LOGO_ITAU from '@/assets/image-8977c.png'
 import LOGO_BB from '@/assets/image-2876a.png'
-import { LeadService } from '@/services/leadService'
+import { LeadService, AuthService, AdminUser } from '@/services/leadService'
+import { PartnerLoginModal } from '@/components/PartnerLoginModal'
 
 const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
@@ -109,7 +110,7 @@ function estimarParcela(credito: number, taxaTotal: number, meses: number) {
   return (credito * (1 + taxaTotal / 100)) / meses
 }
 
-function Header() {
+function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   return (
     <header
       className="sticky top-0 z-50 w-full border-b border-white/10 shadow-sm"
@@ -157,25 +158,20 @@ function Header() {
               Fazer cotação
             </Button>
           </a>
-          <a
-            href={CRM_JARVIS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={onAccessJarvis}
             title="Área do Parceiro (CRM Jarvis)"
             aria-label="Acessar Área do Parceiro (CRM Jarvis)"
+            className="rounded-sm border-white/30 bg-transparent font-medium text-white hover:bg-white/10 hover:text-white px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm flex items-center gap-1.5"
           >
-            <Button
-              size="sm"
-              variant="outline"
-              className="rounded-sm border-white/30 bg-transparent font-medium text-white hover:bg-white/10 hover:text-white px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm flex items-center gap-1.5"
-            >
-              <span className="text-xs">🔒</span>
-              <span className="hidden sm:inline">Área do Parceiro</span>
-              <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.5 rounded text-white/90 font-mono">
-                Jarvis
-              </span>
-            </Button>
-          </a>
+            <span className="text-xs">🔒</span>
+            <span className="hidden sm:inline">Área do Parceiro</span>
+            <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.5 rounded text-white/90 font-mono">
+              Jarvis
+            </span>
+          </Button>
         </div>
       </div>
     </header>
@@ -1609,7 +1605,7 @@ function FAQ() {
   )
 }
 
-function Footer() {
+function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   return (
     <footer className="w-full px-4 py-10" style={{ background: AZUL }}>
       <div className="mx-auto max-w-6xl text-center text-xs text-white/50">
@@ -1647,20 +1643,19 @@ function Footer() {
           escolhida. Sistema de consórcios regulado pelo Banco Central.
         </p>
 
-        {/* Link discreto para Área do Parceiro */}
+        {/* Link discreto para Área do Parceiro com barreira de login */}
         <div className="mt-6 border-t border-white/10 pt-4 flex items-center justify-between text-[11px] text-white/40">
           <span>
             © {new Date().getFullYear()} C Consulting Group. Todos os direitos reservados.
           </span>
-          <a
-            href={CRM_JARVIS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline"
+          <button
+            type="button"
+            onClick={onAccessJarvis}
+            className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline cursor-pointer bg-transparent border-none p-0 inline-flex items-center gap-1"
             title="CRM Jarvis — Consórcio, Seguro e Previdência"
           >
             🔒 Área do Parceiro (CRM Jarvis)
-          </a>
+          </button>
         </div>
       </div>
     </footer>
@@ -1683,13 +1678,35 @@ function WhatsAppFloatingButton() {
 }
 
 const Index = () => {
+  const [partnerModalOpen, setPartnerModalOpen] = useState(false)
+
   useState(() => {
     document.title = 'C Consulting Group · Consórcios, Seguro e Previdência'
   })
 
+  const abrirCRMJarvis = () => {
+    window.open(CRM_JARVIS_URL, '_blank', 'noopener,noreferrer')
+  }
+
+  const handleAccessJarvis = () => {
+    const usuarioAtual = AuthService.getUsuarioAtual()
+    if (usuarioAtual) {
+      // Usuário já autenticado na sessão do PocketBase: redireciona direto
+      abrirCRMJarvis()
+    } else {
+      // Não autenticado: abre modal de login
+      setPartnerModalOpen(true)
+    }
+  }
+
+  const handleLoginSuccess = (_user: AdminUser) => {
+    // Redireciona para o CRM Jarvis em nova aba após login com sucesso
+    abrirCRMJarvis()
+  }
+
   return (
     <div className="min-h-screen relative" style={{ background: '#faf9f5' }}>
-      <Header />
+      <Header onAccessJarvis={handleAccessJarvis} />
       <Hero />
       {/* O comparador/simulador aparece logo em seguida dos parceiros (Hero) */}
       <Simulador />
@@ -1700,8 +1717,15 @@ const Index = () => {
       <PorQue />
       <ProvaSocial />
       <FAQ />
-      <Footer />
+      <Footer onAccessJarvis={handleAccessJarvis} />
       <WhatsAppFloatingButton />
+
+      {/* Modal de login para área do parceiro / CRM Jarvis */}
+      <PartnerLoginModal
+        open={partnerModalOpen}
+        onOpenChange={setPartnerModalOpen}
+        onSuccess={handleLoginSuccess}
+      />
     </div>
   )
 }
