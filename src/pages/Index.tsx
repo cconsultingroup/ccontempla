@@ -4,7 +4,6 @@
    CTAs: "Entender meu perfil para o consórcio" (diagnóstico) e "Já sei o bem que quero comprar → simular melhores condições" (simulador).
    Fonte das taxas: Banco Central — taxa média de administração ponderada por cotas ativas (maio/2026) */
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
 import { Input } from '@/components/ui/input'
@@ -24,6 +23,7 @@ const AZUL = '#0A1F38'
 const AZUL_MEDIO = '#14416B'
 const WHATS_CONSULTOR = '558197543716'
 const WHATS_URL = `https://wa.me/${WHATS_CONSULTOR}`
+const CRM_JARVIS_URL = 'https://joao-adibe-pipedrive-copy-327f3.goskip.app'
 
 // Logos oficiais enviadas e dos parceiros
 const LOGO_C_CONSULTING =
@@ -157,8 +157,10 @@ function Header() {
               Fazer cotação
             </Button>
           </a>
-          <Link
-            to="/parceiro"
+          <a
+            href={CRM_JARVIS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             title="Área do Parceiro (CRM Jarvis)"
             aria-label="Acessar Área do Parceiro (CRM Jarvis)"
           >
@@ -173,7 +175,7 @@ function Header() {
                 Jarvis
               </span>
             </Button>
-          </Link>
+          </a>
         </div>
       </div>
     </header>
@@ -1650,13 +1652,15 @@ function Footer() {
           <span>
             © {new Date().getFullYear()} C Consulting Group. Todos os direitos reservados.
           </span>
-          <Link
-            to="/parceiro"
+          <a
+            href={CRM_JARVIS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline"
             title="CRM Jarvis — Consórcio, Seguro e Previdência"
           >
             🔒 Área do Parceiro (CRM Jarvis)
-          </Link>
+          </a>
         </div>
       </div>
     </footer>
