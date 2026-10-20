@@ -363,7 +363,11 @@ export default function ParceiroPage() {
         <header className="border-b border-gray-200 bg-[#091523] shadow-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
             <Link to="/" className="flex items-center gap-3">
-              <ContemplaLogo variant="dark-bg" className="h-8 w-auto" alt="Contempla Consórcios" />
+              <ContemplaLogo
+                variant="dark-bg"
+                className="h-9 sm:h-10 w-auto"
+                alt="Contempla Consórcios"
+              />
             </Link>
             <Link to="/" className="text-sm font-medium text-white/80 hover:text-white">
               ← Voltar ao site
@@ -672,7 +676,7 @@ export default function ParceiroPage() {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center">
-              <ContemplaLogo variant="badge" className="h-7 w-auto" alt="Contempla Consórcios" />
+              <ContemplaLogo variant="badge" className="h-8 w-auto" alt="Contempla Consórcios" />
             </Link>
             <div className="hidden sm:block border-l border-gray-200 pl-3">
               <div className="flex items-center gap-2">

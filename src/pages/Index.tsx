@@ -129,7 +129,7 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
         <div className="flex items-center gap-3">
           <ContemplaLogo
             variant="dark-bg"
-            className="h-10 sm:h-12 md:h-13 w-auto"
+            className="h-11 sm:h-13 md:h-14 w-auto"
             alt="Contempla Consórcios"
           />
           <div className="hidden sm:block leading-tight text-white border-l border-white/20 pl-3">
@@ -1643,7 +1643,7 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
         <div className="flex justify-center mb-4">
           <ContemplaLogo
             variant="dark-bg"
-            className="h-9 sm:h-10 w-auto"
+            className="h-10 sm:h-12 w-auto"
             alt="Contempla Consórcios"
           />
         </div>
