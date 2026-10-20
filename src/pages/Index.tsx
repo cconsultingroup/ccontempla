@@ -18,18 +18,17 @@ import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.
 import LOGO_ITAU from '@/assets/image-8977c.png'
 import LOGO_BB from '@/assets/image-2876a.png'
 import LOGO_MAG from '@/assets/image-f6114.png'
+import { ContemplaLogo } from '@/components/ContemplaLogo'
 import { LeadService, AuthService, AdminUser } from '@/services/leadService'
 import { PartnerLoginModal } from '@/components/PartnerLoginModal'
 
-const AZUL = '#0A1F38'
-const AZUL_MEDIO = '#14416B'
+const AZUL = '#091523'
+const AZUL_MEDIO = '#142942'
 const WHATS_CONSULTOR = '558197543716'
 const WHATS_URL = `https://wa.me/${WHATS_CONSULTOR}`
 const CRM_JARVIS_URL = 'https://joao-adibe-pipedrive-copy-327f3.goskip.app'
 
 // Logos oficiais enviadas e dos parceiros
-const LOGO_C_CONSULTING =
-  'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/consulting-group-azul-png-2-2-8e0d7.png'
 const LOGO_PORTO_SEGURO =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.54.02-913b9.jpeg'
 const LOGO_MAPFRE =
@@ -128,19 +127,17 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
     >
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:py-3.5">
         <div className="flex items-center gap-3">
-          <div className="flex items-center rounded-md bg-white px-3 sm:px-4 py-2 sm:py-2.5 shadow-md">
-            <img
-              src={LOGO_C_CONSULTING}
-              alt="C Consulting Group - Consórcios, Seguro e Previdência"
-              className="h-11 sm:h-14 md:h-16 w-auto max-w-[220px] sm:max-w-[280px] md:max-w-[320px] object-contain"
-            />
-          </div>
+          <ContemplaLogo
+            variant="dark-bg"
+            className="h-10 sm:h-12 md:h-13 w-auto"
+            alt="Contempla Consórcios"
+          />
           <div className="hidden sm:block leading-tight text-white border-l border-white/20 pl-3">
             <div className="text-xs sm:text-sm font-bold tracking-wide uppercase text-white/95">
               Consórcios, Seguro e Previdência
             </div>
             <div className="text-[11px] sm:text-xs text-white/70">
-              Encontre o melhor preço do mercado
+              Encontre a melhor cotação do mercado
             </div>
           </div>
         </div>
@@ -1644,13 +1641,11 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
     <footer className="w-full px-4 py-10" style={{ background: AZUL }}>
       <div className="mx-auto max-w-6xl text-center text-xs text-white/50">
         <div className="flex justify-center mb-4">
-          <div className="flex items-center rounded-md bg-white px-3 py-1.5 shadow-sm">
-            <img
-              src={LOGO_C_CONSULTING}
-              alt="C Consulting Group"
-              className="h-8 w-auto max-w-[160px] object-contain"
-            />
-          </div>
+          <ContemplaLogo
+            variant="dark-bg"
+            className="h-9 sm:h-10 w-auto"
+            alt="Contempla Consórcios"
+          />
         </div>
         <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
         <p className="mt-2 text-white/60">

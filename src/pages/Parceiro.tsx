@@ -18,10 +18,9 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Badge } from '@/components/ui/badge'
+import { ContemplaLogo } from '@/components/ContemplaLogo'
 
-const AZUL = '#0A1F38'
-const LOGO_C_CONSULTING =
-  'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/consulting-group-azul-png-2-2-8e0d7.png'
+const AZUL = '#091523'
 
 export default function ParceiroPage() {
   const [searchParams] = useSearchParams()
@@ -361,18 +360,12 @@ export default function ParceiroPage() {
     return (
       <div className="min-h-screen bg-[#f3f6f9] flex flex-col justify-between">
         {/* Cabeçalho simples */}
-        <header className="border-b border-gray-200 bg-white shadow-sm">
+        <header className="border-b border-gray-200 bg-[#091523] shadow-sm">
           <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
             <Link to="/" className="flex items-center gap-3">
-              <div className="flex items-center rounded-md bg-white p-1">
-                <img
-                  src={LOGO_C_CONSULTING}
-                  alt="C Consulting Group"
-                  className="h-9 w-auto object-contain"
-                />
-              </div>
+              <ContemplaLogo variant="dark-bg" className="h-8 w-auto" alt="Contempla Consórcios" />
             </Link>
-            <Link to="/" className="text-sm font-medium text-gray-600 hover:text-gray-900">
+            <Link to="/" className="text-sm font-medium text-white/80 hover:text-white">
               ← Voltar ao site
             </Link>
           </div>
@@ -677,15 +670,11 @@ export default function ParceiroPage() {
       {/* Topo do Painel */}
       <header className="border-b border-gray-200 bg-white sticky top-0 z-30">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center">
-              <img
-                src={LOGO_C_CONSULTING}
-                alt="C Consulting Group"
-                className="h-8 w-auto object-contain"
-              />
+              <ContemplaLogo variant="badge" className="h-7 w-auto" alt="Contempla Consórcios" />
             </Link>
-            <div className="hidden sm:block border-l border-gray-200 pl-4">
+            <div className="hidden sm:block border-l border-gray-200 pl-3">
               <div className="flex items-center gap-2">
                 <span className="text-sm font-bold" style={{ color: AZUL }}>
                   Jarvis — Consórcio, Seguro e Previdência
