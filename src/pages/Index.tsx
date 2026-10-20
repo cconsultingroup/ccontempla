@@ -17,6 +17,7 @@ import {
 import LOGO_EMBRACON from '@/assets/whatsapp-image-2026-10-14-at-14.57.38-8a308.jpeg'
 import LOGO_ITAU from '@/assets/image-8977c.png'
 import LOGO_BB from '@/assets/image-2876a.png'
+import LOGO_MAG from '@/assets/image-f6114.png'
 import { LeadService, AuthService, AdminUser } from '@/services/leadService'
 import { PartnerLoginModal } from '@/components/PartnerLoginModal'
 
@@ -90,6 +91,15 @@ const TAXAS: Record<string, InfoTaxa> = {
     auto: 15.4,
     imovel: 20.15,
     servicos: 18.0,
+  },
+  mag: {
+    nome: 'MAG Seguros',
+    logo: LOGO_MAG,
+    alt: 'Logo MAG Seguros - Mongeral Aegon Group',
+    destaqueParceiro: true,
+    auto: 16.1,
+    imovel: 20.4,
+    servicos: 18.8,
   },
 }
 
@@ -325,6 +335,21 @@ function Hero() {
                       />
                     </div>
                   </div>
+
+                  {/* MAG Seguros */}
+                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
+                    <span
+                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
+                      style={{ background: AZUL_MEDIO }}
+                    >
+                      ★ Parceira Oficial
+                    </span>
+                    <img
+                      src={LOGO_MAG}
+                      alt="Logo MAG Seguros"
+                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
@@ -541,12 +566,12 @@ function Simulador() {
   const [credito, setCredito] = useState(300000)
   const [prazo, setPrazo] = useState(72)
   const [cartasSelecionada, setCartasSelecionada] = useState<
-    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb'
+    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb' | 'mag'
   >('todas')
   const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
-  // As 5 administradoras parceiras oficiais
-  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre'] as const
+  // As administradoras parceiras oficiais
+  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre', 'mag'] as const
 
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
@@ -611,6 +636,15 @@ function Simulador() {
           'Uso facilitado do FGTS para lances residenciais',
         ],
       },
+      mag: {
+        selo: 'Solidez e proteção patrimonial',
+        destaque: chave === 'mag',
+        vantagens: [
+          'Mais de 185 anos de solidez e tradição MAG',
+          'Planejamento financeiro integrado com proteção familiar',
+          'Atendimento consultivo e liberação ágil do crédito',
+        ],
+      },
     }
 
     const infoDif = diferenciais[chave]
@@ -650,9 +684,9 @@ function Simulador() {
             </h2>
             <p className="mt-2 max-w-2xl text-sm text-gray-600">
               Acesso direto e transparente às condições oficiais de <strong>Porto Seguro</strong>,{' '}
-              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong> e{' '}
-              <strong>Mapfre</strong>. Veja quem oferece a menor parcela e o melhor custo total para
-              o seu objetivo.
+              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong>,{' '}
+              <strong>Mapfre</strong> e <strong>MAG Seguros</strong>. Veja quem oferece a menor
+              parcela e o melhor custo total para o seu objetivo.
             </p>
           </div>
           <div className="mt-4 md:mt-0">
@@ -747,7 +781,7 @@ function Simulador() {
               Cartas Disponíveis para {bem.label} · Crédito {fmtBRL(credito)} em {prazo} meses
             </span>
             <span className="text-xs text-gray-500 hidden sm:inline">
-              5 administradoras credenciadas comparadas em tempo real
+              6 administradoras credenciadas comparadas em tempo real
             </span>
           </div>
 
@@ -1546,7 +1580,7 @@ function FAQ() {
       id: 'faq-6',
       pergunta: 'Como a C Consulting Group me ajuda a escolher a melhor administradora?',
       resposta:
-        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios e Mapfre). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
+        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios, Mapfre e MAG Seguros). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
     },
   ]
 
@@ -1620,7 +1654,8 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
         </div>
         <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
         <p className="mt-2 text-white/60">
-          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre
+          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre · MAG
+          Seguros
         </p>
 
         {/* Botão de WhatsApp no rodapé */}
