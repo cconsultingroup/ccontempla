@@ -37,32 +37,24 @@ export const ContemplaLogo: React.FC<ContemplaLogoProps> = ({
 }) => {
   if (variant === 'badge') {
     return (
-      <div className="inline-flex items-center rounded-lg bg-[#091523] px-2.5 py-1 shadow-sm border border-slate-700/40">
-        <div
-          className={`relative overflow-hidden aspect-[3.6/1] flex items-center justify-center ${className}`}
-        >
-          <img
-            src={logoSrc}
-            alt={alt}
-            className="absolute inset-0 h-full w-full object-cover object-center scale-[1.28] pointer-events-none select-none"
-            loading="eager"
-          />
-        </div>
+      <div className="inline-flex items-center rounded-lg bg-[#091523] p-1 shadow-sm border border-slate-700/40">
+        <img
+          src={logoSrc}
+          alt={alt}
+          className={`object-contain pointer-events-none select-none ${className}`}
+          loading="eager"
+        />
       </div>
     )
   }
 
   return (
-    <div
-      className={`relative overflow-hidden aspect-[3.6/1] inline-flex items-center justify-center bg-[#091523] ${className}`}
-    >
-      <img
-        src={logoSrc}
-        alt={alt}
-        className="absolute inset-0 h-full w-full object-cover object-center scale-[1.28] pointer-events-none select-none"
-        loading="eager"
-      />
-    </div>
+    <img
+      src={logoSrc}
+      alt={alt}
+      className={`object-contain pointer-events-none select-none ${className}`}
+      loading="eager"
+    />
   )
 }
 
