@@ -1,13 +1,15 @@
 import React from 'react'
-import logoSrc from '@/assets/logos-contempla-1-1-4ad2e.png'
+import logoSrc from '@/assets/logo-contempla-6219e.png'
 
 interface ContemplaLogoProps {
   /**
    * Variantes de exibição:
-   * - 'dark-bg': para uso sobre fundos escuros (header, footer, barra do parceiro).
-   *   O container usa o mesmo azul #091523 do fundo original do PNG, fundindo-se
-   *   de forma imperceptível aos cabeçalhos e rodapé do site sem aspecto de recorte.
-   * - 'badge': para uso sobre fundos claros, isolando a marca em uma cápsula elegante escura.
+   * - 'dark-bg': para uso sobre fundos escuros (header da Index, footer da Index, barra do login de Parceiro).
+   *   Como o asset possui fundo preto / escuro e elementos em creme + teal, renderiza a imagem
+   *   horizontal completa com object-contain sem nenhum corte lateral ou vertical.
+   * - 'badge': para uso sobre fundos claros (ex.: topo interno da Área do Parceiro),
+   *   envolvendo a logo em uma cápsula escura elegante com cantos suaves para garantir contraste
+   *   perfeito e integridade de todos os elementos.
    */
   variant?: 'dark-bg' | 'badge'
   className?: string
@@ -15,20 +17,15 @@ interface ContemplaLogoProps {
 }
 
 /**
- * Componente da logo "contempla CONSÓRCIOS".
+ * Componente da nova logo "contempla CONSÓRCIOS".
  *
- * Imagem original: `src/assets/logos-contempla-1-1-4ad2e.png` (quadrada 1024×1024,
- * fundo azul-marinho #091523, marca horizontal centralizada: símbolo de elos dourados
- * à esquerda + textos "contempla" e "CONSÓRCIOS").
+ * Imagem: `src/assets/logo-contempla-6219e.png`
+ * Símbolo "C" bipartido (verde-água/teal + creme) à esquerda +
+ * textos "contempla" e "CONSÓRCIOS" em tom creme.
  *
- * Correção do corte:
- * - A versão anterior aplicava `scale-[2.2]` em um container `aspect-[16/6]`, provocando
- *   corte severo da tipografia e do símbolo nas bordas.
- * - Com uma janela `aspect-[3.6/1]` e escala suave `scale-[1.28]`, toda a marca
- *   (símbolo + "contempla" + "CONSÓRCIOS") é exibida inteira, com margens de respiro
- *   seguras tanto nas laterais quanto em cima e embaixo.
- * - O fundo do container e a imagem possuem a cor exata `#091523`, mantendo a integração
- *   total com o cabeçalho e rodapé azul-marinho.
+ * A imagem já possui proporção panorâmica (~5:1).
+ * Não há cortes laterais nem verticais; o object-contain assegura que 100% da marca
+ * fique visível e legível em todos os viewports.
  */
 export const ContemplaLogo: React.FC<ContemplaLogoProps> = ({
   variant = 'dark-bg',
@@ -37,11 +34,11 @@ export const ContemplaLogo: React.FC<ContemplaLogoProps> = ({
 }) => {
   if (variant === 'badge') {
     return (
-      <div className="inline-flex items-center rounded-lg bg-[#091523] p-1 shadow-sm border border-slate-700/40">
+      <div className="inline-flex items-center rounded-lg bg-[#091523] px-2.5 py-1 shadow-sm border border-slate-700/50">
         <img
           src={logoSrc}
           alt={alt}
-          className={`object-contain pointer-events-none select-none ${className}`}
+          className={`object-contain pointer-events-none select-none max-w-full ${className}`}
           loading="eager"
         />
       </div>
@@ -52,7 +49,7 @@ export const ContemplaLogo: React.FC<ContemplaLogoProps> = ({
     <img
       src={logoSrc}
       alt={alt}
-      className={`object-contain pointer-events-none select-none ${className}`}
+      className={`object-contain pointer-events-none select-none max-w-full ${className}`}
       loading="eager"
     />
   )
