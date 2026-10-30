@@ -1,8 +1,11 @@
-/* Consórcio C Consulting Group — Landing Page Fase 1 (v5)
-   Tom: técnico + emocional medido, textos enxutos.
-   Novo: seção "O que é consórcio?" com accordion didático clicável.
-   CTAs: "Entender meu perfil para o consórcio" (diagnóstico) e "Já sei o bem que quero comprar → simular melhores condições" (simulador).
-   Fonte das taxas: Banco Central — taxa média de administração ponderada por cotas ativas (maio/2026) */
+/* Landing Page C Contempla — Design Oficial Institucional/Sofisticado
+   Paleta: deep #0d1a30, primary #1d2f50, secondary #154671, hover #2a5e8c,
+   texto-suave #c7d6e6, accent #15705f, tint #e6eef6, bg-page #fff, bg-soft #f5f5f5,
+   bordas #ececec, texto-secundário #5b6b80, muted #8a96a6.
+   Tipografia: Poppins (headings/display 600-700) + Montserrat (body/eyebrow 400-600).
+   WhatsApp consultor: 558197543716 em todos os links.
+*/
+
 import { useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Slider } from '@/components/ui/slider'
@@ -22,19 +25,16 @@ import { ContemplaLogo } from '@/components/ContemplaLogo'
 import { LeadService, AuthService, AdminUser } from '@/services/leadService'
 import { PartnerLoginModal } from '@/components/PartnerLoginModal'
 
-const AZUL = '#091523'
-const AZUL_MEDIO = '#142942'
 const WHATS_CONSULTOR = '558197543716'
 const WHATS_URL = `https://wa.me/${WHATS_CONSULTOR}`
 const CRM_JARVIS_URL = 'https://joao-adibe-pipedrive-copy-327f3.goskip.app'
 
-// Logos oficiais enviadas e dos parceiros
 const LOGO_PORTO_SEGURO =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.54.02-913b9.jpeg'
 const LOGO_MAPFRE =
   'https://dagtlwojkqyivnjgveda.supabase.co/storage/v1/object/public/message-attachments/471e33d4-fd07-48e7-9f0e-b0d44a66c54f/whatsapp-image-2026-10-14-at-14.55.07-4a45c.jpeg'
 
-/* Taxa média de administração total (% do crédito) — BCB, ponderada por cotas ativas */
+/* Taxa média de administração total (% do crédito) — BCB */
 type InfoTaxa = {
   nome: string
   logo: string
@@ -46,14 +46,14 @@ type InfoTaxa = {
 }
 
 const TAXAS: Record<string, InfoTaxa> = {
-  embracon: {
-    nome: 'Embracon',
-    logo: LOGO_EMBRACON,
-    alt: 'Logo Embracon Consórcios',
+  itau: {
+    nome: 'Itaú Consórcio',
+    logo: LOGO_ITAU,
+    alt: 'Logo Consórcio Itaú',
     destaqueParceiro: true,
-    auto: 15.02,
-    imovel: 20.78,
-    servicos: 18.5,
+    auto: 15.6,
+    imovel: 19.8,
+    servicos: 18.2,
   },
   porto: {
     nome: 'Porto Seguro',
@@ -63,24 +63,6 @@ const TAXAS: Record<string, InfoTaxa> = {
     auto: 16.81,
     imovel: 20.05,
     servicos: 19.0,
-  },
-  mapfre: {
-    nome: 'Mapfre',
-    logo: LOGO_MAPFRE,
-    alt: 'Logo Mapfre Consórcios - Associada à BR Consórcios',
-    destaqueParceiro: true,
-    auto: 16.2,
-    imovel: 21.4,
-    servicos: 19.5,
-  },
-  itau: {
-    nome: 'Itaú Consórcio',
-    logo: LOGO_ITAU,
-    alt: 'Logo Consórcio Itaú',
-    destaqueParceiro: true,
-    auto: 15.6,
-    imovel: 19.8,
-    servicos: 18.2,
   },
   bb: {
     nome: 'BB Consórcios',
@@ -100,12 +82,30 @@ const TAXAS: Record<string, InfoTaxa> = {
     imovel: 20.4,
     servicos: 18.8,
   },
+  embracon: {
+    nome: 'Embracon',
+    logo: LOGO_EMBRACON,
+    alt: 'Logo Embracon Consórcios',
+    destaqueParceiro: true,
+    auto: 15.02,
+    imovel: 20.78,
+    servicos: 18.5,
+  },
+  mapfre: {
+    nome: 'Mapfre',
+    logo: LOGO_MAPFRE,
+    alt: 'Logo Mapfre Consórcios - Associada à BR Consórcios',
+    destaqueParceiro: true,
+    auto: 16.2,
+    imovel: 21.4,
+    servicos: 19.5,
+  },
 }
 
 const BENS = [
-  { id: 'moto', label: 'Moto', creditoPadrao: 20000, tipo: 'auto' },
-  { id: 'carro', label: 'Carro', creditoPadrao: 80000, tipo: 'auto' },
-  { id: 'imovel', label: 'Imóvel', creditoPadrao: 300000, tipo: 'imovel' },
+  { id: 'moto', label: 'Moto', creditoPadrao: 25000, tipo: 'auto' },
+  { id: 'carro', label: 'Carro', creditoPadrao: 90000, tipo: 'auto' },
+  { id: 'imovel', label: 'Imóvel', creditoPadrao: 350000, tipo: 'imovel' },
   { id: 'servicos', label: 'Serviços', creditoPadrao: 50000, tipo: 'servicos' },
 ]
 
@@ -114,53 +114,41 @@ const PRAZOS = [24, 36, 48, 60, 72, 84]
 const fmtBRL = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
 
-/* Estimativa simplificada: parcela = (crédito + taxa adm total) / meses — sem juros, sem fundo de reserva */
 function estimarParcela(credito: number, taxaTotal: number, meses: number) {
   return (credito * (1 + taxaTotal / 100)) / meses
 }
 
+/* =========================================================================
+   1. HEADER STICKY
+   ========================================================================= */
 function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   return (
-    <header
-      className="sticky top-0 z-50 w-full border-b border-white/10 shadow-sm"
-      style={{ background: AZUL }}
-    >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3 sm:py-3.5">
-        <div className="flex items-center gap-3">
-          <ContemplaLogo
-            variant="dark-bg"
-            className="h-11 sm:h-13 md:h-14 w-auto"
-            alt="Contempla Consórcios"
-          />
-          <div className="hidden sm:block leading-tight text-white border-l border-white/20 pl-3">
-            <div className="text-xs sm:text-sm font-bold tracking-wide uppercase text-white/95">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)]">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
+        <div className="flex items-center gap-4">
+          <a href="#" className="flex items-center focus:outline-hidden">
+            <ContemplaLogo
+              variant="light-bg"
+              className="h-10 sm:h-12 w-auto"
+              alt="C Contempla - Consórcios, Seguro e Previdência"
+            />
+          </a>
+          <div className="hidden sm:block h-8 w-px bg-[#ececec]" />
+          <div className="hidden sm:block leading-tight">
+            <div className="font-display font-semibold text-[11px] sm:text-xs tracking-wider uppercase text-[#1d2f50]">
               Consórcios, Seguro e Previdência
             </div>
-            <div className="text-[11px] sm:text-xs text-white/70">
+            <div className="font-body text-[11px] text-[#5b6b80]">
               Encontre a melhor cotação do mercado
             </div>
           </div>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3">
-          <a
-            href={WHATS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label="Falar no WhatsApp com o parceiro"
-          >
+
+        <div className="flex items-center gap-2.5 sm:gap-3">
+          <a href="#cotacao" className="hidden md:inline-block">
             <Button
               size="sm"
-              className="rounded-sm bg-emerald-600 font-semibold text-white hover:bg-emerald-500 shadow-sm flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm"
-            >
-              <span>💬</span>
-              <span>Falar no WhatsApp</span>
-            </Button>
-          </a>
-          <a href="#cotacao" className="hidden sm:inline-block">
-            <Button
-              size="sm"
-              className="rounded-sm bg-white font-medium hover:bg-white/90"
-              style={{ color: AZUL }}
+              className="rounded-[6px] bg-[#1d2f50] hover:bg-[#2a5e8c] text-white font-body font-semibold text-xs px-3.5 py-2 transition-colors shadow-[0_2px_6px_rgba(29,47,80,0.15)]"
             >
               Fazer cotação
             </Button>
@@ -171,11 +159,11 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             onClick={onAccessJarvis}
             title="Área do Parceiro (CRM Jarvis)"
             aria-label="Acessar Área do Parceiro (CRM Jarvis)"
-            className="rounded-sm border-white/30 bg-transparent font-medium text-white hover:bg-white/10 hover:text-white px-2.5 sm:px-3 py-1.5 text-xs sm:text-sm flex items-center gap-1.5"
+            className="rounded-[6px] border-[#ececec] bg-white text-[#1d2f50] hover:bg-[#f5f5f5] hover:text-[#154671] font-body font-medium text-xs px-3 py-2 flex items-center gap-2 transition-colors shadow-xs"
           >
             <span className="text-xs">🔒</span>
-            <span className="hidden sm:inline">Área do Parceiro</span>
-            <span className="hidden md:inline text-[10px] bg-white/20 px-1 py-0.5 rounded text-white/90 font-mono">
+            <span className="font-semibold">Área do Parceiro</span>
+            <span className="text-[10px] bg-[#e6eef6] text-[#154671] px-1.5 py-0.5 rounded font-mono font-semibold">
               Jarvis
             </span>
           </Button>
@@ -185,168 +173,135 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   )
 }
 
+/* =========================================================================
+   2. HERO + 3. FAIXA DE PARCEIROS MARQUEE
+   ========================================================================= */
 function Hero() {
+  const parceirosLista = [
+    { nome: 'Itaú Consórcio', logo: LOGO_ITAU, bg: '#EC7000' },
+    { nome: 'Porto Seguro', logo: LOGO_PORTO_SEGURO, bg: '#ffffff' },
+    { nome: 'BB Consórcios', logo: LOGO_BB, bg: '#FFED00' },
+    { nome: 'MAG Seguros', logo: LOGO_MAG, bg: '#ffffff' },
+    { nome: 'Embracon', logo: LOGO_EMBRACON, bg: '#ffffff' },
+    { nome: 'Mapfre', logo: LOGO_MAPFRE, bg: '#ffffff' },
+  ]
+
   return (
-    <section
-      className="w-full px-4 py-20 text-center"
-      style={{ background: `linear-gradient(180deg, ${AZUL} 0%, ${AZUL_MEDIO} 100%)` }}
-    >
-      <div className="mx-auto max-w-3xl">
-        <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
-          C Consulting Group
-        </p>
-        <h1 className="text-4xl font-bold leading-tight text-white md:text-5xl">
+    <section className="relative w-full bg-[#0d1a30] text-white overflow-hidden pt-16 sm:pt-20 pb-12 sm:pb-16">
+      {/* SVG arcos decorativos no canto superior direito */}
+      <div className="pointer-events-none absolute -top-12 -right-12 sm:-top-20 sm:-right-20 w-[360px] sm:w-[540px] h-[360px] sm:h-[540px] opacity-40">
+        <svg viewBox="0 0 500 500" fill="none" className="w-full h-full">
+          <circle
+            cx="350"
+            cy="150"
+            r="280"
+            stroke="#1d2f50"
+            strokeWidth="2"
+            strokeDasharray="8 8"
+          />
+          <circle
+            cx="350"
+            cy="150"
+            r="210"
+            stroke="#15705f"
+            strokeWidth="2"
+            strokeDasharray="6 6"
+          />
+          <circle
+            cx="350"
+            cy="150"
+            r="140"
+            stroke="#1d2f50"
+            strokeWidth="1.5"
+            strokeDasharray="4 4"
+          />
+          <circle cx="350" cy="150" r="70" stroke="#15705f" strokeWidth="2" />
+        </svg>
+      </div>
+
+      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
+        <div className="inline-flex items-center gap-2 rounded-full bg-[#1d2f50]/80 border border-[#c7d6e6]/20 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#c7d6e6] mb-6">
+          <span>★</span> C Consulting Group · Cotação Oficial
+        </div>
+
+        <h1 className="font-display font-bold text-3xl sm:text-5xl md:text-[60px] leading-[1.08] tracking-[-0.015em] uppercase text-white">
           Consórcios, Seguro e Previdência
-          <br />
-          <span className="text-2xl md:text-3xl font-medium text-white/90">
-            pelo{' '}
-            <span className="underline decoration-white/40 underline-offset-8">
-              melhor preço
-            </span>{' '}
-            do mercado.
-          </span>
         </h1>
-        <p className="mx-auto mt-6 max-w-xl text-base text-white/70">
+
+        <div className="mt-3 font-display font-semibold text-2xl sm:text-3xl md:text-[36px] text-[#c7d6e6] leading-tight">
+          pelo{' '}
+          <span className="relative inline-block text-white font-bold underline decoration-[#15705f] decoration-4 underline-offset-8">
+            melhor preço
+          </span>{' '}
+          do mercado.
+        </div>
+
+        <p className="font-body mx-auto mt-6 max-w-2xl text-base sm:text-[19px] leading-relaxed text-[#c7d6e6]">
           Cotamos entre as principais administradoras do Brasil e encontramos para você o melhor
           preço, o melhor prazo e a melhor condição. Sem juros. Sem custo para fazer sua cotação.
         </p>
-        <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+
+        <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
           <a href="#cotacao" className="w-full sm:w-auto">
             <Button
               size="lg"
-              className="w-full rounded-sm bg-white px-8 font-semibold hover:bg-white/90"
-              style={{ color: AZUL }}
+              className="w-full sm:w-auto rounded-[6px] bg-white text-[#1d2f50] hover:bg-[#e6eef6] px-8 py-6 font-display font-bold text-sm sm:text-base uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(13,26,48,0.25)]"
             >
               Fazer cotação do meu perfil
             </Button>
           </a>
-          <a href="#simulador" className="w-full sm:w-auto">
+          <a href="#comparador" className="w-full sm:w-auto">
             <Button
               size="lg"
               variant="outline"
-              className="w-full rounded-sm border-white/40 bg-transparent px-8 font-semibold text-white hover:bg-white/10 hover:text-white"
+              className="w-full sm:w-auto rounded-[6px] border-[#c7d6e6]/40 bg-transparent text-white hover:bg-white/10 hover:text-white px-7 py-6 font-display font-semibold text-xs sm:text-sm tracking-wide transition-all"
             >
               Já sei o bem que quero comprar → simular melhores condições
             </Button>
           </a>
         </div>
-        <p className="mt-6 text-xs text-white/50">
+
+        <p className="mt-5 text-xs text-[#c7d6e6]/80 font-body">
           Grátis, sem compromisso. A contratação é sempre no ambiente oficial da administradora.
         </p>
 
-        {/* Faixa de Parceiros em Carrossel Deslizante Contínuo (Marquee Infinito) */}
-        <div className="mt-12 border-t border-white/10 pt-8">
-          <div className="flex items-center justify-center gap-2 mb-4">
-            <p className="text-xs uppercase tracking-widest text-white/80 font-semibold">
-              Parceiros Oficiais Credenciados
+        {/* 3. Faixa de parceiros no próprio hero com marquee infinito 40s */}
+        <div className="mt-14 border-t border-white/10 pt-8">
+          <div className="flex items-center justify-center gap-2 mb-6">
+            <p className="eyebrow text-[#c7d6e6]! tracking-[0.2em] font-semibold text-xs">
+              PARCEIROS OFICIAIS CREDENCIADOS
             </p>
-            <span className="text-[10px] text-white/50 hidden sm:inline">
-              (passe o mouse para pausar)
-            </span>
           </div>
 
-          {/* Carrossel infinito com as 5 marcas aumentadas */}
-          <div className="relative w-full overflow-hidden py-3">
-            {/* Gradientes laterais para transição suave */}
-            <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-20 bg-gradient-to-r from-[#0A1F38] to-transparent" />
-            <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-20 bg-gradient-to-l from-[#14416B] to-transparent" />
+          <div className="relative w-full overflow-hidden py-2">
+            {/* Gradientes laterais para fusão suave com o fundo escuro */}
+            <div className="pointer-events-none absolute left-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-r from-[#0d1a30] to-transparent" />
+            <div className="pointer-events-none absolute right-0 top-0 bottom-0 z-10 w-12 sm:w-24 bg-gradient-to-l from-[#0d1a30] to-transparent" />
 
-            <div className="animate-marquee flex gap-4 sm:gap-6 items-center">
+            <div className="animate-cc-marquee flex gap-4 sm:gap-5 items-center">
               {[0, 1].map((copyIndex) => (
-                <div key={copyIndex} className="flex gap-4 sm:gap-6 items-center flex-shrink-0">
-                  {/* Embracon */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
+                <div key={copyIndex} className="flex gap-4 sm:gap-5 items-center shrink-0">
+                  {parceirosLista.map((p, pIdx) => (
+                    <div
+                      key={`${copyIndex}-${pIdx}`}
+                      className="relative group flex flex-col items-center justify-center rounded-[12px] bg-white px-4 py-3 shadow-[0_4px_12px_rgba(13,26,48,0.08)] border border-[#ececec] w-[208px] h-[104px] shrink-0 transition-transform duration-200 hover:scale-[1.02]"
                     >
-                      ★ Parceira Oficial
-                    </span>
-                    <img
-                      src={LOGO_EMBRACON}
-                      alt="Embracon Consórcios"
-                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Porto Seguro */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
-                    </span>
-                    <img
-                      src={LOGO_PORTO_SEGURO}
-                      alt="Porto Seguro Consórcio"
-                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Mapfre */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
-                    </span>
-                    <img
-                      src={LOGO_MAPFRE}
-                      alt="Mapfre Consórcios - Associada à BR Consórcios"
-                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
-                    />
-                  </div>
-
-                  {/* Itaú Consórcio */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-4 sm:px-5 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
-                    </span>
-                    <div className="w-full h-18 sm:h-26 flex items-center justify-center overflow-hidden rounded-lg bg-[#EC7000] p-2 shadow-xs">
-                      <img
-                        src={LOGO_ITAU}
-                        alt="Itaú Consórcio"
-                        className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                      />
+                      <span className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider text-white uppercase bg-[#154671] shadow-xs">
+                        ★ PARCEIRA OFICIAL
+                      </span>
+                      <div
+                        className="w-full h-14 flex items-center justify-center rounded-md p-1.5 overflow-hidden"
+                        style={{ backgroundColor: p.bg }}
+                      >
+                        <img
+                          src={p.logo}
+                          alt={p.nome}
+                          className="max-h-full max-w-full object-contain"
+                          loading="lazy"
+                        />
+                      </div>
                     </div>
-                  </div>
-
-                  {/* BB Consórcios */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-4 sm:px-5 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
-                    </span>
-                    <div className="w-full h-18 sm:h-26 flex items-center justify-center overflow-hidden rounded-lg bg-[#FFED00] p-2 shadow-xs">
-                      <img
-                        src={LOGO_BB}
-                        alt="BB Consórcios"
-                        className="h-full w-full object-contain transition-transform group-hover:scale-105"
-                      />
-                    </div>
-                  </div>
-
-                  {/* MAG Seguros */}
-                  <div className="relative group flex flex-col items-center justify-center rounded-xl bg-white px-5 sm:px-7 py-3 shadow-lg hover:shadow-2xl transition-all border border-white/30 h-28 sm:h-36 w-48 sm:w-64 flex-shrink-0">
-                    <span
-                      className="absolute -top-3 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-white uppercase tracking-wider shadow-sm"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
-                    </span>
-                    <img
-                      src={LOGO_MAG}
-                      alt="Logo MAG Seguros"
-                      className="h-16 sm:h-24 w-auto max-w-[170px] sm:max-w-[210px] object-contain transition-transform group-hover:scale-105"
-                    />
-                  </div>
+                  ))}
                 </div>
               ))}
             </div>
@@ -357,351 +312,126 @@ function Hero() {
   )
 }
 
-function OQueE() {
-  return (
-    <section id="o-que-e" className="w-full px-4 py-16" style={{ background: '#eef3f6' }}>
-      <div className="mx-auto max-w-3xl">
-        <h2 className="text-center text-2xl font-bold md:text-3xl" style={{ color: AZUL }}>
-          O que é consórcio?
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-gray-600">
-          Explicação simples, sem letra miúda. Clique nas perguntas e entenda em 2 minutos.
-        </p>
-        <Accordion type="single" collapsible className="mt-8">
-          <AccordionItem value="q1" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              O que é um consórcio, em uma frase?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              É um grupo de pessoas que junta dinheiro todo mês para comprar bens, um por vez. Todo
-              mês, um membro do grupo é contemplado e recebe o valor cheio para comprar o bem dele —
-              e assim vai, até todos do grupo receberem.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="q2" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              Como funciona na prática?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              Você escolhe o bem e o valor do crédito. Entra no grupo e paga uma parcela mensal. A
-              contemplação acontece de duas formas: <strong>sorteio</strong> (feito pela Loteria
-              Federal, sem custo) ou <strong>lance</strong> (você oferece uma antecipação e quem
-              oferece mais leva o crédito primeiro). Quando é contemplado, recebe a{' '}
-              <strong>carta de crédito</strong> — o valor cheio para comprar o bem, como se fosse
-              dinheiro na mão.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="q3" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              Quanto eu pago? Tem juros?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              <strong>Não tem juros</strong> — essa é a grande diferença para o financiamento. Você
-              paga uma taxa de administração (o serviço de quem organiza o grupo) e, em algumas
-              administradoras, fundo de reserva e seguro. No fim, o custo total costuma ser bem
-              menor que o de um financiamento com juros.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="q4" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              É seguro?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              Sim. O sistema de consórcios é{' '}
-              <strong>regulado e fiscalizado pelo Banco Central</strong>, e só pode operar quem tem
-              autorização dele. O dinheiro do grupo é administrado pela administradora com regras
-              rígidas de proteção ao consorciado.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="q5" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              Consórcio ou financiamento?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              No financiamento, você recebe o dinheiro agora e paga juros todo mês — geralmente
-              caros. No consórcio, você não paga juros, mas espera a contemplação (ou antecipa com
-              lance). Quem não tem pressa e quer pagar menos, costuma sair melhor no consórcio.
-              Nossa cotação comparativa mostra exatamente essa conta para o seu caso.
-            </AccordionContent>
-          </AccordionItem>
-          <AccordionItem value="q6" className="border-gray-200">
-            <AccordionTrigger className="text-left font-semibold" style={{ color: AZUL }}>
-              O que eu faço com a carta de crédito?
-            </AccordionTrigger>
-            <AccordionContent className="text-sm leading-relaxed text-gray-600">
-              Compra o bem que você planejou: carro, moto, imóvel, serviços, reforma, maquinário.
-              Como a carta vale como pagamento à vista, dá para negociar desconto na loja ou com
-              vendedor particular. É o seu poder de compra, com valor cheio.
-            </AccordionContent>
-          </AccordionItem>
-        </Accordion>
-        <div className="mt-8 text-center">
-          <a href="#cotacao">
-            <Button
-              className="rounded-sm font-semibold text-white"
-              style={{ background: AZUL_MEDIO }}
-            >
-              Entendi — quero minha cotação
-            </Button>
-          </a>
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Emocional() {
-  const itens = [
-    {
-      emoji: '🏡',
-      titulo: 'A casa própria',
-      desc: 'A chave na mão e o quintal próprio para a família.',
-    },
-    {
-      emoji: '🚗',
-      titulo: 'A liberdade de ir e vir',
-      desc: 'Levar a família no carro novo, sem depender de ninguém.',
-    },
-    {
-      emoji: '🏍️',
-      titulo: 'A sua independência',
-      desc: 'A primeira moto — e a autonomia que vem com ela.',
-    },
-    {
-      emoji: '📈',
-      titulo: 'O seu patrimônio',
-      desc: 'O caminhão, a máquina, o imóvel que faz o negócio crescer.',
-    },
-  ]
-  return (
-    <section className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
-      <div className="mx-auto max-w-5xl">
-        <h2 className="text-center text-2xl font-bold" style={{ color: AZUL }}>
-          Todo bem tem uma história por trás.
-        </h2>
-        <p className="mx-auto mt-3 max-w-2xl text-center text-sm text-gray-600">
-          O consórcio não é sobre parcela — é sobre a conquista que vem depois dela.
-        </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-2">
-          {itens.map((i) => (
-            <div
-              key={i.titulo}
-              className="flex items-start gap-4 rounded-sm border border-gray-200 bg-white p-6 shadow-sm"
-            >
-              <div className="text-3xl">{i.emoji}</div>
-              <div>
-                <h3 className="font-bold" style={{ color: AZUL }}>
-                  {i.titulo}
-                </h3>
-                <p className="mt-1 text-sm text-gray-600">{i.desc}</p>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </section>
-  )
-}
-
-function Caminhos() {
-  const cards = [
-    {
-      titulo: 'Cotação',
-      desc: 'Responda 7 perguntas rápidas. Nosso especialista recebe o seu perfil e cota as melhores condições para o seu caso.',
-      cta: 'Fazer minha cotação',
-      href: '#cotacao',
-      destaque: true,
-    },
-    {
-      titulo: 'Simulador',
-      desc: 'Já sabe o bem e o valor? Compare as administradoras na hora, com dados oficiais do Banco Central.',
-      cta: 'Simular melhores condições',
-      href: '#simulador',
-      destaque: false,
-    },
-  ]
-  return (
-    <section className="w-full px-4 py-16" style={{ background: '#eef3f6' }}>
-      <div className="mx-auto grid max-w-5xl gap-6 md:grid-cols-2">
-        {cards.map((c) => (
-          <div
-            key={c.titulo}
-            className="rounded-sm border bg-white p-8 shadow-sm"
-            style={
-              c.destaque ? { borderColor: AZUL_MEDIO, borderWidth: 2 } : { borderColor: '#e5e7eb' }
-            }
-          >
-            {c.destaque && (
-              <span
-                className="mb-3 inline-block rounded-sm px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white"
-                style={{ background: AZUL_MEDIO }}
-              >
-                Recomendado
-              </span>
-            )}
-            <h2 className="text-xl font-bold" style={{ color: AZUL }}>
-              {c.titulo}
-            </h2>
-            <p className="mt-3 text-sm leading-relaxed text-gray-600">{c.desc}</p>
-            <a href={c.href}>
-              <Button
-                className="mt-6 rounded-sm font-semibold text-white"
-                style={{ background: AZUL_MEDIO }}
-              >
-                {c.cta}
-              </Button>
-            </a>
-          </div>
-        ))}
-      </div>
-    </section>
-  )
-}
-
-function Simulador() {
+/* =========================================================================
+   4. COMPARADOR DE CARTAS LADO A LADO (#comparador, bg #f5f5f5)
+   ========================================================================= */
+function Comparador() {
   const [bemId, setBemId] = useState('imovel')
   const [credito, setCredito] = useState(300000)
   const [prazo, setPrazo] = useState(72)
-  const [cartasSelecionada, setCartasSelecionada] = useState<
-    'todas' | 'embracon' | 'mapfre' | 'porto' | 'itau' | 'bb' | 'mag'
-  >('todas')
+
   const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
-  // As administradoras parceiras oficiais
-  const PARCEIRAS_CHAVE = ['porto', 'embracon', 'itau', 'bb', 'mapfre', 'mag'] as const
+  const PARCEIRAS_CHAVE = ['itau', 'porto', 'bb', 'mag', 'embracon', 'mapfre'] as const
+
+  const diferenciais: Record<string, { selo: string; bgLogo?: string; condicoes: string[] }> = {
+    itau: {
+      selo: 'Crédito ágil & menor burocracia',
+      bgLogo: '#EC7000',
+      condicoes: [
+        'Agilidade na liberação de cartas contempladas',
+        'Flexibilidade no abatimento de parcelas',
+        'Opção de lance embutido de até 30%',
+      ],
+    },
+    porto: {
+      selo: 'Tradição e solidez máxima',
+      condicoes: [
+        'Solidez e tradição do Grupo Porto Seguro',
+        'Possibilidade de usar FGTS no imóvel',
+        'Assessoria pós-contemplação dedicada',
+      ],
+    },
+    bb: {
+      selo: 'Solidez e capilaridade federal',
+      bgLogo: '#FFED00',
+      condicoes: [
+        'Solidez centenária do Banco do Brasil',
+        'Grupos estruturados com assembleias transparentes',
+        'Uso facilitado do FGTS para lances residenciais',
+      ],
+    },
+    mag: {
+      selo: 'Solidez e proteção patrimonial',
+      condicoes: [
+        'Mais de 185 anos de solidez e tradição MAG',
+        'Planejamento financeiro integrado com proteção familiar',
+        'Atendimento consultivo e liberação ágil',
+      ],
+    },
+    embracon: {
+      selo: 'Maior flexibilidade de lances',
+      condicoes: [
+        'Opção de lance embutido de até 50%',
+        'Contemplações mensais por sorteio e lance livre',
+        'Atendimento ágil para liberação do crédito',
+      ],
+    },
+    mapfre: {
+      selo: 'Ampla rede credenciada',
+      condicoes: [
+        'Associada à BR Consórcios nacional',
+        'Prazos estendidos sob medida',
+        'Seguro prestamista opcional integrado',
+      ],
+    },
+  }
 
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
     const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos'] ?? 20.0
     const parcela = estimarParcela(credito, taxa, prazo)
     const total = credito * (1 + taxa / 100)
-
-    // Diferenciais e vantagens específicos por administradora
-    const diferenciais: Record<
-      string,
-      {
-        selo: string
-        destaque: boolean
-        bgLogo?: string
-        vantagens: string[]
-      }
-    > = {
-      embracon: {
-        selo: 'Maior flexibilidade de lances',
-        destaque: chave === 'embracon',
-        vantagens: [
-          'Opção de lance embutido de até 50%',
-          'Contemplações mensais por sorteio e lance livre',
-          'Atendimento ágil para liberação do crédito',
-        ],
-      },
-      porto: {
-        selo: 'Tradição e solidez máxima',
-        destaque: chave === 'porto',
-        vantagens: [
-          'Solidez e tradição do Grupo Porto Seguro',
-          'Possibilidade de usar FGTS no imóvel',
-          'Assessoria pós-contemplação dedicada',
-        ],
-      },
-      mapfre: {
-        selo: 'Ampla rede credenciada',
-        destaque: chave === 'mapfre',
-        vantagens: [
-          'Associada à BR Consórcios',
-          'Prazos estendidos sob medida',
-          'Seguro prestamista opcional integrado',
-        ],
-      },
-      itau: {
-        selo: 'Crédito ágil & menor burocracia',
-        destaque: chave === 'itau',
-        bgLogo: '#EC7000',
-        vantagens: [
-          'Agilidade na liberação de cartas contempladas',
-          'Flexibilidade no abatimento de parcelas',
-          'Possibilidade de lance embutido de até 30%',
-        ],
-      },
-      bb: {
-        selo: 'Solidez e capilaridade federal',
-        destaque: chave === 'bb',
-        bgLogo: '#FFED00',
-        vantagens: [
-          'Solidez centenária do Banco do Brasil',
-          'Grupos estruturados com assembleias transparentes',
-          'Uso facilitado do FGTS para lances residenciais',
-        ],
-      },
-      mag: {
-        selo: 'Solidez e proteção patrimonial',
-        destaque: chave === 'mag',
-        vantagens: [
-          'Mais de 185 anos de solidez e tradição MAG',
-          'Planejamento financeiro integrado com proteção familiar',
-          'Atendimento consultivo e liberação ágil do crédito',
-        ],
-      },
-    }
-
-    const infoDif = diferenciais[chave]
+    const dif = diferenciais[chave]
 
     return {
       chave,
       nome: t.nome,
       logo: t.logo,
       alt: t.alt,
-      destaqueParceiro: true,
-      bgLogo: infoDif.bgLogo,
+      bgLogo: dif.bgLogo,
       taxa,
       parcela,
       total,
-      selo: infoDif.selo,
-      vantagens: infoDif.vantagens,
+      selo: dif.selo,
+      condicoes: dif.condicoes,
     }
   }).sort((a, b) => a.total - b.total)
 
-  // A primeira é a de menor custo total
   const melhorPrecoChave = cartas[0]?.chave
 
-  const cartasExibidas =
-    cartasSelecionada === 'todas' ? cartas : cartas.filter((c) => c.chave === cartasSelecionada)
-
   return (
-    <section id="simulador" className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
-      <div className="mx-auto max-w-6xl">
-        {/* Cabeçalho do Comparador Oficial */}
-        <div className="text-center md:text-left md:flex md:items-end md:justify-between border-b border-gray-200 pb-6">
+    <section id="comparador" className="w-full bg-[#f5f5f5] py-16 sm:py-20 scroll-mt-14">
+      <div id="simulador" className="sr-only" aria-hidden="true" />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        {/* Cabeçalho */}
+        <div className="text-center md:text-left md:flex md:items-end md:justify-between border-b border-[#ececec] pb-6">
           <div>
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-900 mb-2">
-              <span>🔍</span> Comparador Oficial de Cartas
-            </div>
-            <h2 className="text-3xl font-extrabold" style={{ color: AZUL }}>
+            <p className="eyebrow mb-2">COMPARADOR OFICIAL DE CARTAS</p>
+            <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
               Compare as Cartas de Consórcio Lado a Lado
             </h2>
-            <p className="mt-2 max-w-2xl text-sm text-gray-600">
-              Acesso direto e transparente às condições oficiais de <strong>Porto Seguro</strong>,{' '}
-              <strong>Embracon</strong>, <strong>Itaú</strong>, <strong>BB Consórcios</strong>,{' '}
-              <strong>Mapfre</strong> e <strong>MAG Seguros</strong>. Veja quem oferece a menor
-              parcela e o melhor custo total para o seu objetivo.
+            <p className="font-body mt-2 max-w-2xl text-sm text-[#5b6b80]">
+              Acesso direto e transparente às condições oficiais das 6 principais administradoras do
+              Brasil. Veja quem oferece a menor parcela e o melhor custo total.
             </p>
           </div>
           <div className="mt-4 md:mt-0">
-            <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-800 bg-emerald-50 border border-emerald-200 rounded px-2.5 py-1">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e6eef6] border border-[#154671]/20 px-3 py-1 text-xs font-semibold text-[#154671]">
               ✓ Dados oficiais regulados pelo Banco Central
             </span>
           </div>
         </div>
 
-        {/* Barra de Filtros / Busca */}
-        <div className="mt-8 rounded-lg border border-gray-200 bg-white p-5 shadow-sm">
+        {/* Painel Branco de 3 Colunas com radius 16px */}
+        <div className="mt-8 rounded-[16px] border border-[#ececec] bg-white p-6 sm:p-8 shadow-[0_4px_14px_rgba(13,26,48,0.04)]">
           <div className="grid gap-6 md:grid-cols-12">
-            {/* 1. Escolha do Bem */}
+            {/* Coluna 1: Escolha do Bem */}
             <div className="md:col-span-4">
-              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              <Label className="font-body text-xs font-bold uppercase tracking-wider text-[#154671]">
                 1. Escolha o Bem
               </Label>
-              <div className="mt-2 grid grid-cols-2 gap-1.5">
+              <div className="mt-3 grid grid-cols-2 gap-2">
                 {BENS.map((b) => (
                   <button
                     key={b.id}
@@ -709,10 +439,10 @@ function Simulador() {
                       setBemId(b.id)
                       setCredito(b.creditoPadrao)
                     }}
-                    className={`rounded border px-3 py-2 text-xs font-semibold transition-all text-left flex items-center justify-between ${
+                    className={`rounded-[6px] border px-3 py-2.5 text-xs font-semibold transition-all text-left flex items-center justify-between cursor-pointer ${
                       bemId === b.id
-                        ? 'border-[#0A1F38] bg-[#0A1F38] text-white shadow-sm'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                        ? 'border-[#1d2f50] bg-[#1d2f50] text-white shadow-xs'
+                        : 'border-[#ececec] bg-white text-[#1d2f50] hover:border-[#154671]'
                     }`}
                   >
                     <span>{b.label}</span>
@@ -722,45 +452,46 @@ function Simulador() {
               </div>
             </div>
 
-            {/* 2. Valor do Crédito com Slider */}
+            {/* Coluna 2: Slider Valor da Carta */}
             <div className="md:col-span-5">
               <div className="flex items-center justify-between">
-                <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+                <Label className="font-body text-xs font-bold uppercase tracking-wider text-[#154671]">
                   2. Valor da Carta (Crédito)
                 </Label>
-                <span className="text-base font-extrabold" style={{ color: AZUL }}>
+                <span className="font-display font-bold text-lg text-[#1d2f50]">
                   {fmtBRL(credito)}
                 </span>
               </div>
               <div className="mt-4">
                 <Slider
-                  min={bem.tipo === 'imovel' ? 100000 : 10000}
-                  max={bem.tipo === 'imovel' ? 1200000 : 250000}
-                  step={bem.tipo === 'imovel' ? 10000 : 5000}
+                  min={100000}
+                  max={1200000}
+                  step={10000}
                   value={[credito]}
                   onValueChange={(v) => setCredito(v[0])}
+                  className="my-2"
                 />
-                <div className="mt-2 flex justify-between text-[11px] text-gray-400 font-mono">
-                  <span>{fmtBRL(bem.tipo === 'imovel' ? 100000 : 10000)}</span>
-                  <span>{fmtBRL(bem.tipo === 'imovel' ? 1200000 : 250000)}</span>
+                <div className="mt-2 flex justify-between text-[11px] text-[#8a96a6] font-mono">
+                  <span>R$ 100.000</span>
+                  <span>R$ 1.200.000</span>
                 </div>
               </div>
             </div>
 
-            {/* 3. Prazo em Meses */}
+            {/* Coluna 3: Prazo em Meses */}
             <div className="md:col-span-3">
-              <Label className="text-xs font-bold uppercase tracking-wider text-gray-500">
+              <Label className="font-body text-xs font-bold uppercase tracking-wider text-[#154671]">
                 3. Prazo Desejado
               </Label>
-              <div className="mt-2 flex flex-wrap gap-1.5">
+              <div className="mt-3 flex flex-wrap gap-1.5">
                 {PRAZOS.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPrazo(p)}
-                    className={`flex-1 min-w-[42px] rounded border py-2 text-xs font-semibold text-center transition-all ${
+                    className={`flex-1 min-w-[42px] rounded-[6px] border py-2 text-xs font-semibold text-center transition-all cursor-pointer ${
                       prazo === p
-                        ? 'border-[#0A1F38] bg-[#0A1F38] text-white shadow-sm'
-                        : 'border-gray-200 bg-white text-gray-700 hover:border-gray-400'
+                        ? 'border-[#1d2f50] bg-[#1d2f50] text-white shadow-xs'
+                        : 'border-[#ececec] bg-white text-[#1d2f50] hover:border-[#154671]'
                     }`}
                   >
                     {p}x
@@ -771,51 +502,48 @@ function Simulador() {
           </div>
         </div>
 
-        {/* Comparador Visual em Colunas / Cards */}
+        {/* Cards das 6 Administradoras */}
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-500">
-              Cartas Disponíveis para {bem.label} · Crédito {fmtBRL(credito)} em {prazo} meses
+            <span className="eyebrow text-[#5b6b80]!">
+              Cartas disponíveis para {bem.label} · {fmtBRL(credito)} em {prazo} meses
             </span>
-            <span className="text-xs text-gray-500 hidden sm:inline">
-              6 administradoras credenciadas comparadas em tempo real
+            <span className="text-xs text-[#8a96a6] hidden sm:inline font-body">
+              6 administradoras credenciadas comparadas lado a lado
             </span>
           </div>
 
-          <div className="flex flex-col gap-6 md:grid md:grid-cols-2 lg:grid-cols-3">
-            {cartasExibidas.map((carta) => {
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {cartas.map((carta) => {
               const ehMelhorPreco = carta.chave === melhorPrecoChave
               const msgWhats = `Olá! Comparei no site da C Consulting Group as cartas de ${bem.label.toLowerCase()} e me interessei pela carta da ${carta.nome}.\n\nCrédito: ${fmtBRL(credito)}\nPrazo: ${prazo} parcelas\nParcela estimada: ${fmtBRL(carta.parcela)}/mês\n\nQuero a cotação oficial detalhada dessa carta.`
 
               return (
                 <div
                   key={carta.chave}
-                  className={`relative flex flex-col justify-between rounded-lg border bg-white transition-all duration-200 hover:shadow-lg w-full ${
+                  className={`relative flex flex-col justify-between rounded-[12px] bg-white transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,26,48,0.08)] ${
                     ehMelhorPreco
-                      ? 'border-2 border-emerald-600 shadow-md ring-1 ring-emerald-600/20 mt-4 md:mt-0'
-                      : 'border-gray-200 shadow-sm mt-4 md:mt-0'
+                      ? 'border-2 border-[#15705f] shadow-[0_4px_16px_rgba(21,112,95,0.12)] ring-2 ring-[#15705f]/20 mt-3 md:mt-0'
+                      : 'border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] mt-3 md:mt-0'
                   }`}
                 >
                   {/* Badges superiores */}
-                  <div className="absolute -top-3 left-3 right-3 sm:left-4 sm:right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
-                    <span
-                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap"
-                      style={{ background: AZUL_MEDIO }}
-                    >
-                      ★ Parceira Oficial
+                  <div className="absolute -top-3 left-4 right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
+                    <span className="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-[#154671] shadow-xs pointer-events-auto">
+                      ★ PARCEIRA OFICIAL
                     </span>
                     {ehMelhorPreco && (
-                      <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-sm pointer-events-auto whitespace-nowrap">
-                        🏆 Menor Parcela
+                      <span className="rounded-full bg-[#15705f] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-xs pointer-events-auto">
+                        MENOR PARCELA
                       </span>
                     )}
                   </div>
 
-                  <div className="p-4 sm:p-6 pt-7 sm:pt-7">
-                    {/* Logo e Nome da Administradora */}
-                    <div className="flex items-center justify-between border-b border-gray-100 pb-4">
+                  <div className="p-6 pt-7">
+                    {/* Logo e Taxa de Administração */}
+                    <div className="flex items-center justify-between border-b border-[#ececec] pb-4">
                       <div
-                        className="flex h-14 w-32 sm:w-36 items-center justify-center rounded-md border border-gray-100 p-1.5 shadow-xs overflow-hidden"
+                        className="flex h-12 w-28 sm:w-32 items-center justify-center rounded-[6px] border border-[#ececec] p-1.5 overflow-hidden"
                         style={{ backgroundColor: carta.bgLogo || '#ffffff' }}
                       >
                         <img
@@ -826,64 +554,62 @@ function Simulador() {
                         />
                       </div>
                       <div className="text-right">
-                        <span className="text-xs font-semibold text-gray-500 block">
+                        <span className="text-[11px] font-semibold text-[#8a96a6] block uppercase tracking-wider">
                           Taxa Adm. Total
                         </span>
-                        <span className="text-sm font-bold text-gray-900">
+                        <span className="font-display font-bold text-sm text-[#1d2f50]">
                           {carta.taxa.toFixed(2).replace('.', ',')}%
                         </span>
                       </div>
                     </div>
 
-                    {/* Destaque de Preço e Parcela */}
-                    <div className="mt-4 sm:mt-5 rounded-md bg-gray-50/80 p-3 sm:p-4 border border-gray-100 text-center">
-                      <span className="text-xs uppercase tracking-wide text-gray-500 font-semibold block">
+                    {/* Parcela Estimada em 36px */}
+                    <div className="mt-4 rounded-[8px] bg-[#f5f5f5] p-4 text-center border border-[#ececec]">
+                      <span className="text-[11px] uppercase tracking-wider text-[#5b6b80] font-semibold block">
                         Parcela Estimada
                       </span>
-                      <div
-                        className="mt-1 text-2xl sm:text-3xl font-extrabold"
-                        style={{ color: AZUL }}
-                      >
+                      <div className="mt-1 font-display font-bold text-3xl sm:text-[36px] text-[#1d2f50] leading-none">
                         {fmtBRL(carta.parcela)}
-                        <span className="text-xs font-medium text-gray-500">/mês</span>
                       </div>
-                      <div className="mt-1 text-xs text-gray-500">{prazo} parcelas sem juros</div>
-                    </div>
-
-                    {/* Ficha Resumo da Carta */}
-                    <div className="mt-4 space-y-2 text-xs">
-                      <div className="flex justify-between py-1 border-b border-gray-100">
-                        <span className="text-gray-500">Carta de Crédito:</span>
-                        <span className="font-bold text-gray-900">{fmtBRL(credito)}</span>
-                      </div>
-                      <div className="flex justify-between py-1 border-b border-gray-100">
-                        <span className="text-gray-500">Custo Total Previsto:</span>
-                        <span className="font-bold text-gray-900">{fmtBRL(carta.total)}</span>
-                      </div>
-                      <div className="flex justify-between py-1 border-b border-gray-100">
-                        <span className="text-gray-500">Destaque:</span>
-                        <span className="font-medium text-emerald-800">{carta.selo}</span>
+                      <div className="mt-1.5 text-xs text-[#8a96a6]">
+                        {prazo} parcelas sem juros
                       </div>
                     </div>
 
-                    {/* Lista de Vantagens da Administradora */}
-                    <div className="mt-4 pt-3 border-t border-gray-100">
-                      <span className="text-[11px] font-bold uppercase tracking-wider text-gray-400 block mb-2">
+                    {/* Custo Total e Destaque */}
+                    <div className="mt-4 space-y-2 text-xs font-body">
+                      <div className="flex justify-between py-1 border-b border-[#ececec]">
+                        <span className="text-[#5b6b80]">Carta de Crédito:</span>
+                        <span className="font-bold text-[#1d2f50]">{fmtBRL(credito)}</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-[#ececec]">
+                        <span className="text-[#5b6b80]">Custo Total Previsto:</span>
+                        <span className="font-bold text-[#1d2f50]">{fmtBRL(carta.total)}</span>
+                      </div>
+                      <div className="flex justify-between py-1 border-b border-[#ececec]">
+                        <span className="text-[#5b6b80]">Destaque:</span>
+                        <span className="font-semibold text-[#15705f]">{carta.selo}</span>
+                      </div>
+                    </div>
+
+                    {/* 3 Condições com Check Verde */}
+                    <div className="mt-4 pt-3 border-t border-[#ececec]">
+                      <span className="eyebrow text-[10px] block mb-2 text-[#5b6b80]!">
                         Condições da Carta
                       </span>
-                      <ul className="space-y-1.5 text-xs text-gray-600">
-                        {carta.vantagens.map((v, idx) => (
+                      <ul className="space-y-1.5 text-xs text-[#5b6b80]">
+                        {carta.condicoes.map((c, idx) => (
                           <li key={idx} className="flex items-start gap-1.5">
-                            <span className="text-emerald-600 font-bold">✓</span>
-                            <span>{v}</span>
+                            <span className="text-[#15705f] font-bold">✓</span>
+                            <span>{c}</span>
                           </li>
                         ))}
                       </ul>
                     </div>
                   </div>
 
-                  {/* Rodapé do Card com CTA para WhatsApp */}
-                  <div className="p-4 sm:p-6 pt-0">
+                  {/* Rodapé do Card com CTA WhatsApp */}
+                  <div className="p-6 pt-0">
                     <a
                       href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgWhats)}`}
                       target="_blank"
@@ -891,12 +617,11 @@ function Simulador() {
                       className="block"
                     >
                       <Button
-                        className={`w-full rounded-sm font-bold text-white transition-all py-2.5 text-sm ${
+                        className={`w-full rounded-[6px] font-display font-semibold text-white py-2.5 text-xs sm:text-sm uppercase tracking-wider transition-all ${
                           ehMelhorPreco
-                            ? 'bg-emerald-600 hover:bg-emerald-700 shadow-sm'
-                            : 'hover:opacity-95'
+                            ? 'bg-[#15705f] hover:bg-[#125c4f] shadow-sm'
+                            : 'bg-[#1d2f50] hover:bg-[#2a5e8c]'
                         }`}
-                        style={ehMelhorPreco ? {} : { background: AZUL_MEDIO }}
                       >
                         Cotar Carta {carta.nome}
                       </Button>
@@ -907,16 +632,17 @@ function Simulador() {
             })}
           </div>
 
-          <div className="mt-6 rounded-md bg-white border border-gray-200 p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-gray-500">
+          {/* Rodapé do Comparador com Disclaimer + Link WhatsApp */}
+          <div className="mt-8 rounded-[12px] bg-white border border-[#ececec] p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-[#5b6b80]">
             <p>
-              * Estimativa comparativa sem juros calculada conforme taxa de administração ponderada
-              do BCB. Contratação formalizada no ambiente oficial da administradora.
+              * Estimativa comparativa sem juros calculada conforme taxa de administração do BCB.
+              Contratação formalizada no ambiente oficial da administradora.
             </p>
             <a
               href={WHATS_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-2 sm:mt-0 inline-flex items-center gap-1 font-semibold text-emerald-700 hover:underline"
+              className="mt-2 sm:mt-0 inline-flex items-center gap-1 font-semibold text-[#15705f] hover:underline"
             >
               <span>💬</span> Falar com o parceiro no WhatsApp
             </a>
@@ -927,6 +653,253 @@ function Simulador() {
   )
 }
 
+/* =========================================================================
+   5. "O QUE É CONSÓRCIO?" (bg branco, coluna sticky + FAQ acordeão 01-06)
+   ========================================================================= */
+function OQueE() {
+  const perguntas = [
+    {
+      num: '01',
+      pergunta: 'O que é um consórcio em uma frase?',
+      resposta:
+        'É um grupo de pessoas que junta dinheiro todo mês para comprar bens, um por vez. Todo mês, um membro do grupo é contemplado e recebe o valor cheio para comprar o bem dele — e assim vai, até todos do grupo receberem.',
+    },
+    {
+      num: '02',
+      pergunta: 'Como funciona na prática?',
+      resposta:
+        'Você escolhe o bem e o valor do crédito. Entra no grupo e paga uma parcela mensal. A contemplação acontece por sorteio (feito pela Loteria Federal) ou por lance (antecipação de parcelas para retirar a carta antes). Ao ser contemplado, você recebe a carta de crédito à vista.',
+    },
+    {
+      num: '03',
+      pergunta: 'Quanto eu pago? Tem juros?',
+      resposta:
+        'Não tem juros. Essa é a principal vantagem sobre o financiamento bancário. Você paga apenas uma taxa de administração diluída em todas as parcelas ao longo do contrato e, conforme a administradora, fundo de reserva ou seguro prestamista.',
+    },
+    {
+      num: '04',
+      pergunta: 'É seguro?',
+      resposta:
+        'Sim, 100% seguro. O sistema de consórcios no Brasil é regulado e fiscalizado diretamente pelo Banco Central (Lei nº 11.795/2008). Todos os recursos do grupo ficam segregados do patrimônio da administradora.',
+    },
+    {
+      num: '05',
+      pergunta: 'Consórcio ou financiamento?',
+      resposta:
+        'No financiamento você paga juros compostos que dobram ou triplicam o valor do bem. No consórcio não há juros, apenas taxa de administração. É a forma mais inteligente e econômica de planejar a aquisição do seu patrimônio.',
+    },
+    {
+      num: '06',
+      pergunta: 'O que eu faço com a carta de crédito?',
+      resposta:
+        'Você compra o bem que planejou: imóvel novo, usado, terreno, construção, reforma, carro, moto, frota ou serviços. Como a carta de crédito equivale a pagamento à vista, você tem poder total de negociação para conseguir descontos.',
+    },
+  ]
+
+  return (
+    <section id="o-que-e" className="w-full bg-white py-16 sm:py-20 border-t border-[#ececec]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-10 lg:grid-cols-12">
+          {/* Coluna Sticky */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <p className="eyebrow mb-2">ENTENDA EM POUCOS MINUTOS</p>
+              <h2 className="font-display font-semibold text-3xl sm:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
+                O que é consórcio?
+              </h2>
+              <p className="font-body mt-4 text-base text-[#5b6b80] leading-relaxed">
+                Explicação simples, transparente e sem letra miúda. Entenda como funciona a compra
+                planejada sem juros e por que ela é a escolha de milhares de famílias.
+              </p>
+              <div className="mt-8">
+                <a href="#cotacao">
+                  <Button
+                    size="lg"
+                    className="rounded-[6px] bg-[#1d2f50] hover:bg-[#2a5e8c] text-white font-display font-semibold text-xs sm:text-sm uppercase tracking-wider px-6 py-5 shadow-sm"
+                  >
+                    Entendi, quero minha cotação
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Acordeão 01 a 06 */}
+          <div className="lg:col-span-7">
+            <Accordion type="single" collapsible className="space-y-3">
+              {perguntas.map((p) => (
+                <AccordionItem
+                  key={p.num}
+                  value={p.num}
+                  className="rounded-[12px] border border-[#ececec] bg-[#f5f5f5] px-5 py-1"
+                >
+                  <AccordionTrigger className="text-left font-display font-semibold text-[#1d2f50] hover:no-underline py-4 text-sm sm:text-base">
+                    <span className="flex items-center gap-3">
+                      <span className="font-mono text-xs font-bold text-[#15705f]">{p.num}</span>
+                      <span>{p.pergunta}</span>
+                    </span>
+                  </AccordionTrigger>
+                  <AccordionContent className="font-body text-xs sm:text-sm text-[#5b6b80] leading-relaxed pb-4 pt-1">
+                    {p.resposta}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================================================
+   6. "TODO BEM TEM UMA HISTÓRIA POR TRÁS." (bg #f5f5f5, 4 cards com foto 220px)
+   ========================================================================= */
+function Emocional() {
+  const historias = [
+    {
+      titulo: 'A casa própria',
+      legenda: 'A chave na mão e o quintal próprio para a família.',
+      foto: 'https://img.usecurling.com/p/600/400?q=modern%20house%20home&color=blue',
+    },
+    {
+      titulo: 'A liberdade de ir e vir',
+      legenda: 'Levar a família no carro novo, sem depender de ninguém.',
+      foto: 'https://img.usecurling.com/p/600/400?q=family%20suv%20car&color=blue',
+    },
+    {
+      titulo: 'A sua independência',
+      legenda: 'A primeira moto e a autonomia que vem com ela.',
+      foto: 'https://img.usecurling.com/p/600/400?q=motorcycle%20freedom&color=black',
+    },
+    {
+      titulo: 'O seu patrimônio',
+      legenda: 'O caminhão, a máquina, o imóvel que faz o negócio crescer.',
+      foto: 'https://img.usecurling.com/p/600/400?q=commercial%20building%20business&color=gray',
+    },
+  ]
+
+  return (
+    <section className="w-full bg-[#f5f5f5] py-16 sm:py-20 border-t border-[#ececec]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto mb-12">
+          <p className="eyebrow mb-2">PLANEJAMENTO QUE TRANSFORMA</p>
+          <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
+            Todo bem tem uma história por trás.
+          </h2>
+          <p className="font-body mt-3 text-sm sm:text-base text-[#5b6b80]">
+            O consórcio não é sobre parcela — é sobre a conquista que vem depois dela.
+          </p>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {historias.map((h, idx) => (
+            <div
+              key={idx}
+              className="flex flex-col overflow-hidden rounded-[12px] bg-white border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] transition-transform duration-200 hover:-translate-y-1"
+            >
+              <div className="h-[220px] w-full overflow-hidden bg-[#e6eef6]">
+                <img
+                  src={h.foto}
+                  alt={h.titulo}
+                  className="h-full w-full object-cover transition-transform duration-300 hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <div className="p-5 flex-1 flex flex-col justify-between">
+                <div>
+                  <h3 className="font-display font-semibold text-base text-[#1d2f50] uppercase">
+                    {h.titulo}
+                  </h3>
+                  <p className="font-body mt-2 text-xs sm:text-sm text-[#5b6b80] leading-relaxed">
+                    "{h.legenda}"
+                  </p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================================================
+   7. SPLIT COTAÇÃO / SIMULADOR
+   ========================================================================= */
+function SplitCaminhos() {
+  return (
+    <section className="w-full bg-white py-14 border-t border-[#ececec]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Card Escuro #0d1a30 */}
+          <div className="relative rounded-[16px] bg-[#0d1a30] text-white p-8 sm:p-10 shadow-[0_8px_24px_rgba(13,26,48,0.15)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-mono text-xs font-bold text-[#c7d6e6] tracking-wider uppercase">
+                  01 Cotação
+                </span>
+                <span className="rounded-full bg-[#15705f] text-white text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 shadow-xs">
+                  RECOMENDADO
+                </span>
+              </div>
+              <h3 className="font-display font-semibold text-2xl text-white uppercase tracking-tight">
+                Cotação Personalizada do Perfil
+              </h3>
+              <p className="font-body mt-3 text-sm text-[#c7d6e6] leading-relaxed">
+                Responda 7 perguntas rápidas em 1 minuto. Nosso consultor recebe o seu perfil e cota
+                entre as 6 principais administradoras para entregar o menor preço e melhor condição.
+              </p>
+            </div>
+            <div className="mt-8">
+              <a href="#cotacao">
+                <Button
+                  size="lg"
+                  className="rounded-[6px] bg-white text-[#1d2f50] hover:bg-[#e6eef6] font-display font-bold text-xs uppercase tracking-wider px-6 py-5"
+                >
+                  Fazer minha cotação
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          {/* Card Claro #f5f5f5 */}
+          <div className="rounded-[16px] bg-[#f5f5f5] border border-[#ececec] text-[#1d2f50] p-8 sm:p-10 shadow-[0_4px_14px_rgba(13,26,48,0.04)] flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between mb-4">
+                <span className="font-mono text-xs font-bold text-[#154671] tracking-wider uppercase">
+                  02 Simulador
+                </span>
+              </div>
+              <h3 className="font-display font-semibold text-2xl text-[#1d2f50] uppercase tracking-tight">
+                Simulador Direto de Cartas
+              </h3>
+              <p className="font-body mt-3 text-sm text-[#5b6b80] leading-relaxed">
+                Já sabe o bem e o valor desejado? Ajuste o valor da carta e o prazo no comparador
+                oficial e veja as parcelas de cada administradora calculadas em tempo real.
+              </p>
+            </div>
+            <div className="mt-8">
+              <a href="#comparador">
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="rounded-[6px] border-[#1d2f50] text-[#1d2f50] hover:bg-[#1d2f50] hover:text-white font-display font-semibold text-xs uppercase tracking-wider px-6 py-5 transition-colors"
+                >
+                  Simular melhores condições
+                </Button>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================================================
+   8. COTAÇÃO 7 ETAPAS (#cotacao, bg #f5f5f5)
+   ========================================================================= */
 const PERGUNTAS = [
   {
     id: 'objetivo',
@@ -934,8 +907,8 @@ const PERGUNTAS = [
     opcoes: [
       'Comprar um bem',
       'Trocar de bem',
-      'Capital de giro / empresa',
-      'Patrimônio / investimento',
+      'Capital de giro empresa',
+      'Patrimônio investimento',
     ],
   },
   {
@@ -985,10 +958,9 @@ const PERGUNTAS = [
   },
 ]
 
-// Horário comercial de atendimento padrão claramente editável no código
 const HORARIO_ATENDIMENTO_PADRAO = 'Segunda a sexta-feira, das 09h às 18h'
 
-function Diagnostico() {
+function CotacaoFluxo() {
   const [etapa, setEtapa] = useState(0)
   const [respostas, setRespostas] = useState<Record<string, string>>({})
   const [dadosOk, setDadosOk] = useState(false)
@@ -1004,9 +976,41 @@ function Diagnostico() {
     setEtapa((e) => e + 1)
   }
 
+  const faixaParaCredito: Record<string, number> = {
+    'Até R$ 50 mil': 40000,
+    'R$ 50 mil a R$ 150 mil': 100000,
+    'R$ 150 mil a R$ 500 mil': 300000,
+    'Acima de R$ 500 mil': 600000,
+  }
+  const credito = faixaParaCredito[respostas.valor] ?? 80000
+
+  const tipoBem =
+    respostas.bem === 'Imóvel'
+      ? 'imovel'
+      : respostas.bem === 'Serviços / outro'
+        ? 'servicos'
+        : 'auto'
+
+  const opcoes = Object.values(TAXAS)
+    .flatMap((t) => {
+      const taxa = t[tipoBem as 'auto' | 'imovel' | 'servicos']
+      if (taxa === null) return []
+      return [
+        {
+          nome: t.nome,
+          logo: t.logo,
+          alt: t.alt,
+          destaqueParceiro: t.destaqueParceiro,
+          taxa,
+          parcela: estimarParcela(credito, taxa, 48),
+          total: credito * (1 + taxa / 100),
+        },
+      ]
+    })
+    .sort((a, b) => a.total - b.total)
+
   const handleConcluirDiagnostico = async () => {
     setSalvandoLead(true)
-    // Salva o lead no banco PocketBase (persiste de forma real para a Área do Parceiro)
     try {
       await LeadService.salvarLead({
         nome,
@@ -1030,47 +1034,14 @@ function Diagnostico() {
     setDadosOk(true)
   }
 
-  const faixaParaCredito: Record<string, number> = {
-    'Até R$ 50 mil': 40000,
-    'R$ 50 mil a R$ 150 mil': 100000,
-    'R$ 150 mil a R$ 500 mil': 300000,
-    'Acima de R$ 500 mil': 600000,
-  }
-  const credito = faixaParaCredito[respostas.valor] ?? 80000
-  const tipoBem =
-    respostas.bem === 'Imóvel'
-      ? 'imovel'
-      : respostas.bem === 'Serviços / outro'
-        ? 'servicos'
-        : 'auto'
-  const opcoes = Object.values(TAXAS)
-    .flatMap((t) => {
-      const taxa = t[tipoBem as 'auto' | 'imovel' | 'servicos']
-      if (taxa === null) return []
-      return [
-        {
-          nome: t.nome,
-          logo: t.logo,
-          alt: t.alt,
-          destaqueParceiro: t.destaqueParceiro,
-          taxa,
-          parcela: estimarParcela(credito, taxa, 48),
-          total: credito * (1 + taxa / 100),
-        },
-      ]
-    })
-    .sort((a, b) => a.total - b.total)
-
   const msgDiagnostico = `Olá! Acabei de completar a cotação no site da C Consulting Group.\n\nNome: ${nome}\nWhatsApp: ${whats}\nObjetivo: ${respostas.objetivo}\nBem: ${respostas.bem}\nValor: ${respostas.valor}\nContemplação: ${respostas.prazo}\nParcela: ${respostas.parcela}\nDecisão: ${respostas.urgencia}\nMelhor horário para contato: ${respostas.melhorHorario || 'Qualquer horário comercial'}\n\nQuero falar com o especialista e realizar meu sonho.`
 
   const handleAbrirWhatsApp = () => {
-    // Abre o WhatsApp do especialista com a mensagem pré-preenchida
     window.open(
       `https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`,
       '_blank',
       'noopener,noreferrer',
     )
-    // Mostra em seguida a tela de agradecimento com horário de atendimento
     setAgradecimentoExibido(true)
   }
 
@@ -1084,45 +1055,61 @@ function Diagnostico() {
   }
 
   return (
-    <section id="cotacao" className="w-full px-4 py-16 scroll-mt-16" style={{ background: AZUL }}>
+    <section id="cotacao" className="w-full bg-[#f5f5f5] py-16 sm:py-20 scroll-mt-14">
       <div id="diagnostico" className="sr-only" aria-hidden="true" />
-      <div className="mx-auto max-w-3xl">
-        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/60">Cotação</p>
-        <h2 className="mt-2 text-3xl font-bold text-white">Faça sua cotação personalizada</h2>
-        <p className="mt-2 text-sm text-white/70">
-          7 perguntas rápidas. No final, nosso especialista recebe o seu perfil e cota entre as
-          principais administradoras para entregar o melhor preço, prazo e condição.
-        </p>
+      <div className="mx-auto max-w-4xl px-4 sm:px-6">
+        <div className="text-center mb-8">
+          <p className="eyebrow mb-2">COTAÇÃO PERSONALIZADA</p>
+          <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
+            Faça sua Cotação em 7 Etapas
+          </h2>
+          <p className="font-body mt-2 text-sm sm:text-base text-[#5b6b80]">
+            Descubra as condições ideais para o seu orçamento e receba a melhor cotação comparada
+            pelo nosso especialista.
+          </p>
+        </div>
 
-        <div className="mt-8 rounded-sm bg-white p-6 sm:p-8">
+        {/* Card Branco radius 16px */}
+        <div className="rounded-[16px] bg-white border border-[#ececec] p-6 sm:p-10 shadow-[0_6px_20px_rgba(13,26,48,0.06)]">
           {!concluido && (
             <>
-              <div className="mb-6 flex items-center gap-3">
-                <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-gray-100">
-                  <div
-                    className="h-full rounded-full transition-all"
-                    style={{
-                      width: `${(etapa / PERGUNTAS.length) * 100}%`,
-                      background: AZUL_MEDIO,
-                    }}
-                  />
+              {/* Barra de progresso com 7 segmentos verdes */}
+              <div className="mb-8">
+                <div className="flex items-center justify-between text-xs font-semibold text-[#154671] mb-2 font-mono">
+                  <span>
+                    ETAPA {etapa + 1} DE {PERGUNTAS.length}
+                  </span>
+                  <span className="text-[#15705f]">{etapa + 1}/7</span>
                 </div>
-                <span className="text-xs font-medium text-gray-500">
-                  {etapa + 1}/{PERGUNTAS.length}
-                </span>
+                <div className="grid grid-cols-7 gap-1.5 h-2">
+                  {PERGUNTAS.map((_, idx) => (
+                    <div
+                      key={idx}
+                      className={`h-full rounded-full transition-all duration-300 ${
+                        idx <= etapa ? 'bg-[#15705f]' : 'bg-[#e6eef6]'
+                      }`}
+                    />
+                  ))}
+                </div>
               </div>
-              <h3 className="text-xl font-bold" style={{ color: AZUL }}>
+
+              {/* Pergunta Atual */}
+              <h3 className="font-display font-semibold text-xl sm:text-2xl text-[#1d2f50]">
                 {PERGUNTAS[etapa].pergunta}
               </h3>
+
+              {/* Opções estilo rádio */}
               <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                {PERGUNTAS[etapa].opcoes.map((o) => (
+                {PERGUNTAS[etapa].opcoes.map((opcao) => (
                   <button
-                    key={o}
-                    onClick={() => responder(PERGUNTAS[etapa].id, o)}
-                    className="rounded-sm border border-gray-200 px-4 py-4 text-left text-sm font-medium transition-colors hover:border-gray-400"
-                    style={{ color: AZUL }}
+                    key={opcao}
+                    onClick={() => responder(PERGUNTAS[etapa].id, opcao)}
+                    className="flex items-center gap-3 rounded-[8px] border border-[#ececec] bg-[#f5f5f5] px-4 py-4 text-left font-body text-sm font-medium text-[#1d2f50] transition-all hover:border-[#154671] hover:bg-white hover:shadow-xs cursor-pointer group"
                   >
-                    {o}
+                    <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 border-[#8a96a6] group-hover:border-[#15705f] transition-colors">
+                      <span className="h-2 w-2 rounded-full bg-transparent group-hover:bg-[#15705f] transition-colors" />
+                    </span>
+                    <span>{opcao}</span>
                   </button>
                 ))}
               </div>
@@ -1131,124 +1118,130 @@ function Diagnostico() {
 
           {concluido && !dadosOk && (
             <>
-              <span className="inline-block rounded-sm bg-green-700 px-2 py-1 text-[11px] font-semibold uppercase tracking-wide text-white">
-                Perfil gerado
-              </span>
-              <h3 className="mt-4 text-xl font-bold" style={{ color: AZUL }}>
+              <div className="inline-flex items-center gap-1.5 rounded-full bg-[#e6eef6] text-[#15705f] px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                ✓ Perfil gerado com sucesso
+              </div>
+              <h3 className="font-display font-semibold text-xl sm:text-2xl text-[#1d2f50] mt-3">
                 Cotação concluída. Este é o seu perfil:
               </h3>
-              <div className="mt-4 grid gap-2 rounded-sm bg-gray-50 p-4 text-sm text-gray-700 sm:grid-cols-2">
+
+              <div className="mt-4 grid gap-2.5 rounded-[12px] bg-[#f5f5f5] p-5 text-sm text-[#5b6b80] sm:grid-cols-2 border border-[#ececec]">
                 <div>
-                  <strong>Objetivo:</strong> {respostas.objetivo}
+                  <strong className="text-[#1d2f50]">Objetivo:</strong> {respostas.objetivo}
                 </div>
                 <div>
-                  <strong>Bem:</strong> {respostas.bem}
+                  <strong className="text-[#1d2f50]">Bem:</strong> {respostas.bem}
                 </div>
                 <div>
-                  <strong>Valor:</strong> {respostas.valor}
+                  <strong className="text-[#1d2f50]">Valor:</strong> {respostas.valor}
                 </div>
                 <div>
-                  <strong>Contemplação:</strong> {respostas.prazo}
+                  <strong className="text-[#1d2f50]">Contemplação:</strong> {respostas.prazo}
                 </div>
                 <div>
-                  <strong>Parcela:</strong> {respostas.parcela}
+                  <strong className="text-[#1d2f50]">Parcela:</strong> {respostas.parcela}
                 </div>
                 <div>
-                  <strong>Decisão:</strong> {respostas.urgencia}
+                  <strong className="text-[#1d2f50]">Decisão:</strong> {respostas.urgencia}
                 </div>
-                <div className="sm:col-span-2 text-blue-900 bg-blue-50 p-2 rounded">
+                <div className="sm:col-span-2 text-[#154671] bg-[#e6eef6] p-2.5 rounded-[6px]">
                   <strong>Melhor horário para contato:</strong> {respostas.melhorHorario}
                 </div>
               </div>
-              <h4 className="mt-6 text-sm font-semibold uppercase tracking-wide text-gray-500">
-                Prévia do comparativo (crédito de {fmtBRL(credito)}, 48x)
-              </h4>
-              <div className="mt-3 space-y-2">
-                {opcoes.map((o, i) => (
-                  <div
-                    key={o.nome}
-                    className="flex items-center justify-between rounded-lg border p-3 bg-white shadow-xs"
-                    style={
-                      i === 0
-                        ? { borderColor: AZUL_MEDIO, borderWidth: 2 }
-                        : { borderColor: '#e5e7eb' }
-                    }
-                  >
-                    <div className="flex items-center gap-3">
-                      {o.logo ? (
-                        <div
-                          className="flex h-10 w-20 sm:w-24 flex-shrink-0 items-center justify-center rounded-md border border-gray-100 p-1 shadow-xs overflow-hidden"
-                          style={{
-                            backgroundColor: o.nome.includes('Itaú')
-                              ? '#EC7000'
-                              : o.nome.includes('BB')
-                                ? '#FFED00'
-                                : '#ffffff',
-                          }}
-                        >
-                          <img
-                            src={o.logo}
-                            alt={o.alt}
-                            className="max-h-full max-w-full object-contain"
-                          />
+
+              <div className="mt-6 border-t border-[#ececec] pt-6">
+                <p className="eyebrow mb-2">PRÉVIA DO COMPARATIVO</p>
+                <div className="space-y-2 mt-3">
+                  {opcoes.map((o, i) => (
+                    <div
+                      key={o.nome}
+                      className={`flex items-center justify-between rounded-[8px] border p-3 bg-white shadow-2xs ${
+                        i === 0 ? 'border-[#15705f] ring-1 ring-[#15705f]/20' : 'border-[#ececec]'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        {o.logo ? (
+                          <div
+                            className="flex h-10 w-20 sm:w-24 shrink-0 items-center justify-center rounded-[4px] border border-[#ececec] p-1 overflow-hidden"
+                            style={{
+                              backgroundColor: o.nome.includes('Itaú')
+                                ? '#EC7000'
+                                : o.nome.includes('BB')
+                                  ? '#FFED00'
+                                  : '#ffffff',
+                            }}
+                          >
+                            <img
+                              src={o.logo}
+                              alt={o.alt}
+                              className="max-h-full max-w-full object-contain"
+                            />
+                          </div>
+                        ) : null}
+                        <div>
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#15705f] block">
+                            ★ Parceira Oficial
+                          </span>
+                          <span className="text-sm font-semibold text-[#1d2f50]">
+                            {i === 0 && (
+                              <span className="mr-2 rounded-full bg-[#15705f] px-1.5 py-0.5 text-[9px] font-bold text-white">
+                                MENOR PARCELA
+                              </span>
+                            )}
+                            {o.nome}
+                          </span>
                         </div>
-                      ) : null}
-                      <div>
-                        <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 block">
-                          ★ Parceira Oficial
-                        </span>
-                        <span className="text-sm font-semibold" style={{ color: AZUL }}>
-                          {i === 0 && (
-                            <span className="mr-2 rounded-sm bg-green-700 px-1.5 py-0.5 text-[10px] font-bold text-white">
-                              MELHOR PARCELA
-                            </span>
-                          )}
-                          {o.nome}
-                        </span>
                       </div>
+                      <span className="text-sm sm:text-base font-display font-bold text-[#1d2f50]">
+                        {fmtBRL(o.parcela)}/mês
+                      </span>
                     </div>
-                    <span className="text-sm sm:text-base font-bold" style={{ color: AZUL }}>
-                      {fmtBRL(o.parcela)}/mês
-                    </span>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <div className="mt-8 border-t pt-6">
-                <h4 className="font-bold" style={{ color: AZUL }}>
+
+              {/* Formulário Nome + WhatsApp */}
+              <div className="mt-8 border-t border-[#ececec] pt-6">
+                <h4 className="font-display font-semibold text-base sm:text-lg text-[#1d2f50]">
                   Falta um passo para falar com o especialista
                 </h4>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="font-body mt-1 text-xs sm:text-sm text-[#5b6b80]">
                   Deixe seu nome e WhatsApp para levarmos a sua cotação direto para a conversa.
                 </p>
+
                 <div className="mt-4 grid gap-3 sm:grid-cols-2">
                   <div>
-                    <Label htmlFor="nome">Nome completo</Label>
+                    <Label htmlFor="nome" className="text-xs font-semibold text-[#1d2f50]">
+                      Nome completo
+                    </Label>
                     <Input
                       id="nome"
                       value={nome}
                       onChange={(e) => setNome(e.target.value)}
                       placeholder="Seu nome"
-                      className="mt-1"
+                      className="mt-1 rounded-[6px] border-[#ececec]"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="whats">WhatsApp com DDD</Label>
+                    <Label htmlFor="whats" className="text-xs font-semibold text-[#1d2f50]">
+                      WhatsApp com DDD
+                    </Label>
                     <Input
                       id="whats"
                       value={whats}
                       onChange={(e) => setWhats(e.target.value)}
                       placeholder="(81) 9 9999-9999"
-                      className="mt-1"
+                      className="mt-1 rounded-[6px] border-[#ececec]"
                     />
                   </div>
                 </div>
+
                 <Button
-                  className="mt-4 w-full rounded-sm font-semibold text-white"
-                  style={{ background: AZUL_MEDIO }}
+                  className="mt-5 w-full rounded-[6px] bg-[#1d2f50] hover:bg-[#2a5e8c] text-white font-display font-semibold text-sm py-5 uppercase tracking-wider transition-colors"
                   disabled={!nome || whats.length < 8 || salvandoLead}
                   onClick={handleConcluirDiagnostico}
                 >
-                  {salvandoLead ? 'Salvando cotação...' : 'Concluir cotação'}
+                  {salvandoLead ? 'Salvando cotação...' : 'Concluir cotação e falar com consultor'}
                 </Button>
               </div>
             </>
@@ -1256,74 +1249,69 @@ function Diagnostico() {
 
           {concluido && dadosOk && !agradecimentoExibido && (
             <div className="py-6 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#e6eef6] text-[#15705f] text-3xl font-bold">
                 ✓
               </div>
-              <h3 className="mt-5 text-2xl font-bold" style={{ color: AZUL }}>
+              <h3 className="font-display font-semibold mt-5 text-2xl text-[#1d2f50]">
                 Cotação completa, {nome.split(' ')[0]}!
               </h3>
-              <p className="mx-auto mt-3 max-w-md text-base font-medium text-gray-700">
+              <p className="font-body mx-auto mt-3 max-w-md text-base text-[#1d2f50]">
                 Fale direto com o nosso especialista e{' '}
-                <strong style={{ color: AZUL }}>ainda hoje</strong> dê o primeiro passo para
+                <strong className="text-[#15705f]">ainda hoje</strong> dê o primeiro passo para
                 realizar o seu sonho.
               </p>
-              <p className="mx-auto mt-2 max-w-md text-sm text-gray-600">
-                O seu perfil já está pronto na nossa mão com a sua preferência de contato:{' '}
-                <strong>{respostas.melhorHorario}</strong>. É só tocar no botão abaixo — a conversa
-                abre com tudo o que você respondeu, sem repetir nada.
+              <p className="font-body mx-auto mt-2 max-w-md text-sm text-[#5b6b80]">
+                O seu perfil já está pronto com a sua preferência de contato:{' '}
+                <strong className="text-[#1d2f50]">{respostas.melhorHorario}</strong>.
               </p>
-              <div className="mt-6 block">
+              <div className="mt-6">
                 <Button
                   size="lg"
                   onClick={handleAbrirWhatsApp}
-                  className="w-full rounded-sm bg-green-600 px-8 py-6 text-lg font-bold text-white hover:bg-green-700 shadow-md"
+                  className="w-full rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-8 py-6 text-base font-display font-bold text-white shadow-md uppercase tracking-wider"
                 >
                   💬 Falar agora com o especialista no WhatsApp
                 </Button>
               </div>
-              <p className="mt-3 text-xs text-gray-400">
-                Atendimento humano, sem custo e sem compromisso. O seu sonho não pode esperar.
+              <p className="mt-3 text-xs text-[#8a96a6]">
+                Atendimento humano, sem custo e sem compromisso.
               </p>
             </div>
           )}
 
           {concluido && dadosOk && agradecimentoExibido && (
             <div className="py-6 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-50 text-emerald-600 text-3xl border border-emerald-200">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#e6eef6] text-[#15705f] text-3xl">
                 🎉
               </div>
-              <span className="mt-3 inline-block rounded-full bg-emerald-100 text-emerald-800 px-3 py-1 text-xs font-bold uppercase tracking-wider">
+              <span className="mt-3 inline-block rounded-full bg-[#e6eef6] text-[#15705f] px-3 py-1 text-xs font-bold uppercase tracking-wider">
                 Cotação Recebida com Sucesso!
               </span>
-              <h3 className="mt-3 text-2xl font-extrabold" style={{ color: AZUL }}>
+              <h3 className="font-display font-bold mt-3 text-2xl text-[#1d2f50]">
                 Muito obrigado, {nome.split(' ')[0]}!
               </h3>
-              <p className="mx-auto mt-3 max-w-lg text-base text-gray-700 font-medium">
+              <p className="font-body mx-auto mt-3 max-w-lg text-base text-[#5b6b80]">
                 Nosso especialista vai falar com você no WhatsApp em instantes com a cotação
-                comparativa oficial.
+                oficial.
               </p>
 
-              {/* Informação do Horário de Atendimento Editável */}
-              <div className="mx-auto mt-6 max-w-md rounded-lg border border-blue-100 bg-blue-50/70 p-4 text-left shadow-xs">
+              <div className="mx-auto mt-6 max-w-md rounded-[12px] border border-[#ececec] bg-[#f5f5f5] p-4 text-left">
                 <div className="flex items-start gap-3">
                   <span className="text-xl">🕒</span>
                   <div>
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-blue-900">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#154671]">
                       Horário de Atendimento da Equipe
                     </h4>
-                    <p className="mt-1 text-sm font-semibold text-blue-950">
+                    <p className="mt-1 text-sm font-semibold text-[#1d2f50]">
                       {HORARIO_ATENDIMENTO_PADRAO}
                     </p>
-                    <p className="mt-1 text-xs text-blue-700 leading-relaxed">
-                      Você marcou preferência para <strong>{respostas.melhorHorario}</strong>.
-                      Respeitaremos o seu momento! Fora do horário comercial, responderemos na
-                      primeira hora do dia seguinte.
+                    <p className="mt-1 text-xs text-[#5b6b80] leading-relaxed">
+                      Preferência marcada para <strong>{respostas.melhorHorario}</strong>.
                     </p>
                   </div>
                 </div>
               </div>
 
-              {/* Botão de reforço para reabrir o WhatsApp */}
               <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
                 <a
                   href={`https://wa.me/${WHATS_CONSULTOR}?text=${encodeURIComponent(msgDiagnostico)}`}
@@ -1333,7 +1321,7 @@ function Diagnostico() {
                 >
                   <Button
                     size="sm"
-                    className="w-full rounded-sm bg-emerald-600 px-6 py-2.5 font-bold text-white hover:bg-emerald-700"
+                    className="w-full rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-6 py-2.5 font-display font-semibold text-white uppercase tracking-wider"
                   >
                     💬 Reabrir conversa no WhatsApp
                   </Button>
@@ -1342,7 +1330,7 @@ function Diagnostico() {
                   variant="outline"
                   size="sm"
                   onClick={reiniciarDiagnostico}
-                  className="w-full sm:w-auto border-gray-300 text-gray-700"
+                  className="w-full sm:w-auto rounded-[6px] border-[#ececec] text-[#5b6b80]"
                 >
                   Fazer nova simulação
                 </Button>
@@ -1355,183 +1343,243 @@ function Diagnostico() {
   )
 }
 
+/* =========================================================================
+   9. "POR QUE A C CONSULTING GROUP?" (bg branco, 3 cards em painel #f5f5f5 radius 16)
+   ========================================================================= */
 function PorQue() {
-  const itens = [
+  const diferenciais = [
     {
-      t: 'Comparativo real',
-      d: 'Cotamos entre as principais administradoras do Brasil — preço lado a lado, com dados oficiais.',
+      num: '01',
+      titulo: 'Comparativo real',
+      desc: 'Cotamos entre as principais administradoras do Brasil — preço lado a lado, com dados oficiais e transparentes.',
+      icone: '📊',
     },
     {
-      t: 'Melhor preço, prazo e condição',
-      d: 'Analisamos custo total, taxa, fundo de reserva e condições de lance — não só a parcela.',
+      num: '02',
+      titulo: 'Melhor preço, prazo e condição',
+      desc: 'Analisamos custo total, taxa, fundo de reserva e condições de lance — não apenas o valor aparente da parcela.',
+      icone: '🎯',
     },
     {
-      t: 'Acompanhamento completo',
-      d: 'Da cotação ao fechamento no ambiente oficial da administradora, com especialista ao seu lado.',
+      num: '03',
+      titulo: 'Acompanhamento completo',
+      desc: 'Da cotação ao fechamento no ambiente oficial da administradora, com consultor dedicado ao seu lado.',
+      icone: '🤝',
     },
   ]
+
   return (
-    <section className="w-full px-4 py-16" style={{ background: '#eef3f6' }}>
-      <div className="mx-auto max-w-5xl">
-        <h2 className="text-center text-2xl font-bold" style={{ color: AZUL }}>
-          Por que a C Consulting Group?
-        </h2>
-        <div className="mt-8 grid gap-6 md:grid-cols-3">
-          {itens.map((i) => (
-            <div key={i.t} className="rounded-sm border border-gray-200 bg-white p-6">
-              <h3 className="font-bold" style={{ color: AZUL }}>
-                {i.t}
-              </h3>
-              <p className="mt-2 text-sm text-gray-600">{i.d}</p>
-            </div>
-          ))}
-        </div>
-        <div
-          className="mx-auto mt-10 max-w-3xl rounded-sm p-8 text-center"
-          style={{ background: AZUL }}
-        >
-          <p className="text-lg font-semibold leading-relaxed text-white md:text-xl">
-            A conquista de um bem muda uma família. O seu momento é agora — e a gente cuida do preço
-            para você cuidar do sonho.
+    <section className="w-full bg-white py-16 sm:py-20 border-t border-[#ececec]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <p className="eyebrow mb-2">ASSESSORIA INDEPENDENTE</p>
+          <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
+            Por que a C Consulting Group?
+          </h2>
+          <p className="font-body mt-2 text-sm sm:text-base text-[#5b6b80]">
+            Não vendemos apenas uma administradora. Defendemos o seu interesse para encontrar a
+            melhor carta do mercado.
           </p>
-          <a href="#cotacao" className="mt-6 inline-block">
-            <Button
-              size="lg"
-              className="rounded-sm bg-white px-8 font-bold hover:bg-white/90"
-              style={{ color: AZUL }}
-            >
-              Começar agora → é grátis
-            </Button>
-          </a>
+        </div>
+
+        {/* Painel #f5f5f5 com radius 16px */}
+        <div className="rounded-[16px] bg-[#f5f5f5] border border-[#ececec] p-6 sm:p-10 shadow-[0_4px_14px_rgba(13,26,48,0.04)]">
+          <div className="grid gap-6 md:grid-cols-3">
+            {diferenciais.map((d) => (
+              <div
+                key={d.num}
+                className="rounded-[12px] bg-white border border-[#ececec] p-6 shadow-xs flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1d2f50] text-white text-lg">
+                      {d.icone}
+                    </div>
+                    <span className="font-mono text-xs font-bold text-[#15705f]">{d.num}</span>
+                  </div>
+                  <h3 className="font-display font-semibold text-lg text-[#1d2f50] uppercase">
+                    {d.titulo}
+                  </h3>
+                  <p className="font-body mt-2 text-xs sm:text-sm text-[#5b6b80] leading-relaxed">
+                    {d.desc}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
   )
 }
 
-/* 4. Prova Social — Depoimentos de clientes e números de destaque (Exemplos editáveis) */
-function ProvaSocial() {
-  // Números de destaque de exemplo (valores neutros e editáveis no código)
-  const metricas = [
-    { valor: '+1.200', label: 'Clientes atendidos', detalhe: 'Consultoria personalizada' },
-    { valor: '+350', label: 'Contratos contemplados', detalhe: 'Por sorteio e lance' },
-    { valor: 'R$ 85M+', label: 'Em créditos intermediados', detalhe: 'Imóveis, autos e frotas' },
-    { valor: '98%', label: 'Satisfação comprovada', detalhe: 'Atendimento do início ao fim' },
+/* =========================================================================
+   10. BANNER CTA BG #1d2f50 RADIUS 16 COM CÍRCULOS DECORATIVOS + 4 STATS
+   ========================================================================= */
+function BannerCTA() {
+  const stats = [
+    { valor: '+1.200', label: 'Clientes atendidos' },
+    { valor: '+350', label: 'Contratos contemplados' },
+    { valor: 'R$ 85M+', label: 'Em créditos intermediados' },
+    { valor: '98%', label: 'Satisfação comprovada' },
   ]
 
-  // Depoimentos de clientes (3 exemplos editáveis)
+  return (
+    <section className="w-full bg-white py-8 sm:py-12">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="relative overflow-hidden rounded-[16px] bg-[#1d2f50] text-white p-8 sm:p-14 shadow-[0_12px_32px_rgba(13,26,48,0.2)]">
+          {/* Círculos decorativos SVG */}
+          <div className="pointer-events-none absolute -bottom-10 -right-10 w-72 h-72 opacity-20">
+            <svg viewBox="0 0 300 300" fill="none" className="w-full h-full">
+              <circle
+                cx="200"
+                cy="200"
+                r="160"
+                stroke="#c7d6e6"
+                strokeWidth="2"
+                strokeDasharray="6 6"
+              />
+              <circle cx="200" cy="200" r="110" stroke="#15705f" strokeWidth="2" />
+              <circle
+                cx="200"
+                cy="200"
+                r="60"
+                stroke="#c7d6e6"
+                strokeWidth="1"
+                strokeDasharray="4 4"
+              />
+            </svg>
+          </div>
+
+          <div className="relative z-10 max-w-3xl text-center mx-auto">
+            <p className="font-display font-semibold text-xl sm:text-2xl md:text-3xl leading-snug text-white">
+              A conquista de um bem muda uma família. O seu momento é agora, e a gente cuida do
+              preço para você cuidar do sonho.
+            </p>
+            <div className="mt-8">
+              <a href="#cotacao">
+                <Button
+                  size="lg"
+                  className="rounded-[6px] bg-white text-[#1d2f50] hover:bg-[#e6eef6] px-8 py-6 font-display font-bold text-xs sm:text-sm uppercase tracking-wider shadow-md"
+                >
+                  Começar agora → é grátis
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          {/* 4 Stats */}
+          <div className="relative z-10 mt-12 pt-8 border-t border-white/15 grid grid-cols-2 gap-6 md:grid-cols-4 text-center">
+            {stats.map((s) => (
+              <div key={s.label}>
+                <div className="font-display font-bold text-2xl sm:text-3xl text-white">
+                  {s.valor}
+                </div>
+                <div className="font-body mt-1 text-xs text-[#c7d6e6] font-medium">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+/* =========================================================================
+   11. DEPOIMENTOS (bg #f5f5f5, 3 cards ★★★★★ 5.0)
+   ========================================================================= */
+function Depoimentos() {
   const depoimentos = [
     {
       id: 1,
       nome: 'Rodrigo S. Albuquerque',
       perfil: 'Empresário · Recife/PE',
-      bem: 'Carta de Imóvel (R$ 450 mil)',
+      bem: 'Carta de Imóvel R$ 450 mil',
       administradora: 'Porto Seguro Consórcio',
       foto: 'https://img.usecurling.com/ppl/medium?gender=male&seed=42',
       texto:
-        'Conseguimos comprar nosso imóvel comercial sem pagar os juros abusivos de um financiamento tradicional. A equipe da C Consulting comparou as opções da Porto e Embracon e nos orientou o mês exato para dar o lance embutido.',
-      nota: 5,
+        'Conseguimos comprar nosso imóvel comercial sem pagar os juros abusivos de um financiamento tradicional. A equipe da C Consulting comparou as opções da Porto e Embracon e nos orientou o mês exato para o lance embutido.',
     },
     {
       id: 2,
       nome: 'Camila Mendonça Vieira',
       perfil: 'Médica · Olinda/PE',
-      bem: 'Carta de Veículo (R$ 130 mil)',
+      bem: 'Carta de Veículo R$ 130 mil',
       administradora: 'Embracon Consórcios',
       foto: 'https://img.usecurling.com/ppl/medium?gender=female&seed=18',
       texto:
         'Fiz a cotação no site e em poucos minutos o consultor me chamou no WhatsApp já com a proposta pronta. Fui contemplada por sorteio no 8º mês e troquei de carro sem surpresas na parcela.',
-      nota: 5,
     },
     {
       id: 3,
-      nome: 'Marcelo F. Gusmão',
+      nome: 'Marcelo F. Guzmão',
       perfil: 'Engenheiro Civil · Jaboatão/PE',
-      bem: 'Carta de Terreno & Construção (R$ 600 mil)',
+      bem: 'Carta de Terreno & Construção R$ 680 mil',
       administradora: 'Mapfre Consórcios',
       foto: 'https://img.usecurling.com/ppl/medium?gender=male&seed=73',
       texto:
         'A transparência nas taxas do Banco Central fez toda a diferença. Sabia exatamente quanto estava pagando de taxa de administração e a assessoria pós-contemplação para liberar o crédito foi impecável.',
-      nota: 5,
     },
   ]
 
   return (
-    <section id="depoimentos" className="w-full px-4 py-16" style={{ background: '#faf9f5' }}>
-      <div className="mx-auto max-w-6xl">
-        {/* Métricas / Números de Destaque */}
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-4 border-b border-gray-200 pb-12">
-          {metricas.map((m) => (
-            <div
-              key={m.label}
-              className="rounded-lg border border-gray-200 bg-white p-5 text-center shadow-xs"
-            >
-              <div className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
-                {m.valor}
-              </div>
-              <div className="mt-1 text-xs font-bold text-gray-800">{m.label}</div>
-              <div className="mt-0.5 text-[11px] text-gray-500">{m.detalhe}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* Cabeçalho da Prova Social */}
-        <div className="mt-12 text-center">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-800 mb-2 border border-emerald-200">
-            ★ Prova Social & Experiências Reais
-          </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
+    <section
+      id="depoimentos"
+      className="w-full bg-[#f5f5f5] py-16 sm:py-20 border-t border-[#ececec]"
+    >
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="text-center max-w-2xl mx-auto mb-10">
+          <p className="eyebrow mb-2">EXPERIÊNCIAS REAIS</p>
+          <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
             O que dizem os clientes que conquistaram seus bens
           </h2>
-          <p className="mx-auto mt-2 max-w-2xl text-sm text-gray-600">
+          <p className="font-body mt-2 text-sm sm:text-base text-[#5b6b80]">
             Histórias de quem planejou o futuro com sabedoria, economizou milhares de reais em juros
-            e foi acompanhado pelo time da C Consulting Group.
+            e foi acompanhado pela C Consulting Group.
           </p>
         </div>
 
-        {/* Cards de Depoimentos */}
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-3">
           {depoimentos.map((dep) => (
             <div
               key={dep.id}
-              className="flex flex-col justify-between rounded-lg border border-gray-200 bg-white p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="flex flex-col justify-between rounded-[12px] bg-white border border-[#ececec] p-6 shadow-[0_2px_8px_rgba(13,26,48,0.04)]"
             >
               <div>
-                {/* Estrelas */}
-                <div className="flex items-center gap-1 text-amber-400 text-sm mb-3">
-                  {'★'.repeat(dep.nota)}
-                  <span className="text-[11px] text-gray-400 ml-1 font-semibold">5.0</span>
+                <div className="flex items-center gap-1 text-amber-500 text-sm mb-3">
+                  {'★'.repeat(5)}
+                  <span className="text-xs text-[#8a96a6] ml-1 font-semibold">5.0</span>
                 </div>
-                {/* Depoimento */}
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed italic">
+                <p className="font-body text-xs sm:text-sm text-[#5b6b80] leading-relaxed italic">
                   "{dep.texto}"
                 </p>
               </div>
 
-              {/* Autor e Bem */}
-              <div className="mt-6 border-t border-gray-100 pt-4">
+              <div className="mt-6 border-t border-[#ececec] pt-4">
                 <div className="flex items-center gap-3">
                   <img
                     src={dep.foto}
                     alt={dep.nome}
-                    className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                    className="h-10 w-10 rounded-full object-cover border border-[#ececec]"
                     loading="lazy"
                   />
                   <div>
-                    <div className="text-xs font-bold text-gray-900">{dep.nome}</div>
-                    <div className="text-[11px] text-gray-500">{dep.perfil}</div>
+                    <div className="font-display font-semibold text-xs sm:text-sm text-[#1d2f50]">
+                      {dep.nome}
+                    </div>
+                    <div className="text-[11px] text-[#8a96a6]">{dep.perfil}</div>
                   </div>
                 </div>
-                <div className="mt-2.5 rounded bg-gray-50 px-2.5 py-1 text-[11px] text-gray-600 flex items-center justify-between">
+                <div className="mt-2.5 rounded-[6px] bg-[#f5f5f5] px-2.5 py-1 text-[11px] text-[#5b6b80] flex items-center justify-between">
                   <span>{dep.bem}</span>
-                  <span className="font-semibold text-emerald-800">{dep.administradora}</span>
+                  <span className="font-semibold text-[#15705f]">{dep.administradora}</span>
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        <p className="mt-6 text-center text-[11px] text-gray-400">
+        <p className="mt-6 text-center text-xs text-[#8a96a6]">
           * Depoimentos ilustrativos baseados em perfis reais atendidos por nossos consultores
           parceiros.
         </p>
@@ -1540,148 +1588,159 @@ function ProvaSocial() {
   )
 }
 
-/* 3. Seção de Perguntas Frequentes (FAQ) em Acordeão */
-function FAQ() {
+/* =========================================================================
+   12. FAQ 2 (bg branco, coluna sticky + bloco WhatsApp)
+   ========================================================================= */
+function FAQ2() {
   const itensFAQ = [
     {
       id: 'faq-1',
-      pergunta: 'Quanto tempo leva para ser contemplado no consórcio?',
+      pergunta: 'Quanto tempo leva para ser contemplado?',
       resposta:
-        'A contemplação pode ocorrer desde a primeira assembleia até o final do grupo. Existem duas maneiras: por sorteio (com chances iguais para todos os participantes adimplentes) ou por lance (livre ou embutido, onde quem oferta o maior percentual de parcelas antecipadas leva o crédito no mês). Quem tem urgência pode planejar uma estratégia de lance orientada pelo nosso consultor.',
+        'A contemplação pode ocorrer desde a primeira assembleia até o final do grupo. Existem duas maneiras: por sorteio (com chances iguais para todos) ou por lance (livre ou embutido, onde quem oferta mais parcelas antecipadas leva o crédito no mês).',
     },
     {
       id: 'faq-2',
-      pergunta: 'Posso usar a carta de crédito para qualquer bem?',
+      pergunta: 'Posso usar a carta para qualquer bem?',
       resposta:
-        'A carta deve ser utilizada dentro da categoria contratada: consórcio imobiliário permite comprar casa, apartamento, terreno, reforma, construção e até quitar financiamento bancário pré-existente; consórcio de automóveis permite adquirir veículos novos ou seminovos de qualquer marca e modelo, motos e frotas.',
+        'A carta deve ser utilizada dentro da categoria contratada: consórcio imobiliário permite comprar casa, apartamento, terreno, reforma, construção e até quitar financiamento pré-existente; consórcio de automóveis permite veículos novos, seminovos, motos e frotas.',
     },
     {
       id: 'faq-3',
-      pergunta: 'O que é lance e como funciona o lance embutido?',
+      pergunta: 'O que é lance embutido?',
       resposta:
-        'O lance é uma oferta para adiantar parcelas do consórcio e antecipar sua contemplação. O "lance embutido" é uma vantagem onde você pode usar até 30% a 50% do valor da própria carta de crédito contratada como lance, sem precisar tirar dinheiro do bolso. Se for contemplado, esse percentual é deduzido do saldo e o restante é liberado para comprar o bem.',
+        'O lance embutido é uma vantagem onde você pode usar até 30% a 50% do valor da própria carta de crédito contratada como lance, sem precisar tirar dinheiro do bolso. Se contemplado, o percentual é deduzido do saldo e o restante liberado para compra.',
     },
     {
       id: 'faq-4',
-      pergunta: 'Quais são as taxas cobradas? Tem juros?',
+      pergunta: 'Quais são as taxas? Tem juros?',
       resposta:
-        'Consórcio NÃO cobra juros. A única remuneração é a Taxa de Administração (que remunera a administradora pela gestão do grupo durante todo o contrato, diluída nas parcelas) e, conforme a administradora, fundo de reserva e seguro prestamista. No custo efetivo total, o consórcio chega a ser até 60% mais barato que um financiamento tradicional com juros compostos.',
+        'Consórcio NÃO cobra juros. A única remuneração é a Taxa de Administração (que remunera a administradora pela gestão do grupo durante o contrato, diluída nas parcelas) e, conforme a administradora, fundo de reserva e seguro prestamista.',
     },
     {
       id: 'faq-5',
-      pergunta: 'Posso usar o meu FGTS no consórcio imobiliário?',
+      pergunta: 'Posso usar meu FGTS no consórcio imobiliário?',
       resposta:
-        'Sim! As administradoras parceiras como a Porto Seguro e Embracon permitem a utilização do FGTS para ofertar lances, complementar o valor da carta de crédito na compra de imóvel residencial ou abater parcelas do saldo devedor após a contemplação, segundo as normas da Caixa e SFH.',
+        'Sim! As administradoras parceiras como Porto Seguro e Embracon permitem a utilização do FGTS para ofertar lances, complementar a carta de crédito ou abater parcelas do saldo devedor após a contemplação, segundo normas da Caixa/SFH.',
     },
     {
       id: 'faq-6',
-      pergunta: 'Como a C Consulting Group me ajuda a escolher a melhor administradora?',
+      pergunta: 'Como a C Consulting Group me ajuda a escolher?',
       resposta:
-        'Nós somos consultores credenciados pelas principais administradoras do país (Porto Seguro, Embracon, Itaú, BB Consórcios, Mapfre e MAG Seguros). Em vez de vender uma única administradora, comparamos as taxas oficiais do Banco Central, o histórico de contemplações, o percentual médio de lance de cada grupo e montamos uma solução sob medida para o seu orçamento e prazo desejado.',
+        'Somos consultores credenciados pelas 6 maiores administradoras do país. Em vez de vender uma única opção, comparamos as taxas oficiais do Banco Central, o histórico de contemplações e o perfil de lance para montar a solução ideal para o seu bolso.',
     },
   ]
 
   return (
-    <section id="faq" className="w-full px-4 py-16" style={{ background: '#eef3f6' }}>
-      <div className="mx-auto max-w-3xl">
-        <div className="text-center">
-          <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-blue-900 mb-2">
-            ❓ Dúvidas Frequentes
+    <section id="faq" className="w-full bg-white py-16 sm:py-20 border-t border-[#ececec]">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-10 lg:grid-cols-12">
+          {/* Coluna Sticky */}
+          <div className="lg:col-span-5">
+            <div className="lg:sticky lg:top-24">
+              <p className="eyebrow mb-2">DÚVIDAS FREQUENTES</p>
+              <h2 className="font-display font-semibold text-3xl sm:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
+                Perguntas Frequentes
+              </h2>
+              <p className="font-body mt-4 text-base text-[#5b6b80] leading-relaxed">
+                Tudo o que você precisa saber sobre prazos, taxas, lances e contemplação para tomar
+                a melhor decisão com segurança.
+              </p>
+
+              {/* Bloco WhatsApp Consultor */}
+              <div className="mt-8 rounded-[12px] bg-[#f5f5f5] border border-[#ececec] p-5">
+                <p className="font-display font-semibold text-sm text-[#1d2f50]">
+                  Ficou com alguma dúvida específica para o seu caso?
+                </p>
+                <p className="font-body text-xs text-[#5b6b80] mt-1">
+                  Nosso consultor responde rapidamente e analisa sua situação.
+                </p>
+                <a
+                  href={WHATS_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-4 inline-flex items-center gap-2 rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-4 py-2.5 font-display font-semibold text-xs sm:text-sm text-white uppercase tracking-wider transition-colors shadow-xs w-full justify-center"
+                >
+                  <span>💬</span>
+                  <span>Tirar dúvidas no WhatsApp com o consultor</span>
+                </a>
+              </div>
+            </div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold" style={{ color: AZUL }}>
-            Perguntas Frequentes sobre Consórcio
-          </h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-gray-600">
-            Tudo o que você precisa saber sobre prazos, taxas, lances e contemplação para tomar a
-            melhor decisão.
-          </p>
-        </div>
 
-        <Accordion
-          type="single"
-          collapsible
-          className="mt-8 bg-white rounded-lg border border-gray-200 p-2 sm:p-4 shadow-sm"
-        >
-          {itensFAQ.map((item) => (
-            <AccordionItem key={item.id} value={item.id} className="border-gray-200 px-3">
-              <AccordionTrigger
-                className="text-left font-bold text-sm sm:text-base py-4 hover:no-underline"
-                style={{ color: AZUL }}
-              >
-                {item.pergunta}
-              </AccordionTrigger>
-              <AccordionContent className="text-xs sm:text-sm leading-relaxed text-gray-600 pb-4">
-                {item.resposta}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
-
-        <div className="mt-8 rounded-lg bg-white border border-gray-200 p-5 text-center shadow-xs">
-          <p className="text-xs sm:text-sm text-gray-700 font-medium">
-            Ficou com alguma dúvida específica para o seu caso?
-          </p>
-          <a
-            href={WHATS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-3 inline-flex items-center gap-2 rounded bg-emerald-600 px-5 py-2.5 font-bold text-white hover:bg-emerald-700 text-xs sm:text-sm transition-colors shadow-sm"
-          >
-            <span>💬</span>
-            <span>Tirar dúvidas no WhatsApp com o consultor</span>
-          </a>
+          {/* Acordeão de 6 perguntas */}
+          <div className="lg:col-span-7">
+            <Accordion type="single" collapsible className="space-y-3">
+              {itensFAQ.map((item) => (
+                <AccordionItem
+                  key={item.id}
+                  value={item.id}
+                  className="rounded-[12px] border border-[#ececec] bg-[#f5f5f5] px-5 py-1"
+                >
+                  <AccordionTrigger className="text-left font-display font-semibold text-[#1d2f50] hover:no-underline py-4 text-sm sm:text-base">
+                    {item.pergunta}
+                  </AccordionTrigger>
+                  <AccordionContent className="font-body text-xs sm:text-sm text-[#5b6b80] leading-relaxed pb-4 pt-1">
+                    {item.resposta}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </div>
         </div>
       </div>
     </section>
   )
 }
 
+/* =========================================================================
+   13. RODAPÉ BG #0d1a30
+   ========================================================================= */
 function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   return (
-    <footer className="w-full px-4 py-10" style={{ background: AZUL }}>
-      <div className="mx-auto max-w-6xl text-center text-xs text-white/50">
+    <footer className="w-full bg-[#0d1a30] text-white py-12 border-t border-white/10">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 text-center text-xs text-[#c7d6e6]/70">
         <div className="flex justify-center mb-4">
           <ContemplaLogo
             variant="dark-bg"
             className="h-10 sm:h-12 w-auto"
-            alt="Contempla Consórcios"
+            alt="C Contempla - Consórcios, Seguro e Previdência"
           />
         </div>
-        <p className="font-semibold tracking-wide text-white/80">C CONSULTING GROUP · Recife, PE</p>
-        <p className="mt-2 text-white/60">
+
+        <p className="font-display font-semibold tracking-wider text-white uppercase text-sm">
+          C CONSULTING GROUP · Recife, PE
+        </p>
+        <p className="mt-2 text-[#c7d6e6]/80 text-xs">
           Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre · MAG
           Seguros
         </p>
 
-        {/* Botão de WhatsApp no rodapé */}
-        <div className="mt-4 flex justify-center">
+        {/* Botão WhatsApp Verde no Rodapé */}
+        <div className="mt-5 flex justify-center">
           <a
             href={WHATS_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded bg-emerald-600 px-4 py-2 font-semibold text-white hover:bg-emerald-500 shadow-sm text-xs transition-colors"
+            className="inline-flex items-center gap-2 rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-5 py-2.5 font-display font-semibold text-white shadow-sm text-xs uppercase tracking-wider transition-colors"
           >
             <span>💬</span>
-            <span>Falar diretamente com o parceiro no WhatsApp (81 9754-3716)</span>
+            <span>Falar no WhatsApp (81 9754-3716)</span>
           </a>
         </div>
 
-        <p className="mt-4 max-w-2xl mx-auto leading-relaxed">
-          Protótipo em desenvolvimento. As estimativas exibidas usam a taxa média de administração
-          publicada pelo Banco Central (maio/2026, ponderada por cotas ativas) e não constituem
-          oferta ou cotação oficial. A contratação ocorre no ambiente oficial da administradora
-          escolhida. Sistema de consórcios regulado pelo Banco Central.
+        <p className="mt-5 max-w-2xl mx-auto leading-relaxed text-[11px] text-[#c7d6e6]/60">
+          As estimativas exibidas utilizam taxas médias de administração oficiais e não constituem
+          oferta vinculante. A contratação ocorre no ambiente oficial da administradora escolhida.
+          Sistema de consórcios regulado pelo Banco Central do Brasil.
         </p>
 
-        {/* Link discreto para Área do Parceiro com barreira de login */}
-        <div className="mt-6 border-t border-white/10 pt-4 flex items-center justify-between text-[11px] text-white/40">
-          <span>
-            © {new Date().getFullYear()} C Consulting Group. Todos os direitos reservados.
-          </span>
+        <div className="mt-8 border-t border-white/10 pt-5 flex flex-col sm:flex-row items-center justify-between gap-3 text-[11px] text-[#c7d6e6]/50">
+          <span>© 2026 C Consulting Group. Todos os direitos reservados.</span>
           <button
             type="button"
             onClick={onAccessJarvis}
-            className="text-white/40 hover:text-white/80 transition-colors underline-offset-2 hover:underline cursor-pointer bg-transparent border-none p-0 inline-flex items-center gap-1"
+            className="text-[#c7d6e6]/60 hover:text-white transition-colors underline-offset-2 hover:underline cursor-pointer bg-transparent border-none p-0 inline-flex items-center gap-1"
             title="CRM Jarvis — Consórcio, Seguro e Previdência"
           >
             🔒 Área do Parceiro (CRM Jarvis)
@@ -1692,27 +1751,29 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   )
 }
 
+/* =========================================================================
+   14. BOTÃO FLUTUANTE FIXO (Pill verde #15705f)
+   ========================================================================= */
 function WhatsAppFloatingButton() {
   return (
     <a
       href={WHATS_URL}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Falar no WhatsApp com o parceiro"
-      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white shadow-lg transition-transform hover:scale-105 hover:bg-emerald-500"
+      aria-label="Falar com o Parceiro no WhatsApp"
+      className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-[#15705f] hover:bg-[#125c4f] px-4 py-3 text-xs sm:text-sm font-display font-semibold text-white shadow-[0_4px_16px_rgba(21,112,95,0.35)] transition-all hover:scale-105"
     >
-      <span className="text-lg">💬</span>
-      <span className="hidden sm:inline">Falar com o Parceiro</span>
+      <span className="text-base sm:text-lg">💬</span>
+      <span className="tracking-wide">Falar com o Parceiro</span>
     </a>
   )
 }
 
-const Index = () => {
+/* =========================================================================
+   COMPONENTE PRINCIPAL (INDEX)
+   ========================================================================= */
+export const Index = () => {
   const [partnerModalOpen, setPartnerModalOpen] = useState(false)
-
-  useState(() => {
-    document.title = 'C Consulting Group · Consórcios, Seguro e Previdência'
-  })
 
   const abrirCRMJarvis = () => {
     window.open(CRM_JARVIS_URL, '_blank', 'noopener,noreferrer')
@@ -1721,36 +1782,58 @@ const Index = () => {
   const handleAccessJarvis = () => {
     const usuarioAtual = AuthService.getUsuarioAtual()
     if (usuarioAtual) {
-      // Usuário já autenticado na sessão do PocketBase: redireciona direto
       abrirCRMJarvis()
     } else {
-      // Não autenticado: abre modal de login
       setPartnerModalOpen(true)
     }
   }
 
   const handleLoginSuccess = (_user: AdminUser) => {
-    // Redireciona para o CRM Jarvis em nova aba após login com sucesso
     abrirCRMJarvis()
   }
 
   return (
-    <div className="min-h-screen relative" style={{ background: '#faf9f5' }}>
+    <div className="min-h-screen relative bg-white font-body text-[#1d2f50]">
+      {/* 1. Header sticky */}
       <Header onAccessJarvis={handleAccessJarvis} />
+
+      {/* 2. Hero + 3. Faixa de parceiros no hero */}
       <Hero />
-      {/* O comparador/simulador aparece logo em seguida dos parceiros (Hero) */}
-      <Simulador />
+
+      {/* 4. Comparador de cartas lado a lado */}
+      <Comparador />
+
+      {/* 5. O que é consórcio? */}
       <OQueE />
+
+      {/* 6. Todo bem tem uma história por trás */}
       <Emocional />
-      <Caminhos />
-      <Diagnostico />
+
+      {/* 7. Split Cotação/Simulador */}
+      <SplitCaminhos />
+
+      {/* 8. Cotação 7 etapas */}
+      <CotacaoFluxo />
+
+      {/* 9. Por que a C Consulting Group? */}
       <PorQue />
-      <ProvaSocial />
-      <FAQ />
+
+      {/* 10. Banner CTA com círculos decorativos + stats */}
+      <BannerCTA />
+
+      {/* 11. Depoimentos */}
+      <Depoimentos />
+
+      {/* 12. FAQ 2 com coluna sticky e bloco WhatsApp */}
+      <FAQ2 />
+
+      {/* 13. Rodapé escuro #0d1a30 */}
       <Footer onAccessJarvis={handleAccessJarvis} />
+
+      {/* 14. Botão flutuante WhatsApp */}
       <WhatsAppFloatingButton />
 
-      {/* Modal de login para área do parceiro / CRM Jarvis */}
+      {/* Modal de login oficial da Área do Parceiro (CRM Jarvis) */}
       <PartnerLoginModal
         open={partnerModalOpen}
         onOpenChange={setPartnerModalOpen}
