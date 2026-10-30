@@ -29,29 +29,21 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "role",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "admin",
-            "consultor"
-          ]
+          "selectValues": ["admin", "consultor"]
         }
       ],
       "indexes": [
@@ -129,42 +121,28 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "diagnostico",
-            "simulador",
-            "site"
-          ]
+          "selectValues": ["diagnostico", "simulador", "site"]
         },
         {
           "name": "status",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": [
-            "novo",
-            "em_atendimento",
-            "ganho",
-            "perdido"
-          ]
+          "selectValues": ["novo", "em_atendimento", "ganho", "perdido"]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate"
-          ]
+          "autodateTriggers": ["onCreate"]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": [
-            "onCreate",
-            "onUpdate"
-          ]
+          "autodateTriggers": ["onCreate", "onUpdate"]
         },
         {
           "name": "melhorHorarioContato",

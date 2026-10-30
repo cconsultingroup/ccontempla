@@ -161,7 +161,6 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             aria-label="Acessar Área do Parceiro (CRM Jarvis)"
             className="rounded-[6px] border-[#ececec] bg-white text-[#1d2f50] hover:bg-[#f5f5f5] hover:text-[#154671] font-body font-medium text-xs px-3 py-2 flex items-center gap-2 transition-colors shadow-xs"
           >
-            <span className="text-xs">🔒</span>
             <span className="font-semibold">Área do Parceiro</span>
             <span className="text-[10px] bg-[#e6eef6] text-[#154671] px-1.5 py-0.5 rounded font-mono font-semibold">
               Jarvis
@@ -219,11 +218,7 @@ function Hero() {
         </svg>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-center">
-        <div className="inline-flex items-center gap-2 rounded-full bg-[#1d2f50]/80 border border-[#c7d6e6]/20 px-3.5 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[#c7d6e6] mb-6">
-          <span>★</span> C Consulting Group · Cotação Oficial
-        </div>
-
+      <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-left">
         <h1 className="font-display font-bold text-3xl sm:text-5xl md:text-[60px] leading-[1.08] tracking-[-0.015em] uppercase text-white">
           Consórcios, Seguro e Previdência
         </h1>
@@ -236,12 +231,12 @@ function Hero() {
           do mercado.
         </div>
 
-        <p className="font-body mx-auto mt-6 max-w-2xl text-base sm:text-[19px] leading-relaxed text-[#c7d6e6]">
+        <p className="font-body mt-6 max-w-2xl text-base sm:text-[19px] leading-relaxed text-[#c7d6e6]">
           Cotamos entre as principais administradoras do Brasil e encontramos para você o melhor
           preço, o melhor prazo e a melhor condição. Sem juros. Sem custo para fazer sua cotação.
         </p>
 
-        <div className="mt-9 flex flex-col items-center justify-center gap-3.5 sm:flex-row">
+        <div className="mt-9 flex flex-col items-start justify-start gap-3.5 sm:flex-row">
           <a href="#cotacao" className="w-full sm:w-auto">
             <Button
               size="lg"
@@ -267,7 +262,7 @@ function Hero() {
 
         {/* 3. Faixa de parceiros no próprio hero com marquee infinito 40s */}
         <div className="mt-14 border-t border-white/10 pt-8">
-          <div className="flex items-center justify-center gap-2 mb-6">
+          <div className="flex items-center justify-start gap-2 mb-6">
             <p className="eyebrow text-[#c7d6e6]! tracking-[0.2em] font-semibold text-xs">
               PARCEIROS OFICIAIS CREDENCIADOS
             </p>
@@ -284,13 +279,13 @@ function Hero() {
                   {parceirosLista.map((p, pIdx) => (
                     <div
                       key={`${copyIndex}-${pIdx}`}
-                      className="relative group flex flex-col items-center justify-center rounded-[12px] bg-white px-4 py-3 shadow-[0_4px_12px_rgba(13,26,48,0.08)] border border-[#ececec] w-[208px] h-[104px] shrink-0 transition-transform duration-200 hover:scale-[1.02]"
+                      className="relative group flex flex-col items-center justify-center rounded-[12px] bg-white px-4 py-3 shadow-[0_4px_12px_rgba(13,26,48,0.08)] border border-[#ececec] w-[240px] h-[120px] shrink-0 transition-transform duration-200 hover:scale-[1.02]"
                     >
                       <span className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider text-white uppercase bg-[#154671] shadow-xs">
-                        ★ PARCEIRA OFICIAL
+                        PARCEIRA OFICIAL
                       </span>
                       <div
-                        className="w-full h-14 flex items-center justify-center rounded-md p-1.5 overflow-hidden"
+                        className="w-full h-20 flex items-center justify-center rounded-md p-2 overflow-hidden"
                         style={{ backgroundColor: p.bg }}
                       >
                         <img
@@ -530,7 +525,7 @@ function Comparador() {
                   {/* Badges superiores */}
                   <div className="absolute -top-3 left-4 right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
                     <span className="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-[#154671] shadow-xs pointer-events-auto">
-                      ★ PARCEIRA OFICIAL
+                      PARCEIRA OFICIAL
                     </span>
                     {ehMelhorPreco && (
                       <span className="rounded-full bg-[#15705f] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-xs pointer-events-auto">
@@ -543,7 +538,7 @@ function Comparador() {
                     {/* Logo e Taxa de Administração */}
                     <div className="flex items-center justify-between border-b border-[#ececec] pb-4">
                       <div
-                        className="flex h-12 w-28 sm:w-32 items-center justify-center rounded-[6px] border border-[#ececec] p-1.5 overflow-hidden"
+                        className="flex h-16 w-36 sm:w-44 items-center justify-center rounded-[6px] border border-[#ececec] p-2 overflow-hidden"
                         style={{ backgroundColor: carta.bgLogo || '#ffffff' }}
                       >
                         <img
@@ -644,7 +639,7 @@ function Comparador() {
               rel="noopener noreferrer"
               className="mt-2 sm:mt-0 inline-flex items-center gap-1 font-semibold text-[#15705f] hover:underline"
             >
-              <span>💬</span> Falar com o parceiro no WhatsApp
+              Falar com o parceiro no WhatsApp
             </a>
           </div>
         </div>
@@ -1180,7 +1175,7 @@ function CotacaoFluxo() {
                         ) : null}
                         <div>
                           <span className="text-[10px] font-bold uppercase tracking-wider text-[#15705f] block">
-                            ★ Parceira Oficial
+                            Parceira Oficial
                           </span>
                           <span className="text-sm font-semibold text-[#1d2f50]">
                             {i === 0 && (
@@ -1270,7 +1265,7 @@ function CotacaoFluxo() {
                   onClick={handleAbrirWhatsApp}
                   className="w-full rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-8 py-6 text-base font-display font-bold text-white shadow-md uppercase tracking-wider"
                 >
-                  💬 Falar agora com o especialista no WhatsApp
+                  Falar agora com o especialista no WhatsApp
                 </Button>
               </div>
               <p className="mt-3 text-xs text-[#8a96a6]">
@@ -1281,8 +1276,8 @@ function CotacaoFluxo() {
 
           {concluido && dadosOk && agradecimentoExibido && (
             <div className="py-6 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#e6eef6] text-[#15705f] text-3xl">
-                🎉
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#e6eef6] text-[#15705f] text-3xl font-bold">
+                ✓
               </div>
               <span className="mt-3 inline-block rounded-full bg-[#e6eef6] text-[#15705f] px-3 py-1 text-xs font-bold uppercase tracking-wider">
                 Cotação Recebida com Sucesso!
@@ -1297,7 +1292,7 @@ function CotacaoFluxo() {
 
               <div className="mx-auto mt-6 max-w-md rounded-[12px] border border-[#ececec] bg-[#f5f5f5] p-4 text-left">
                 <div className="flex items-start gap-3">
-                  <span className="text-xl">🕒</span>
+                  <div className="h-2 w-2 rounded-full bg-[#15705f] mt-1.5 shrink-0" />
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[#154671]">
                       Horário de Atendimento da Equipe
@@ -1323,7 +1318,7 @@ function CotacaoFluxo() {
                     size="sm"
                     className="w-full rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-6 py-2.5 font-display font-semibold text-white uppercase tracking-wider"
                   >
-                    💬 Reabrir conversa no WhatsApp
+                    Reabrir conversa no WhatsApp
                   </Button>
                 </a>
                 <Button
@@ -1352,19 +1347,16 @@ function PorQue() {
       num: '01',
       titulo: 'Comparativo real',
       desc: 'Cotamos entre as principais administradoras do Brasil — preço lado a lado, com dados oficiais e transparentes.',
-      icone: '📊',
     },
     {
       num: '02',
       titulo: 'Melhor preço, prazo e condição',
       desc: 'Analisamos custo total, taxa, fundo de reserva e condições de lance — não apenas o valor aparente da parcela.',
-      icone: '🎯',
     },
     {
       num: '03',
       titulo: 'Acompanhamento completo',
       desc: 'Da cotação ao fechamento no ambiente oficial da administradora, com consultor dedicado ao seu lado.',
-      icone: '🤝',
     },
   ]
 
@@ -1392,10 +1384,12 @@ function PorQue() {
               >
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#1d2f50] text-white text-lg">
-                      {d.icone}
-                    </div>
-                    <span className="font-mono text-xs font-bold text-[#15705f]">{d.num}</span>
+                    <span className="font-mono text-sm font-bold text-[#154671] bg-[#e6eef6] px-2.5 py-1 rounded">
+                      {d.num}
+                    </span>
+                    <span className="font-mono text-xs font-bold text-[#15705f]">
+                      ✓ Certificado
+                    </span>
                   </div>
                   <h3 className="font-display font-semibold text-lg text-[#1d2f50] uppercase">
                     {d.titulo}
@@ -1661,7 +1655,6 @@ function FAQ2() {
                   rel="noopener noreferrer"
                   className="mt-4 inline-flex items-center gap-2 rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-4 py-2.5 font-display font-semibold text-xs sm:text-sm text-white uppercase tracking-wider transition-colors shadow-xs w-full justify-center"
                 >
-                  <span>💬</span>
                   <span>Tirar dúvidas no WhatsApp com o consultor</span>
                 </a>
               </div>
@@ -1724,7 +1717,6 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-5 py-2.5 font-display font-semibold text-white shadow-sm text-xs uppercase tracking-wider transition-colors"
           >
-            <span>💬</span>
             <span>Falar no WhatsApp (81 9754-3716)</span>
           </a>
         </div>
@@ -1743,7 +1735,7 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             className="text-[#c7d6e6]/60 hover:text-white transition-colors underline-offset-2 hover:underline cursor-pointer bg-transparent border-none p-0 inline-flex items-center gap-1"
             title="CRM Jarvis — Consórcio, Seguro e Previdência"
           >
-            🔒 Área do Parceiro (CRM Jarvis)
+            Área do Parceiro (CRM Jarvis)
           </button>
         </div>
       </div>
@@ -1763,7 +1755,6 @@ function WhatsAppFloatingButton() {
       aria-label="Falar com o Parceiro no WhatsApp"
       className="fixed bottom-5 right-5 z-40 flex items-center gap-2 rounded-full bg-[#15705f] hover:bg-[#125c4f] px-4 py-3 text-xs sm:text-sm font-display font-semibold text-white shadow-[0_4px_16px_rgba(21,112,95,0.35)] transition-all hover:scale-105"
     >
-      <span className="text-base sm:text-lg">💬</span>
       <span className="tracking-wide">Falar com o Parceiro</span>
     </a>
   )
