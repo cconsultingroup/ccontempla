@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-21T18:14:45.839Z",
+  "generatedAt": "2026-10-30T21:02:15.338Z",
   "collections": [
     {
       "name": "users",
@@ -29,21 +29,29 @@
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "role",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["admin", "consultor"]
+          "selectValues": [
+            "admin",
+            "consultor"
+          ]
         }
       ],
       "indexes": [
@@ -121,28 +129,42 @@
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["diagnostico", "simulador", "site"]
+          "selectValues": [
+            "diagnostico",
+            "simulador",
+            "site"
+          ]
         },
         {
           "name": "status",
           "type": "select",
           "required": false,
           "system": false,
-          "selectValues": ["novo", "em_atendimento", "ganho", "perdido"]
+          "selectValues": [
+            "novo",
+            "em_atendimento",
+            "ganho",
+            "perdido"
+          ]
         },
         {
           "name": "created",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate"]
+          "autodateTriggers": [
+            "onCreate"
+          ]
         },
         {
           "name": "updated",
           "type": "autodate",
           "required": false,
           "system": false,
-          "autodateTriggers": ["onCreate", "onUpdate"]
+          "autodateTriggers": [
+            "onCreate",
+            "onUpdate"
+          ]
         },
         {
           "name": "melhorHorarioContato",
