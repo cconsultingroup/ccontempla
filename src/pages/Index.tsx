@@ -123,32 +123,36 @@ function estimarParcela(credito: number, taxaTotal: number, meses: number) {
    ========================================================================= */
 function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)]">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3.5">
-        <div className="flex items-center gap-4">
-          <a href="#" className="flex items-center focus:outline-hidden">
+    <header className="sticky top-0 z-50 w-full bg-[#0d1a30] border-b border-[#1d2f50]/80 shadow-[0_4px_20px_rgba(13,26,48,0.25)]">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3 sm:py-3.5">
+        <div className="flex items-center gap-3.5 sm:gap-4 min-w-0">
+          <a
+            href="#"
+            className="flex items-center shrink-0 focus:outline-hidden focus-visible:ring-2 focus-visible:ring-[#15705f] rounded-sm"
+            aria-label="Página inicial Contempla Consórcios"
+          >
             <ContemplaLogo
-              variant="light-bg"
-              className="h-10 sm:h-12 w-auto"
-              alt="C Contempla - Consórcios, Seguro e Previdência"
+              variant="official"
+              className="h-10 sm:h-12 w-auto max-h-[48px]"
+              alt="contempla CONSÓRCIOS"
             />
           </a>
-          <div className="hidden sm:block h-8 w-px bg-[#ececec]" />
-          <div className="hidden sm:block leading-tight">
-            <div className="font-display font-semibold text-[11px] sm:text-xs tracking-wider uppercase text-[#1d2f50]">
+          <div className="hidden sm:block h-8 w-px bg-white/15" />
+          <div className="hidden sm:block leading-tight min-w-0">
+            <div className="font-display font-semibold text-[11px] sm:text-xs tracking-wider uppercase text-white">
               Consórcios, Seguro e Previdência
             </div>
-            <div className="font-body text-[11px] text-[#5b6b80]">
+            <div className="font-body text-[11px] text-[#c7d6e6]/80 truncate">
               Encontre a melhor cotação do mercado
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2.5 sm:gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <a href="#cotacao" className="hidden md:inline-block">
             <Button
               size="sm"
-              className="rounded-[6px] bg-[#1d2f50] hover:bg-[#2a5e8c] text-white font-body font-semibold text-xs px-3.5 py-2 transition-colors shadow-[0_2px_6px_rgba(29,47,80,0.15)]"
+              className="rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] text-white font-body font-semibold text-xs px-3.5 py-2 transition-colors shadow-[0_2px_8px_rgba(21,112,95,0.3)]"
             >
               Fazer cotação
             </Button>
@@ -159,10 +163,10 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             onClick={onAccessJarvis}
             title="Área do Parceiro (CRM Jarvis)"
             aria-label="Acessar Área do Parceiro (CRM Jarvis)"
-            className="rounded-[6px] border-[#ececec] bg-white text-[#1d2f50] hover:bg-[#f5f5f5] hover:text-[#154671] font-body font-medium text-xs px-3 py-2 flex items-center gap-2 transition-colors shadow-xs"
+            className="rounded-[6px] border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white font-body font-medium text-xs px-3 py-2 flex items-center gap-2 transition-colors shadow-xs"
           >
-            <span className="font-semibold">Área do Parceiro</span>
-            <span className="text-[10px] bg-[#e6eef6] text-[#154671] px-1.5 py-0.5 rounded font-mono font-semibold">
+            <span className="font-semibold text-xs">Área do Parceiro</span>
+            <span className="text-[10px] bg-[#15705f]/30 border border-[#15705f]/50 text-[#c7d6e6] px-1.5 py-0.5 rounded font-mono font-semibold">
               Jarvis
             </span>
           </Button>
@@ -186,9 +190,9 @@ function Hero() {
   ]
 
   return (
-    <section className="relative w-full bg-[#0d1a30] text-white overflow-hidden pt-16 sm:pt-20 pb-12 sm:pb-16">
+    <section className="relative w-full bg-[#0d1a30] text-white overflow-hidden pt-12 sm:pt-16 md:pt-20 pb-12 sm:pb-16">
       {/* SVG arcos decorativos no canto superior direito */}
-      <div className="pointer-events-none absolute -top-12 -right-12 sm:-top-20 sm:-right-20 w-[360px] sm:w-[540px] h-[360px] sm:h-[540px] opacity-40">
+      <div className="pointer-events-none absolute -top-12 -right-12 sm:-top-20 sm:-right-20 w-[300px] sm:w-[480px] md:w-[540px] h-[300px] sm:h-[480px] md:h-[540px] opacity-35 max-w-none">
         <svg viewBox="0 0 500 500" fill="none" className="w-full h-full">
           <circle
             cx="350"
@@ -219,28 +223,33 @@ function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-left">
-        <h1 className="font-display font-bold text-3xl sm:text-5xl md:text-[60px] leading-[1.08] tracking-[-0.015em] uppercase text-white">
+        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#c7d6e6] mb-4 sm:mb-5">
+          <span className="h-1.5 w-1.5 rounded-full bg-[#15705f]" />
+          Portal Oficial de Cotações
+        </div>
+
+        <h1 className="font-display font-bold text-2xl sm:text-4xl md:text-5xl lg:text-[56px] leading-[1.12] sm:leading-[1.08] tracking-[-0.015em] uppercase text-white break-words">
           Consórcios, Seguro e Previdência
         </h1>
 
-        <div className="mt-3 font-display font-semibold text-2xl sm:text-3xl md:text-[36px] text-[#c7d6e6] leading-tight">
+        <div className="mt-2.5 sm:mt-3 font-display font-semibold text-xl sm:text-2xl md:text-3xl lg:text-[34px] text-[#c7d6e6] leading-tight break-words">
           pelo{' '}
-          <span className="relative inline-block text-white font-bold underline decoration-[#15705f] decoration-4 underline-offset-8">
+          <span className="relative inline-block text-white font-bold underline decoration-[#15705f] decoration-3 sm:decoration-4 underline-offset-4 sm:underline-offset-8">
             melhor preço
           </span>{' '}
           do mercado.
         </div>
 
-        <p className="font-body mt-6 max-w-2xl text-base sm:text-[19px] leading-relaxed text-[#c7d6e6]">
+        <p className="font-body mt-4 sm:mt-6 max-w-2xl text-sm sm:text-base md:text-[18px] leading-relaxed text-[#c7d6e6] text-balance">
           Cotamos entre as principais administradoras do Brasil e encontramos para você o melhor
           preço, o melhor prazo e a melhor condição. Sem juros. Sem custo para fazer sua cotação.
         </p>
 
-        <div className="mt-9 flex flex-col items-start justify-start gap-3.5 sm:flex-row">
+        <div className="mt-7 sm:mt-9 flex flex-col items-stretch sm:items-start justify-start gap-3 sm:gap-3.5 sm:flex-row">
           <a href="#cotacao" className="w-full sm:w-auto">
             <Button
               size="lg"
-              className="w-full sm:w-auto rounded-[6px] bg-white text-[#1d2f50] hover:bg-[#e6eef6] px-8 py-6 font-display font-bold text-sm sm:text-base uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(13,26,48,0.25)]"
+              className="w-full sm:w-auto rounded-[6px] bg-white text-[#1d2f50] hover:bg-[#e6eef6] px-6 sm:px-8 py-5 sm:py-6 font-display font-bold text-xs sm:text-sm md:text-base uppercase tracking-wider transition-all shadow-[0_4px_14px_rgba(13,26,48,0.25)] text-center justify-center"
             >
               Fazer cotação do meu perfil
             </Button>
@@ -249,20 +258,20 @@ function Hero() {
             <Button
               size="lg"
               variant="outline"
-              className="w-full sm:w-auto rounded-[6px] border-[#c7d6e6]/40 bg-transparent text-white hover:bg-white/10 hover:text-white px-7 py-6 font-display font-semibold text-xs sm:text-sm tracking-wide transition-all"
+              className="w-full sm:w-auto rounded-[6px] border-[#c7d6e6]/40 bg-transparent text-white hover:bg-white/10 hover:text-white px-5 sm:px-7 py-5 sm:py-6 font-display font-semibold text-xs sm:text-sm tracking-wide transition-all text-center justify-center whitespace-normal h-auto leading-snug"
             >
               Já sei o bem que quero comprar → simular melhores condições
             </Button>
           </a>
         </div>
 
-        <p className="mt-5 text-xs text-[#c7d6e6]/80 font-body">
+        <p className="mt-4 sm:mt-5 text-[11px] sm:text-xs text-[#c7d6e6]/80 font-body">
           Grátis, sem compromisso. A contratação é sempre no ambiente oficial da administradora.
         </p>
 
         {/* 3. Faixa de parceiros no próprio hero com marquee infinito 40s */}
-        <div className="mt-14 border-t border-white/10 pt-8">
-          <div className="flex items-center justify-start gap-2 mb-6">
+        <div className="mt-10 sm:mt-14 border-t border-white/10 pt-6 sm:pt-8">
+          <div className="flex items-center justify-start gap-2 mb-4 sm:mb-6">
             <p className="eyebrow text-[#c7d6e6]! tracking-[0.2em] font-semibold text-xs">
               PARCEIROS OFICIAIS CREDENCIADOS
             </p>
@@ -279,13 +288,13 @@ function Hero() {
                   {parceirosLista.map((p, pIdx) => (
                     <div
                       key={`${copyIndex}-${pIdx}`}
-                      className="relative group flex flex-col items-center justify-center rounded-[12px] bg-white px-4 py-3 shadow-[0_4px_12px_rgba(13,26,48,0.08)] border border-[#ececec] w-[240px] h-[120px] shrink-0 transition-transform duration-200 hover:scale-[1.02]"
+                      className="relative group flex flex-col items-center justify-center rounded-[12px] bg-white px-4 py-3 shadow-[0_4px_12px_rgba(13,26,48,0.08)] border border-[#ececec] w-[220px] sm:w-[240px] h-[110px] sm:h-[120px] shrink-0 transition-transform duration-200 hover:scale-[1.02]"
                     >
                       <span className="absolute -top-2.5 px-2 py-0.5 rounded-full text-[9px] font-bold tracking-wider text-white uppercase bg-[#154671] shadow-xs">
                         PARCEIRA OFICIAL
                       </span>
                       <div
-                        className="w-full h-20 flex items-center justify-center rounded-md p-2 overflow-hidden"
+                        className="w-full h-16 sm:h-20 flex items-center justify-center rounded-md p-2 overflow-hidden"
                         style={{ backgroundColor: p.bg }}
                       >
                         <img
