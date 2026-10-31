@@ -166,9 +166,6 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
             className="rounded-[6px] border-white/20 bg-white/5 text-white hover:bg-white/15 hover:text-white font-body font-medium text-xs px-3 py-2 flex items-center gap-2 transition-colors shadow-xs"
           >
             <span className="font-semibold text-xs">Área do Parceiro</span>
-            <span className="text-[10px] bg-[#15705f]/30 border border-[#15705f]/50 text-[#c7d6e6] px-1.5 py-0.5 rounded font-mono font-semibold">
-              Jarvis
-            </span>
           </Button>
         </div>
       </div>
@@ -223,11 +220,6 @@ function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-5xl px-4 sm:px-6 text-left">
-        <div className="inline-flex items-center gap-2 rounded-full bg-white/10 border border-white/15 px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#c7d6e6] mb-4 sm:mb-5">
-          <span className="h-1.5 w-1.5 rounded-full bg-[#15705f]" />
-          Portal Oficial de Cotações
-        </div>
-
         <h1 className="font-display font-bold text-2xl sm:text-4xl md:text-5xl lg:text-[56px] leading-[1.12] sm:leading-[1.08] tracking-[-0.015em] uppercase text-white break-words">
           Consórcios, Seguro e Previdência
         </h1>
@@ -264,10 +256,6 @@ function Hero() {
             </Button>
           </a>
         </div>
-
-        <p className="mt-4 sm:mt-5 text-[11px] sm:text-xs text-[#c7d6e6]/80 font-body">
-          Grátis, sem compromisso. A contratação é sempre no ambiente oficial da administradora.
-        </p>
 
         {/* 3. Faixa de parceiros no próprio hero com marquee infinito 40s */}
         <div className="mt-10 sm:mt-14 border-t border-white/10 pt-6 sm:pt-8">
@@ -1710,25 +1698,8 @@ function Footer({ onAccessJarvis }: { onAccessJarvis: () => void }) {
           />
         </div>
 
-        <p className="font-display font-semibold tracking-wider text-white uppercase text-sm">
-          C CONSULTING GROUP · Recife, PE
-        </p>
-        <p className="mt-2 text-[#c7d6e6]/80 text-xs">
-          Parceiros autorizados: Porto Seguro · Embracon · Itaú · BB Consórcios · Mapfre · MAG
-          Seguros
-        </p>
-
         {/* Botão WhatsApp Verde no Rodapé */}
-        <div className="mt-5 flex justify-center">
-          <a
-            href={WHATS_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-[6px] bg-[#15705f] hover:bg-[#125c4f] px-5 py-2.5 font-display font-semibold text-white shadow-sm text-xs uppercase tracking-wider transition-colors"
-          >
-            <span>Falar no WhatsApp (81 9754-3716)</span>
-          </a>
-        </div>
+        <div className="mt-5 flex justify-center"></div>
 
         <p className="mt-5 max-w-2xl mx-auto leading-relaxed text-[11px] text-[#c7d6e6]/60">
           As estimativas exibidas utilizam taxas médias de administração oficiais e não constituem
