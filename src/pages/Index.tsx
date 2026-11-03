@@ -1513,70 +1513,8 @@ function Depoimentos() {
     },
   ]
 
-  return (
-    <section
-      id="depoimentos"
-      className="w-full bg-[#f5f5f5] py-16 sm:py-20 border-t border-[#ececec]"
-    >
-      <div className="mx-auto max-w-7xl px-4 sm:px-6">
-        <div className="text-center max-w-2xl mx-auto mb-10">
-          <p className="eyebrow mb-2">EXPERIÊNCIAS REAIS</p>
-          <h2 className="font-display font-semibold text-2xl sm:text-3xl md:text-4xl text-[#1d2f50] uppercase tracking-[-0.008em]">
-            O que dizem os clientes que conquistaram seus bens
-          </h2>
-          <p className="font-body mt-2 text-sm sm:text-base text-[#5b6b80]">
-            Histórias de quem planejou o futuro com sabedoria, economizou milhares de reais em juros
-            e foi acompanhado pela C Consulting Group.
-          </p>
-        </div>
-
-        <div className="grid gap-6 md:grid-cols-3">
-          {depoimentos.map((dep) => (
-            <div
-              key={dep.id}
-              className="flex flex-col justify-between rounded-[12px] bg-white border border-[#ececec] p-6 shadow-[0_2px_8px_rgba(13,26,48,0.04)]"
-            >
-              <div>
-                <div className="flex items-center gap-1 text-amber-500 text-sm mb-3">
-                  {'★'.repeat(5)}
-                  <span className="text-xs text-[#8a96a6] ml-1 font-semibold">5.0</span>
-                </div>
-                <p className="font-body text-xs sm:text-sm text-[#5b6b80] leading-relaxed italic">
-                  "{dep.texto}"
-                </p>
-              </div>
-
-              <div className="mt-6 border-t border-[#ececec] pt-4">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={dep.foto}
-                    alt={dep.nome}
-                    className="h-10 w-10 rounded-full object-cover border border-[#ececec]"
-                    loading="lazy"
-                  />
-                  <div>
-                    <div className="font-display font-semibold text-xs sm:text-sm text-[#1d2f50]">
-                      {dep.nome}
-                    </div>
-                    <div className="text-[11px] text-[#8a96a6]">{dep.perfil}</div>
-                  </div>
-                </div>
-                <div className="mt-2.5 rounded-[6px] bg-[#f5f5f5] px-2.5 py-1 text-[11px] text-[#5b6b80] flex items-center justify-between">
-                  <span>{dep.bem}</span>
-                  <span className="font-semibold text-[#15705f]">{dep.administradora}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <p className="mt-6 text-center text-xs text-[#8a96a6]">
-          * Depoimentos ilustrativos baseados em perfis reais atendidos por nossos consultores
-          parceiros.
-        </p>
-      </div>
-    </section>
-  )
+  return
+  null
 }
 
 /* =========================================================================
