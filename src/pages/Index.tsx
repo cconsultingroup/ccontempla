@@ -745,7 +745,7 @@ function OQueE() {
 }
 
 /* =========================================================================
-   6. "TODO BEM TEM UMA HISTÓRIA POR TRÁS." (bg #f5f5f5, 4 cards com foto 220px)
+   6. "TODO BEM TEM UMA HISTÓRIA POR TRÁS." (bg #f5f5f5, 4 cards com fotos ampliadas)
    ========================================================================= */
 function Emocional() {
   const historias = [
@@ -788,9 +788,9 @@ function Emocional() {
           {historias.map((h, idx) => (
             <div
               key={idx}
-              className="flex flex-col overflow-hidden rounded-[12px] bg-white border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] transition-transform duration-200 hover:-translate-y-1"
+              className="flex flex-col overflow-hidden rounded-[14px] bg-white border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] transition-transform duration-200 hover:-translate-y-1"
             >
-              <div className="h-[220px] w-full overflow-hidden bg-[#e6eef6]">
+              <div className="h-[280px] sm:h-[300px] lg:h-[320px] w-full overflow-hidden bg-[#e6eef6]">
                 <img
                   src={h.foto}
                   alt={h.titulo}
