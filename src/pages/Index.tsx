@@ -178,12 +178,12 @@ function Header({ onAccessJarvis }: { onAccessJarvis: () => void }) {
    ========================================================================= */
 function Hero() {
   const parceirosLista = [
+    { nome: 'Mapfre', logo: LOGO_MAPFRE, bg: '#ffffff' },
+    { nome: 'Embracon', logo: LOGO_EMBRACON, bg: '#ffffff' },
     { nome: 'Itaú Consórcio', logo: LOGO_ITAU, bg: '#EC7000' },
     { nome: 'Porto Seguro', logo: LOGO_PORTO_SEGURO, bg: '#ffffff' },
     { nome: 'BB Consórcios', logo: LOGO_BB, bg: '#FFED00' },
     { nome: 'MAG Seguros', logo: LOGO_MAG, bg: '#ffffff' },
-    { nome: 'Embracon', logo: LOGO_EMBRACON, bg: '#ffffff' },
-    { nome: 'Mapfre', logo: LOGO_MAPFRE, bg: '#ffffff' },
   ]
 
   return (
@@ -369,11 +369,15 @@ function Comparador() {
     },
   }
 
+  const CARTAS_RECOMENDADAS = ['mapfre', 'embracon'] as const
+
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
     const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos'] ?? 20.0
     const parcela = estimarParcela(credito, taxa, prazo)
     const total = credito * (1 + taxa / 100)
+    /* Taxa de administração MENSAL: (taxa média total + 2% fundo de reserva) ÷ nº de parcelas */
+    const taxaMensal = (taxa + 2) / prazo
     const dif = diferenciais[chave]
 
     return {
@@ -383,12 +387,19 @@ function Comparador() {
       alt: t.alt,
       bgLogo: dif.bgLogo,
       taxa,
+      taxaMensal,
       parcela,
       total,
+      parcelas: prazo,
+      recomendada: (CARTAS_RECOMENDADAS as readonly string[]).includes(chave),
       selo: dif.selo,
       condicoes: dif.condicoes,
     }
-  }).sort((a, b) => a.total - b.total)
+  }).sort((a, b) => {
+    /* 1º critério: recomendadas (Mapfre e Embracon) sempre primeiro; 2º: menor custo total */
+    if (a.recomendada !== b.recomendada) return a.recomendada ? -1 : 1
+    return a.total - b.total
+  })
 
   const melhorPrecoChave = cartas[0]?.chave
 
@@ -516,19 +527,28 @@ function Comparador() {
                   className={`relative flex flex-col justify-between rounded-[12px] bg-white transition-all duration-200 hover:shadow-[0_8px_24px_rgba(13,26,48,0.08)] ${
                     ehMelhorPreco
                       ? 'border-2 border-[#15705f] shadow-[0_4px_16px_rgba(21,112,95,0.12)] ring-2 ring-[#15705f]/20 mt-3 md:mt-0'
-                      : 'border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] mt-3 md:mt-0'
+                      : carta.recomendada
+                        ? 'border-2 border-[#15705f]/50 shadow-[0_4px_14px_rgba(21,112,95,0.08)] ring-1 ring-[#15705f]/15 mt-3 md:mt-0'
+                        : 'border border-[#ececec] shadow-[0_2px_8px_rgba(13,26,48,0.04)] mt-3 md:mt-0'
                   }`}
                 >
                   {/* Badges superiores */}
                   <div className="absolute -top-3 left-4 right-4 flex items-center justify-between pointer-events-none z-10 gap-2">
-                    <span className="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-[#154671] shadow-xs pointer-events-auto">
+                    <span className="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-white bg-[#154671] shadow-xs pointer-events-auto shrink-0">
                       PARCEIRA OFICIAL
                     </span>
-                    {ehMelhorPreco && (
-                      <span className="rounded-full bg-[#15705f] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-xs pointer-events-auto">
-                        MENOR PARCELA
-                      </span>
-                    )}
+                    <div className="flex items-center gap-1.5 justify-end flex-wrap pointer-events-auto">
+                      {carta.recomendada && (
+                        <span className="rounded-full bg-[#15705f] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-xs">
+                          ★ Recomendada
+                        </span>
+                      )}
+                      {ehMelhorPreco && (
+                        <span className="rounded-full bg-[#1d2f50] px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-white shadow-xs">
+                          Menor Parcela
+                        </span>
+                      )}
+                    </div>
                   </div>
 
                   <div className="p-6 pt-7">
@@ -545,15 +565,28 @@ function Comparador() {
                           loading="lazy"
                         />
                       </div>
-                      <div className="text-right">
+                      <div className="text-right shrink-0">
                         <span className="text-[11px] font-semibold text-[#8a96a6] block uppercase tracking-wider">
                           Taxa Adm. Total
                         </span>
                         <span className="font-display font-bold text-sm text-[#1d2f50]">
                           {carta.taxa.toFixed(2).replace('.', ',')}%
                         </span>
+                        <span className="mt-1 block text-[10px] font-semibold text-[#15705f]">
+                          Taxa mensal: {carta.taxaMensal.toFixed(2).replace('.', ',')}%
+                        </span>
                       </div>
                     </div>
+
+                    {/* Fórmula da Taxa Mensal — transparência do cálculo */}
+                    <p className="mt-2 rounded-[6px] bg-[#e6eef6]/60 border border-[#154671]/10 px-2.5 py-1.5 text-[10px] leading-snug text-[#154671]">
+                      <strong className="font-semibold">Como calculamos:</strong> (
+                      {carta.taxa.toFixed(2).replace('.', ',')}% taxa média + 2% fundo de reserva) ÷{' '}
+                      {carta.parcelas} parcelas ={' '}
+                      <strong className="font-semibold">
+                        {carta.taxaMensal.toFixed(2).replace('.', ',')}% ao mês
+                      </strong>
+                    </p>
 
                     {/* Parcela Estimada em 36px */}
                     <div className="mt-4 rounded-[8px] bg-[#f5f5f5] p-4 text-center border border-[#ececec]">
@@ -628,6 +661,7 @@ function Comparador() {
           <div className="mt-8 rounded-[12px] bg-white border border-[#ececec] p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-[#5b6b80]">
             <p>
               * Estimativa comparativa sem juros calculada conforme taxa de administração do BCB.
+              Taxa mensal = (taxa média total + 2% de fundo de reserva) ÷ nº de parcelas.
               Contratação formalizada no ambiente oficial da administradora.
             </p>
             <a
@@ -1513,8 +1547,7 @@ function Depoimentos() {
     },
   ]
 
-  return
-  null
+  return null
 }
 
 /* =========================================================================
