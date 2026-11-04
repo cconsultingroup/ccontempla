@@ -373,10 +373,11 @@ function Comparador() {
 
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
-    const taxa = t[bem.tipo as 'auto' | 'imovel' | 'servicos'] ?? 20.0
+    /* Taxa de administração média fixa de 25% para TODAS as cartas (não exibida no card) */
+    const taxa = 25.0
     const parcela = estimarParcela(credito, taxa, prazo)
     const total = credito * (1 + taxa / 100)
-    /* Taxa de administração MENSAL: (taxa média total + 2% fundo de reserva) ÷ nº de parcelas */
+    /* Taxa de juros MENSAL: (25% taxa média + 2% fundo de reserva) ÷ nº de parcelas */
     const taxaMensal = (taxa + 2) / prazo
     const dif = diferenciais[chave]
 
@@ -567,22 +568,18 @@ function Comparador() {
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-[11px] font-semibold text-[#8a96a6] block uppercase tracking-wider">
-                          Taxa Adm. Total
+                          Taxa de Juros Mensal
                         </span>
-                        <span className="font-display font-bold text-sm text-[#1d2f50]">
-                          {carta.taxa.toFixed(2).replace('.', ',')}%
-                        </span>
-                        <span className="mt-1 block text-[10px] font-semibold text-[#15705f]">
-                          Taxa mensal: {carta.taxaMensal.toFixed(2).replace('.', ',')}%
+                        <span className="font-display font-bold text-lg text-[#1d2f50]">
+                          {carta.taxaMensal.toFixed(2).replace('.', ',')}%
                         </span>
                       </div>
                     </div>
 
                     {/* Fórmula da Taxa Mensal — transparência do cálculo */}
                     <p className="mt-2 rounded-[6px] bg-[#e6eef6]/60 border border-[#154671]/10 px-2.5 py-1.5 text-[10px] leading-snug text-[#154671]">
-                      <strong className="font-semibold">Como calculamos:</strong> (
-                      {carta.taxa.toFixed(2).replace('.', ',')}% taxa média + 2% fundo de reserva) ÷{' '}
-                      {carta.parcelas} parcelas ={' '}
+                      <strong className="font-semibold">Como calculamos:</strong> (25% taxa média +
+                      2% fundo de reserva) ÷ {carta.parcelas} parcelas ={' '}
                       <strong className="font-semibold">
                         {carta.taxaMensal.toFixed(2).replace('.', ',')}% ao mês
                       </strong>
@@ -661,8 +658,9 @@ function Comparador() {
           <div className="mt-8 rounded-[12px] bg-white border border-[#ececec] p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-[#5b6b80]">
             <p>
               * Estimativa comparativa sem juros calculada conforme taxa de administração do BCB.
-              Taxa mensal = (taxa média total + 2% de fundo de reserva) ÷ nº de parcelas.
-              Contratação formalizada no ambiente oficial da administradora.
+              Taxa mensal = (25% de taxa média + 2% de fundo de reserva) ÷ nº de parcelas, com taxa
+              média de 25% considerada para todas as administradoras. Contratação formalizada no
+              ambiente oficial da administradora.
             </p>
             <a
               href={WHATS_URL}
