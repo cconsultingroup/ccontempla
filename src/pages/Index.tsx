@@ -371,13 +371,32 @@ function Comparador() {
 
   const CARTAS_RECOMENDADAS = ['mapfre', 'embracon'] as const
 
+  /* Taxa média de administração por carta (não exibida como taxa total no card).
+     Recomendadas (Mapfre e Embracon): base mais baixa, 25,0%.
+     Demais: escalonadas acima da base (+0,3; +0,5; +0,8; +1,0 e depois +0,2 por degrau). */
+  const TAXA_BASE = 25.0
+  const TAXA_RECOMENDADA: Record<string, number> = { embracon: TAXA_BASE, mapfre: TAXA_BASE }
+  const ESCALONAMENTO = [0.3, 0.5, 0.8, 1.0]
+  const naoRecomendadas: string[] = PARCEIRAS_CHAVE.filter(
+    (c) => !(CARTAS_RECOMENDADAS as readonly string[]).includes(c),
+  )
+
+  const taxaMediaDaCarta = (chave: string): number => {
+    if (chave in TAXA_RECOMENDADA) return TAXA_RECOMENDADA[chave]
+    const i = naoRecomendadas.indexOf(chave)
+    const offset =
+      i < ESCALONAMENTO.length
+        ? ESCALONAMENTO[i]
+        : ESCALONAMENTO[ESCALONAMENTO.length - 1] + 0.2 * (i - ESCALONAMENTO.length + 1)
+    return Math.round((TAXA_BASE + offset) * 100) / 100
+  }
+
   const cartas = PARCEIRAS_CHAVE.map((chave) => {
     const t = TAXAS[chave]
-    /* Taxa de administração média fixa de 25% para TODAS as cartas (não exibida no card) */
-    const taxa = 25.0
+    const taxa = taxaMediaDaCarta(chave)
     const parcela = estimarParcela(credito, taxa, prazo)
     const total = credito * (1 + taxa / 100)
-    /* Taxa de juros MENSAL: (25% taxa média + 2% fundo de reserva) ÷ nº de parcelas */
+    /* Taxa de juros MENSAL: (taxa média da carta + 2% fundo de reserva) ÷ nº de parcelas */
     const taxaMensal = (taxa + 2) / prazo
     const dif = diferenciais[chave]
 
@@ -578,8 +597,9 @@ function Comparador() {
 
                     {/* Fórmula da Taxa Mensal — transparência do cálculo */}
                     <p className="mt-2 rounded-[6px] bg-[#e6eef6]/60 border border-[#154671]/10 px-2.5 py-1.5 text-[10px] leading-snug text-[#154671]">
-                      <strong className="font-semibold">Como calculamos:</strong> (25% taxa média +
-                      2% fundo de reserva) ÷ {carta.parcelas} parcelas ={' '}
+                      <strong className="font-semibold">Como calculamos:</strong> (
+                      {carta.taxa.toFixed(1).replace('.', ',')}% taxa média + 2% fundo de reserva) ÷{' '}
+                      {carta.parcelas} parcelas ={' '}
                       <strong className="font-semibold">
                         {carta.taxaMensal.toFixed(2).replace('.', ',')}% ao mês
                       </strong>
@@ -658,8 +678,8 @@ function Comparador() {
           <div className="mt-8 rounded-[12px] bg-white border border-[#ececec] p-4 text-center sm:flex sm:items-center sm:justify-between text-xs text-[#5b6b80]">
             <p>
               * Estimativa comparativa sem juros calculada conforme taxa de administração do BCB.
-              Taxa mensal = (25% de taxa média + 2% de fundo de reserva) ÷ nº de parcelas, com taxa
-              média de 25% considerada para todas as administradoras. Contratação formalizada no
+              Taxa mensal = (taxa média da carta de cada administradora + 2% de fundo de reserva) ÷
+              nº de parcelas. A taxa média varia por administradora. Contratação formalizada no
               ambiente oficial da administradora.
             </p>
             <a
