@@ -13,7 +13,7 @@ export interface LeadConsorcio {
   urgencia: string
   melhorHorarioContato?: string
   creditoEstimado?: number
-  origem?: 'diagnostico' | 'simulador' | 'site'
+  origem?: string
   status?: 'novo' | 'em_atendimento' | 'ganho' | 'perdido'
 }
 
@@ -36,6 +36,30 @@ export interface ConsultorItem {
 }
 
 const LEADS_STORAGE_KEY = 'ccg_leads_db_v1'
+const ORIGEM_PARAM_KEY = 'multicotador:origem_parceiro'
+
+/**
+ * Captura ?origem=<slug> na chegada (link da Área do Parceiro de uma landing
+ * do grupo) e mantém durante a visita — a query pode se perder após navegação
+ * interna. Um novo carregamento sem o parâmetro encerra o vínculo da visita.
+ * Regra do grupo: quem define o dono do lead é a origem da landing que o gerou.
+ */
+export function captureOrigemParam(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const origem = new URLSearchParams(window.location.search).get('origem')
+    if (origem) {
+      window.sessionStorage.setItem(ORIGEM_PARAM_KEY, origem)
+      return origem
+    }
+    return window.sessionStorage.getItem(ORIGEM_PARAM_KEY)
+  } catch {
+    return null
+  }
+}
+
+// Captura na entrada do app
+captureOrigemParam()
 
 // Helper para converter registro do PocketBase para a interface da aplicação
 function recordToLead(record: Record<string, any>): LeadConsorcio {
@@ -137,7 +161,7 @@ export const LeadService = {
         urgencia: lead.urgencia || '',
         melhorHorarioContato: lead.melhorHorarioContato || '',
         creditoEstimado: lead.creditoEstimado ?? null,
-        origem: lead.origem || 'diagnostico',
+        origem: captureOrigemParam() || lead.origem || 'diagnostico',
         status: lead.status || 'novo',
       })
       return recordToLead(record)
