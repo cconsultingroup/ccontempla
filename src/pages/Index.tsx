@@ -102,14 +102,41 @@ const TAXAS: Record<string, InfoTaxa> = {
   },
 }
 
+/* Prazos (em meses) por produto. Ao abrir ou trocar de produto, o prazo volta ao máximo. */
 const BENS = [
-  { id: 'moto', label: 'Moto', creditoPadrao: 25000, tipo: 'auto' },
-  { id: 'carro', label: 'Carro', creditoPadrao: 90000, tipo: 'auto' },
-  { id: 'imovel', label: 'Imóvel', creditoPadrao: 350000, tipo: 'imovel' },
-  { id: 'servicos', label: 'Serviços', creditoPadrao: 50000, tipo: 'servicos' },
+  {
+    id: 'moto',
+    label: 'Moto',
+    creditoPadrao: 25000,
+    tipo: 'auto',
+    prazos: [36, 50, 60, 70],
+    prazoPadrao: 70,
+  },
+  {
+    id: 'carro',
+    label: 'Carro',
+    creditoPadrao: 90000,
+    tipo: 'auto',
+    prazos: [36, 50, 60, 70, 80, 90, 100],
+    prazoPadrao: 100,
+  },
+  {
+    id: 'imovel',
+    label: 'Imóvel',
+    creditoPadrao: 350000,
+    tipo: 'imovel',
+    prazos: [200, 220, 240],
+    prazoPadrao: 240,
+  },
+  {
+    id: 'servicos',
+    label: 'Serviços',
+    creditoPadrao: 50000,
+    tipo: 'servicos',
+    prazos: [36, 50, 60, 70, 80, 90, 100],
+    prazoPadrao: 100,
+  },
 ]
-
-const PRAZOS = [24, 36, 48, 60, 72, 84]
 
 const fmtBRL = (v: number) =>
   v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 })
@@ -310,7 +337,7 @@ function Hero() {
 function Comparador() {
   const [bemId, setBemId] = useState('imovel')
   const [credito, setCredito] = useState(300000)
-  const [prazo, setPrazo] = useState(72)
+  const [prazo, setPrazo] = useState(240)
 
   const bem = BENS.find((b) => b.id === bemId) || BENS[2]
 
@@ -461,6 +488,7 @@ function Comparador() {
                     onClick={() => {
                       setBemId(b.id)
                       setCredito(b.creditoPadrao)
+                      setPrazo(b.prazoPadrao)
                     }}
                     className={`rounded-[6px] border px-3 py-2.5 text-xs font-semibold transition-all text-left flex items-center justify-between cursor-pointer ${
                       bemId === b.id
@@ -507,7 +535,7 @@ function Comparador() {
                 3. Prazo Desejado
               </Label>
               <div className="mt-3 flex flex-wrap gap-1.5">
-                {PRAZOS.map((p) => (
+                {bem.prazos.map((p) => (
                   <button
                     key={p}
                     onClick={() => setPrazo(p)}
