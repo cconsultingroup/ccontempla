@@ -615,7 +615,7 @@ function Comparador() {
                       </div>
                       <div className="text-right shrink-0">
                         <span className="text-[11px] font-semibold text-[#8a96a6] block uppercase tracking-wider">
-                          Taxa de Juros Mensal
+                          Taxa Administrativa
                         </span>
                         <span className="font-display font-bold text-lg text-[#1d2f50]">
                           {carta.taxaMensal.toFixed(2).replace('.', ',')}%
